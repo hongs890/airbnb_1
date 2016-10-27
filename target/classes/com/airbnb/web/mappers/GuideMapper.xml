@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airbnb.web.mappers.GuideMapper">
+<select id="gcount" statementType="CALLABLE" resultType="com.airbnb.web.domains.Retval" >   
+   call gcount()
+</select> 
+<select id="glist" resultType="com.airbnb.web.domains.GuideDTO" parameterType="hashmap" statementType="CALLABLE" >	
+		call glist()
+</select>
+<insert id="g_insert" parameterType="com.airbnb.web.domains.GuideDTO">
+call insert_guide(#{place},#{Major_Category},#{email},#{Guide_seq},#{Minor_Category},#{Host_Comment});
+</insert>
+</mapper>

@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airbnb.web.mappers.HostingMapper">
+<insert id="regist_houses" parameterType="com.airbnb.web.domains.HostingDTO">
+	insert into houses (room_type, guest_cnt, bed_cnt, bathroom_cnt, picture, explaination, title, other_rule, checkin_term, checkin_time, min_nights, max_nights, price, reg_date, rules, convenience, safety_fac, space, email, building_seq) 
+values (#{room_type}, #{guest_cnt}, #{bed_cnt}, #{bathroom_cnt}, #{picture}, #{explaination}, #{title}, #{other_rule}, #{checkin_term}, #{checkin_time}, #{min_nights}, #{max_nights}, #{price}, #{reg_date}, #{rules}, #{convenience}, #{safety_fac}, #{space}, #{email}, #{building_seq})
+</insert>
+<insert id="regist_address" parameterType="com.airbnb.web.domains.HostingDTO">
+	insert into address (country, state, city, street, optional, zip_code, latitude, longitude, house_seq)
+values (#{country}, #{state}, #{city}, #{street}, #{optional}, #{zip_code}, #{latitude}, #{longitude}, #{house_seq})
+</insert>
+<select id="building_list" resultType="string">
+	SELECT TYPE FROM BUILDING
+</select>
+<select id="house_seq" parameterType="com.airbnb.web.domains.Command" resultType="int">
+	select max(house_seq) from houses where email = #{keyword}
+</select>
+</mapper>

@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airbnb.web.mappers.AdminMapper">
+
+	<select id="mcount" statementType="CALLABLE"
+		resultType="com.airbnb.web.domains.Retval">
+		<!-- select count(*) as count from member -->
+		call mcount()
+	</select>
+	<select id="hcount" resultType="com.airbnb.web.domains.Retval">
+		call hcount()
+	</select>
+	<select id="rcount" resultType="com.airbnb.web.domains.Retval">
+		call rcount()
+	</select>
+
+	<select id="list" resultType="com.airbnb.web.domains.AdminDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		<!-- select m.email email, m.name name, m.phone phone, m.profileImg profileImg, 
+			m.reg_date regDate from member m order by reg_date desc; -->
+		<!-- procedure mlist -->
+		call mlist()
+	</select>
+	<select id="hlist" resultType="com.airbnb.web.domains.HostingDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		call hlist()
+	</select>
+	<select id="rlist" resultType="com.airbnb.web.domains.BookingDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		call rlist()
+	</select> 
+	<select id="mchart" resultType="com.airbnb.web.domains.MchartDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		<!-- SELECT DATE_FORMAT(reg_date,'%2016-%m') mchart_month, COUNT(*) mchart_count
+		from   member
+		GROUP BY mchart_month -->
+		call mchart()
+	</select>
+	<select id="hchart" resultType="com.airbnb.web.domains.HchartDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		
+		call hchart()
+	</select>
+	<select id="rchart" resultType="com.airbnb.web.domains.RchartDTO"
+		parameterType="hashmap" statementType="CALLABLE">
+		
+		call rchart()
+	</select>
+
+	<select id="find" parameterType="com.airbnb.web.domains.Command"
+		resultType="com.airbnb.web.domains.AdminDTO">
+		select t2.* from(
+		select rownum seq,t.* from (
+		select
+		m.mem_id id,
+		m.name name,
+		m.gender gender,
+		m.reg_date regDate,
+		m.ssn ssn,
+		m.email email,
+		m.profile_img profileImg,
+		m.role role,
+		m.phone phone,
+		m.major_seq majorSeq
+		from Member m where role='STUDENT' and ${keyField}=#{keyword} order by
+		reg_date desc) t)t2
+		where t2.seq between #{start} and #{end}
+		order by t2.seq asc
+	</select>
+	<select id="findByName" parameterType="string"
+		resultType="com.airbnb.web.domains.AdminDTO">
+		select * from member where name = #{name}
+	</select>
+
+	<select id="existId" parameterType="com.airbnb.web.domains.AdminDTO"
+		resultType="int">
+		select count(*) as count from member where mem_id = #{id}
+	</select>
+
+	<insert id="insert" parameterType="com.airbnb.web.domains.AdminDTO">
+		insert into member(mem_id,pw,name,ssn,email,phone)
+		values(#{id},#{pw},#{name},#{ssn},#{email},#{phone})
+	</insert>
+
+	<update id="update" parameterType="com.airbnb.web.domains.AdminDTO">
+		update member set pw = #{pw}, email = #{email} where mem_id = #{id}
+	</update>
+
+	<delete id="delete" parameterType="com.airbnb.web.domains.AdminDTO"></delete>
+
+</mapper>

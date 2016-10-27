@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+  <!-- 페이지 템플릿(레이아웃)과 템플릿을 구성하는 각 부분을 모두 이름을 붙여 선언한다 -->
+    <definition name="public" template="/WEB-INF/views/layouts/public.jsp">
+      	<put-attribute name="title" value="에어비앤비 (Airbnb) – 어디서나 우리집처럼 편안하게"></put-attribute>
+        <put-attribute name="header" value="/WEB-INF/views/public/header.jsp" />
+         <put-attribute name="nav" value=""/>
+        <put-attribute name="body" value=""></put-attribute>
+        <put-attribute name="footer" value="/WEB-INF/views/public/footer.jsp" />
+    </definition>
+   	<definition name="member" template="/WEB-INF/views/layouts/member.jsp">
+      	<put-attribute name="title" value="에어비앤비 (Airbnb) – 어디서나 우리집처럼 편안하게"></put-attribute>
+        <put-attribute name="header" value="/WEB-INF/views/public/header.jsp" />
+        <put-attribute name="nav" value="/WEB-INF/views/member/nav.jsp"/>
+        <put-attribute name="body" value=""></put-attribute>
+        <put-attribute name="footer" value="/WEB-INF/views/public/footer.jsp" />
+    </definition>
+     <definition name="admin" template="/WEB-INF/views/layouts/admin.jsp">
+      	<put-attribute name="title" value="에어비앤비 (Airbnb) – 어디서나 우리집처럼 편안하게"></put-attribute>
+        <put-attribute name="header" value="/WEB-INF/views/admin/header.jsp" />
+        <put-attribute name="nav" value="/WEB-INF/views/admin/nav.jsp" />
+        <put-attribute name="body" value=""></put-attribute>
+        <put-attribute name="footer" value="/WEB-INF/views/admin/footer.jsp" />
+    </definition>
+    <definition name="public:*/*.tiles" extends="public">
+    	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition>
+      <definition name="member:*/*.tiles" extends="member">
+    	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition>
+   <!--    <definition name="public:*/*.tiles" extends="member">
+    	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition> -->
+    <definition name="admin:*/*.tiles" extends="admin">
+    	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition>
+    <!--  노타일즈  -->
+    <definition name="noTiles" template="/WEB-INF/views/layouts/noTemplate.jsp">
+    	<put-attribute name="noTemplate" value="" />
+    </definition>
+    <definition name="*.jsp" extends="noTiles">
+    	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}.jsp" />
+    </definition>
+    <definition name="*/*.jsp" extends="noTiles">
+    	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}.jsp" />
+    </definition>
+    <definition name="*/*/*.jsp" extends="noTiles">
+    	<put-attribute name="noTemplate" value="/WEB-INF/views/{1}/{2}/{3}.jsp" />
+    </definition>
+</tiles-definitions>

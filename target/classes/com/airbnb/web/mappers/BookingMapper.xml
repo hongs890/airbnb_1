@@ -1,0 +1,261 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.airbnb.web.mappers.BookingMapper">
+	<resultMap type="com.airbnb.web.domains.HouseDTO" id="houseMap">
+		<id property="houseSeq" column="house_seq"/>
+		<result property="roomType" column="room_type"/>
+		<result property="guestCnt" column="guest_cnt"/>
+		<result property="bedCnt" column="bed_cnt"/>
+		<result property="bathroomCnt" column="bathroom_cnt"/>
+		<result property="picture" column="picture"/>
+		<result property="explaination" column="explaination"/>
+		<result property="title" column="title"/>
+		<result property="otherRule" column="other_rule"/>
+		<result property="checkinTerm" column="checkin_term"/>
+		<result property="checkinTime" column="checkinTime"/>
+		<result property="period" column="period"/>
+		<result property="minNights" column="min_nights"/>
+		<result property="maxNights" column="max_nights"/>
+		<result property="price" column="price"/>
+		<result property="regDate" column="reg_date"/>
+		<result property="rules" column="rules"/>
+		<result property="convenience" column="convenience"/>
+		<result property="safetyFac" column="safety_fac"/>
+		<result property="space" column="space"/>
+		<result property="email" column="email"/>
+		<result property="type" column="type"/>
+		<result property="country" column="country"/>
+		<result property="state" column="state"/>
+		<result property="city" column="city"/>
+		<result property="street" column="street"/>
+		<result property="optional" column="optional"/>
+		<result property="zipCode" column="zip_code"/>
+		<result property="latitude" column="latitude"/>
+		<result property="longitude" column="longitude"/>	
+	</resultMap>
+
+	<select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal">
+		SELECT count(*) as count
+		FROM houses_view 
+		WHERE country = #{country}
+		<if test="state != 'NONE'">
+		 	AND state IN
+		 	<foreach collection="stateList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<if test="city != 'NONE'">
+		 	AND city IN
+			<foreach collection="cityList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<if test="street != 'NONE'">
+			AND street IN
+		 	<foreach collection="streetList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<![CDATA[ 
+		AND DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL checkin_term DAY), '%Y/%m/%d') <= STR_TO_DATE(#{checkin}, '%Y/%m/%d')
+		AND house_seq not in (SELECT house_seq FROM block WHERE block_date between STR_TO_DATE(#{checkin}, '%Y/%m/%d') AND STR_TO_DATE(#{checkout}, '%Y/%m/%d'))
+		AND house_seq not in (SELECT house_seq FROM reservation WHERE STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') BETWEEN checkin_date AND checkout_date 
+		OR STR_TO_DATE(#{checkout}, '%Y/%m/%d %h:%i:%s') BETWEEN checkin_date AND checkout_date
+		OR (STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') < checkin_date AND  STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') > checkout_date))
+		AND min_nights <= #{nights} and max_nights >= #{nights}
+		AND guest_cnt >= #{guestCnt}
+		]]>
+		
+		<choose>
+			<when test="roomType%2==1">
+				AND (room_type = '집전체'
+				<if test="roomType == 3 || roomType == 7">
+				OR room_type = '개인실'
+				</if>
+				<if test="roomType > 4">
+				OR room_type = '다인실'
+				</if>
+				)
+			</when>
+			<otherwise>
+				<if test="roomType==2">
+				AND room_type ='개인실'
+				</if>
+				<if test="roomType==4">
+				AND room_type ='다인실'
+				</if>
+				<if test="roomType==6">
+				AND (room_type ='개인실' OR room_type ='다인실')
+				</if>
+			</otherwise>
+		</choose>
+
+		<if test="minPrice != 0 and maxPrice !=0">
+			<![CDATA[ 
+			AND price*#{nights} BETWEEN #{minPrice} AND #{maxPrice}
+			]]>
+		</if>
+		<if test="minPrice == 0 and maxPrice !=0">
+			<![CDATA[ 
+			AND price*#{nights} <= #{maxPrice}
+			]]>
+		</if>
+		<if test="minPrice != 0 and maxPrice ==0">
+			<![CDATA[ 
+			AND price*#{nights} >= #{minPrice}
+			]]>
+		</if>
+		
+		<if test="bedCnt > 0">
+			AND bed_cnt = #{bedCnt}
+		</if>
+		<if test="bathroomCnt > 0">
+			AND bathroom_cnt = #{bathroomCnt}
+		</if>	
+		<if test="convenience != null">
+			AND convenience like #{convenience}
+		</if>
+		<if test="safetyFac != null">
+			AND safety_fac like #{safetyFac}
+		</if>
+		
+		
+		
+	</select>
+	
+	<select id="findLoc" resultType="String" parameterType="com.airbnb.web.domains.SearchVal">
+		<choose>
+			<when test="addrDepth == 1">
+				SELECT DISTINCT state FROM address WHERE country = #{country}
+			</when>
+			<when test="addrDepth == 2">
+				SELECT DISTINCT city FROM address 
+				WHERE state IN
+				<foreach collection="stateList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 		</foreach>
+ 			</when>
+			<when test="addrDepth == 3">
+				SELECT DISTINCT street FROM address 
+				WHERE city IN
+				<foreach collection="cityList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+			</when>
+			<otherwise>
+				SELECT DISTINCT street FROM address 
+				WHERE street IN
+				<foreach collection="streetList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 		</foreach>
+			</otherwise>
+		</choose>
+	</select>
+	
+ 	<select id="find" resultMap="houseMap" parameterType="com.airbnb.web.domains.SearchVal">
+		
+		SELECT @RNUM := @RNUM +1 AS ROWNUM,h.* FROM (
+		
+		SELECT house_seq,room_type,guest_cnt,bed_cnt,bathroom_cnt,picture,explaination,title,other_rule,checkin_term,checkin_time,period,min_nights,max_nights,
+    	       price*${nights} as price,reg_date,rules,convenience,safety_fac,space,email,type,country,state,city,street,optional,zip_code,latitude,longitude
+		FROM houses_view 
+		WHERE country = #{country}
+		<if test="state != 'NONE'">
+		 	AND state IN
+		 	<foreach collection="stateList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<if test="city != 'NONE'">
+		 	AND city IN
+			<foreach collection="cityList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<if test="street != 'NONE'">
+			AND street IN
+		 	<foreach collection="streetList" index="index" item="item" open="(" separator="," close=")">
+		 		#{item}
+		 	</foreach>
+		</if>
+		<![CDATA[ 
+		AND DATE_FORMAT(DATE_ADD(CURDATE(),INTERVAL checkin_term DAY), '%Y/%m/%d') <= STR_TO_DATE(#{checkin}, '%Y/%m/%d')
+		AND house_seq not in (SELECT house_seq FROM block WHERE block_date between STR_TO_DATE(#{checkin}, '%Y/%m/%d') AND STR_TO_DATE(#{checkout}, '%Y/%m/%d'))
+		AND house_seq not in (SELECT house_seq FROM reservation WHERE STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') BETWEEN checkin_date AND checkout_date 
+		OR STR_TO_DATE(#{checkout}, '%Y/%m/%d %h:%i:%s') BETWEEN checkin_date AND checkout_date
+		OR (STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') < checkin_date AND  STR_TO_DATE(#{checkin}, '%Y/%m/%d %h:%i:%s') > checkout_date))
+		AND min_nights <= #{nights} and max_nights >= #{nights}
+		AND guest_cnt >= #{guestCnt}
+		]]>
+		
+		<choose>
+			<when test="roomType%2==1">
+				AND (room_type = '집전체'
+				<if test="roomType == 3 || roomType == 7">
+				OR room_type = '개인실'
+				</if>
+				<if test="roomType > 4">
+				OR room_type = '다인실'
+				</if>
+				)
+			</when>
+			<otherwise>
+				<if test="roomType==2">
+				AND room_type ='개인실'
+				</if>
+				<if test="roomType==4">
+				AND room_type ='다인실'
+				</if>
+				<if test="roomType==6">
+				AND (room_type ='개인실' OR room_type ='다인실')
+				</if>
+			</otherwise>
+		</choose>
+
+		<if test="minPrice != 0 and maxPrice !=0">
+			<![CDATA[ 
+			AND price*#{nights} BETWEEN #{minPrice} AND #{maxPrice}
+			]]>
+		</if>
+		<if test="minPrice == 0 and maxPrice !=0">
+			<![CDATA[ 
+			AND price*#{nights} <= #{maxPrice}
+			]]>
+		</if>
+		<if test="minPrice != 0 and maxPrice ==0">
+			<![CDATA[ 
+			AND price*#{nights} >= #{minPrice}
+			]]>
+		</if>
+		
+		<if test="bedCnt > 0">
+			AND bed_cnt = #{bedCnt}
+		</if>
+		<if test="bathroomCnt > 0">
+			AND bathroom_cnt = #{bathroomCnt}
+		</if>	
+		<if test="convenience != null">
+			AND convenience like #{convenience}
+		</if>
+		<if test="safetyFac != null">
+			AND safety_fac like #{safetyFac}
+		</if>
+		) h, (SELECT @RNUM :=0 )R LIMIT #{start},#{end};
+	</select> 
+	
+	
+	<!-- Sangho  -->
+	<select id="resvList" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.BookingDTO">
+   SELECT * FROM resv_view WHERE ${keyField} = #{keyword}
+   </select>
+   <select id="findOne" parameterType="com.airbnb.web.domains.Command" resultMap="houseMap">
+   SELECT * FROM houses_view WHERE ${keyField} = #{keyword}
+   </select>
+   <insert id="payInsert" parameterType="com.airbnb.web.domains.BookingDTO">
+   INSERT INTO payment(card_num,price,payment_date,resv_seq) VALUES(#{cardNum},#{price},CURDATE(),#{resvSeq})
+    </insert>
+    <select id="resvCount" resultType="com.airbnb.web.domains.Command">
+   SELECT count(*) as count FROM resv_view WHERE ${keyField} = #{keyword}
+    </select>
+	
+</mapper>

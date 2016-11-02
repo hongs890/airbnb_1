@@ -7,13 +7,15 @@ select * from building;
 select * from houses;
 select * from Guide_Major;
 select * from Guide_minor;
- select * from information_schema.referential_constraints
+ select * from information_schema.primary constraints;
 where constraint_schema = 'review'
 SELECT * FROM information_schema.REFERENTIAL_CONSTRAINTS
 where constraint_schema = 'member'
+delete from member where name = '1';
+
+
 -- houses
 DROP TABLE IF EXISTS houses RESTRICT;
-
 -- address
 DROP TABLE IF EXISTS address RESTRICT;
 

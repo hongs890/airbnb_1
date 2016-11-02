@@ -48,14 +48,10 @@ public class BookingServiceImpl implements BookingService{
 
 	@Override
 	public List<HouseDTO> list(SearchVal sVal) {
-
-		
-		
 		return sqlSession.getMapper(BookingMapper.class).find(sVal);
 	}
 	@Override
 	public List<String> getLocList(SearchVal sVal) {
-		
 		if(sVal.getState().equals("NONE")){
 			sVal.setAddrDepth(1);
 		}else if(sVal.getCity().equals("NONE")){
@@ -65,7 +61,6 @@ public class BookingServiceImpl implements BookingService{
 		}else{
 			sVal.setAddrDepth(4);
 		}
-		System.out.println(sVal.getAddrDepth());
 		return sqlSession.getMapper(BookingMapper.class).findLoc(sVal);
 	}
 	@Override
@@ -73,8 +68,6 @@ public class BookingServiceImpl implements BookingService{
 		// TODO Auto-generated method stub
 		return sqlSession.getMapper(BookingMapper.class).listCount(sVal).getCount();
 	}
-
-	
 	// ---------------- SANGHO LINE -------------------- //
 	@Override
 	   public Command resvCount(Command command) {
@@ -89,8 +82,14 @@ public class BookingServiceImpl implements BookingService{
 	      BookingMapper mapper = sqlSession.getMapper(BookingMapper.class);
 	      return mapper.resvList(command);
 	   }
-	 
+
+	/*@Override
+	public Integer listCount(SearchVal sVal) {
 	
+		return sqlSession.getMapper(BookingMapper.class).listCount(sVal);
+	}
+	 
+	*/
 	
 
 

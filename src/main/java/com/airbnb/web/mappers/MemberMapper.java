@@ -13,4 +13,5 @@ public interface MemberMapper {
 	public boolean login(MemberMapper param);
 	public int signup(MemberDTO mem);
 	public List<MemberDTO> find(Command command);
+	public int existId(String email);
 }

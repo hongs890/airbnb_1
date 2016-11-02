@@ -98,19 +98,19 @@ margin-bottom: 2px;}
  <div align="center">
  <div style="padding-top:100px;"><h2 style = "color:brown; font-style: italic;">여행은 살아보는 거야</h2><br></br>
 <h3>191개 이상 국가의 현지 대표 호스트의 집을 예약하고 살아보는 여행을 경험해 보세요.</h3></div><br>
-<img src="${img}/public/room1.jpg" id="b_detail1" alt="Bangkok_room" style="width:25%;height:500px;" class="cursor" >
- <img src="${img}/public/room2.jpg" id="b_detail2" alt="Europe_room" style="width:25%;height:500px;" class="cursor" >
- <img src="${img}/public/room3.jpg" id="b_detail3" alt="Paris_room" style="width:25%;height:500px;" class="cursor" >
+<img src="${img}/public/room1.jpg" id="b_detail1" alt="Bangkok_room" style="width:25%;height:500px;" class="cursor"  onclick="sangho.show_detail(12)">
+ <img src="${img}/public/room2.jpg" id="b_detail2" alt="Europe_room" style="width:25%;height:500px;" class="cursor" onclick="sangho.show_detail(12)">
+ <img src="${img}/public/room3.jpg" id="b_detail3" alt="Paris_room" style="width:25%;height:500px;" class="cursor" onclick="sangho.show_detail(12)" >
  </div><br>
 <div align="center" style="width:100%;height:1200px;">
 <div style="padding-top:100px;">
 <h2 style = "font-style: italic;">두근두근 세계 여행</h2><br></br>
 <h4>세계 곳곳을 누벼 보세요</h4></div><br>
-<img src="${img}/public/sweden.jpg" id="b_main1" alt="Bangkok" style="width:50%;height:400px;margin-bottom:0 auto" class="cursor" >
-<img src="${img}/public/paris.jpg" id="b_main2" alt="Paris" style="width:25%;height:400px;" class="cursor" ><br>
-<img src="${img}/public/osaka.jpg" id="b_main3" alt="Osaka" style="width:25%;height:400px;" class="cursor" > 
-<img src="${img}/public/bangkok.jpg" id="b_main4" alt="Bangkok" style="width:25%;height:400px;" class="cursor" > 
- <img src="${img}/public/london.jpg" id="b_main5" alt="London" style="width:25%;height:400px;" class="cursor" > 
+<img src="${img}/public/sweden.jpg" id="b_main1" alt="Bangkok" style="width:50%;height:400px;margin-bottom:0 auto" class="cursor" onclick="sangho.show_detail(12)" >
+<img src="${img}/public/paris.jpg" id="b_main2" alt="Paris" style="width:25%;height:400px;" class="cursor"  onclick="sangho.show_detail(12)"><br>
+<img src="${img}/public/osaka.jpg" id="b_main3" alt="Osaka" style="width:25%;height:400px;" class="cursor"  onclick="sangho.show_detail(12)"> 
+<img src="${img}/public/bangkok.jpg" id="b_main4" alt="Bangkok" style="width:25%;height:400px;" class="cursor"  onclick="sangho.show_detail(12)"> 
+ <img src="${img}/public/london.jpg" id="b_main5" alt="London" style="width:25%;height:400px;" class="cursor" onclick="sangho.show_detail(12)" > 
 </div>
 <div align="center">
 <div style="padding-bottom: 100px;">
@@ -125,6 +125,7 @@ margin-bottom: 2px;}
  </div>
 	<script type="text/javascript" src="${js}/hyunwoo.js"></script>
 	<script type="text/javascript" >
+	   
 		$('.input-daterange').datepicker({
 		    language: "kr",
 			format: "yyyy/mm/dd",

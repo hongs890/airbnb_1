@@ -23,7 +23,7 @@
 
             /* MORRIS BAR CHART
 			-----------------------------------------*/
-            Morris.Bar({
+           /* Morris.Bar({
                 element: 'morris-bar-chart',
                 data: [{
                     y: '2006',
@@ -59,11 +59,11 @@
                 labels: ['Series A', 'Series B'],
                 hideHover: 'auto',
                 resize: true
-            });
+            });*/
 
             /* MORRIS DONUT CHART
 			----------------------------------------*/
-            Morris.Donut({
+           /* Morris.Donut({
                 element: 'morris-donut-chart',
                 data: [{
                     label: "Download Sales",
@@ -77,11 +77,11 @@
                 }],
                 resize: true
             });
-
+*/
             /* MORRIS AREA CHART
 			----------------------------------------*/
 
-            Morris.Area({
+           /* Morris.Area({
                 element: 'morris-area-chart',
                 data: [{
                     period: '2010 Q1',
@@ -140,11 +140,11 @@
                 pointSize: 2,
                 hideHover: 'auto',
                 resize: true
-            });
+            });*/
 
             /* MORRIS LINE CHART
 			----------------------------------------*/
-            Morris.Line({
+      /*      Morris.Line({
                 element: 'morris-line-chart',
                 data: [{
                     y: '2006',
@@ -180,7 +180,7 @@
                 labels: ['Series A', 'Series B'],
                 hideHover: 'auto',
                 resize: true
-            });
+            });*/
            
      
         },

@@ -118,18 +118,11 @@
         <div class=" panel-body link-reset hover-item no-crawl">
           <a id="m_dashboard" class="hover-item_content">마이페이지</a>
         </div>
-        <aside class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_inbox" class="hover-item_content">메세지함</a>
-        </aside>
-        <aside class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_account" class="hover-item_content">계좌관리</a>
-        </aside>
           <aside  class=" panel-body link-reset hover-item no-crawl">
           <a id="m_logout" class="hover-item_content">로그아웃</a>
            </aside>
         </div>
    </div>
-       
 			<div id="js-header-help-menu">
 			<div class="comp pull-right help-trigger-wrapper no-border background-light-gray" >
 			<div  class="hdr-btn js-help-toggle link-reset needsclick">도움말<i class="header-icon icon-lifesaver-alt-gray"></i>
@@ -142,11 +135,11 @@
 				<div class="panel  drop-down-menu avatar-tooltip--new">
     <div class="panel-header no-border hide-lg">
     </div>
-        <div id="m_edit" class=" panel-body link-reset hover-item no-crawl" >
+        <div class=" panel-body link-reset hover-item no-crawl" >
           <a class="hover-item_content"  id="hosting_regist_1">호스팅 등록</a>
         </div>
         <div class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_dashboard" class="hosting_main">호스팅 관리</a>
+          <a id="hosting_manage_1" class="hover-item_content">호스팅 관리</a>
         </div>
         <aside class=" panel-body link-reset hover-item no-crawl">
           <a id="m_inbox" class="hover-item_content">임시3</a>

@@ -91,7 +91,7 @@
       </ul>
       <div class="space-top-2 text-muted">
         &copy; Airbnb, Inc.
-       <input type="hidden" id="hosting_room_type_foot">
+        <input type="hidden" id="hosting_room_type_foot">
         <input type="hidden" id="hosting_guest_cnt_foot">
         <input type="hidden" id="hosting_building_seq_foot">
         <input type="hidden" id="hosting_bed_cnt_foot">
@@ -117,6 +117,8 @@
         <input type="hidden" id="hosting_zip_code_foot">
         <input type="hidden" id="hosting_latitude_foot">
         <input type="hidden" id="hosting_longitude_foot">
+        <input type="hidden" id="manage_house_seq_foot">
+        <input type="hidden" id="hosting_autocomplete_foot">
       </div>
     </div>
 </div>

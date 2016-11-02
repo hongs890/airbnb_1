@@ -78,4 +78,11 @@ public class MemberServiceImpl implements MemberService{
 		}
 	}
 
+	@Override
+	public int existId(String email) {
+		logger.info("MemberService exist ID = {}",email);
+		MemberMapper mapper = sqlSession.getMapper(MemberMapper.class);
+		return mapper.existId(email);
+	}
+
 }

@@ -4,15 +4,14 @@
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.airbnb.web.mappers.AdminMapper">
 
-	<select id="mcount" statementType="CALLABLE"
-		resultType="com.airbnb.web.domains.Retval">
+	<select id="mcount" statementType="CALLABLE"	resultType="com.airbnb.web.domains.Retval">
 		<!-- select count(*) as count from member -->
 		call mcount()
 	</select>
-	<select id="hcount" resultType="com.airbnb.web.domains.Retval">
+	<select id="hcount" resultType="com.airbnb.web.domains.Retval" statementType="CALLABLE">
 		call hcount()
 	</select>
-	<select id="rcount" resultType="com.airbnb.web.domains.Retval">
+	<select id="rcount" resultType="com.airbnb.web.domains.Retval" statementType="CALLABLE">
 		call rcount()
 	</select>
 

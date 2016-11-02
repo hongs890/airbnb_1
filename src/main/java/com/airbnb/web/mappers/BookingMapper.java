@@ -18,6 +18,8 @@ public interface BookingMapper {
 	public List<HouseDTO> find(SearchVal sVal);
 	public List<String> findLoc(SearchVal sVal);
 	public SearchVal listCount(SearchVal sVal);
+	/*public Integer listCount(SearchVal sVal);*/
+	
 // sangho
 	
 	public HouseDTO findOne(Command command);

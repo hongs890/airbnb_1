@@ -127,16 +127,17 @@ public class MemberController {
 	         return user;
 	      }
 	   } */
-	   @RequestMapping("/check_dup/{id}")
-	   public @ResponseBody Retval checkDup(@PathVariable String id) {
-	      logger.info("checkDup {}","id");
-	      if (service.existId(id)==1) {
+	   @RequestMapping(value="/check_dup/{email}")
+	   public @ResponseBody Retval checkDup(@PathVariable String email) {
+	      logger.info("checkDup {}","email");
+	      logger.info("checkDup {}",email);
+	      if (service.existId(email)==1) {
 	    	  retval.setMessage("중복된 아이디입니다.");
 	    	  retval.setFlag("TRUE");
 		}else{
 			retval.setFlag("FALSE");
 			retval.setMessage("가입가능합니다.");
-			retval.setTemp(id);
+			retval.setTemp(email);
 		}
 		 logger.info("RETVAL FLAG IS {}",retval.getFlag());
 		 logger.info("RETVAL MSG IS {}",retval.getMessage());

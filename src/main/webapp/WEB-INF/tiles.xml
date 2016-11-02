@@ -13,7 +13,7 @@
       	<put-attribute name="title" value="에어비앤비 (Airbnb) – 어디서나 우리집처럼 편안하게"></put-attribute>
         <put-attribute name="header" value="/WEB-INF/views/admin/header.jsp" />
         <put-attribute name="nav" value="/WEB-INF/views/admin/nav.jsp" />
-        <put-attribute name="body" value=""></put-attribute>
+        <put-attribute name="body" value="/WEB-INF/views/admin/content.jsp"></put-attribute>
         <put-attribute name="footer" value="/WEB-INF/views/admin/footer.jsp" />
     </definition>
     <definition name="public:*/*.tiles" extends="public">

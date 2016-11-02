@@ -145,6 +145,5 @@
 <script src="${js}/seungjun.js"></script>
 <script>	
 app.init('${pageContext.request.contextPath}');
-
 </script>
 </html>

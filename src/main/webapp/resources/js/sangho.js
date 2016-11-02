@@ -7,185 +7,635 @@ var sangho = (function() {
 	}
 	var onCreate = function() {
 		setContentView();
+		// 예약가능 리스트에서 리스트를 클릭하면 디테일로 향하는 버튼 //
+		$('#pub_article').on('click','a[name=detail_go]',function(e){
+			var house_seq = $(this).children('input').prop('value');
+			sangho.show_detail(house_seq);
+		});
 		// 디테일 에서 예약 요청 버튼(결제 화면 이동 버튼) //
-		$('#pub_article').on('click','a[name=detail_go]',function(){
-			booking.show_detail($(this).children('input').prop('value'))
-			$('#pub_article').html(DETAIL_FORM);
-			$('button[name=paying_go]').click(function(e) {
-				e.preventDefault();
-				var detail = {
-					'checkin' : $('#checkin_date').val(),
-					'checkout' : $('#checkout_date').val(),
-					'guestCnt' : $('#guest_cnt option:selected').val(),
-					'houseSeq' : $(this).children('input').prop('value')
+		$('#pub_article').on('click','button[name=paying_go]',function(e) {
+			e.preventDefault();
+			var detail = {
+				'checkin' : $('#checkin_date').val(),
+				'checkout' : $('#checkout_date').val(),
+				'guestCnt' : $('#guest_cnt option:selected').val(),
+				'houseSeq' : $(this).children('input').prop('value')
+			}
+			$.ajax({
+				url : app.context()+'/booking/GoPay',
+				type : 'POST',
+				data : JSON.stringify(detail),
+				dataType : 'json',
+				contentType : 'application/json',
+				async : false,
+				success : function(data) {
+					if (data.houseSeq != 0) {
+						alert('결제화면으로 이동');
+						$('#pub_article').html(PAYING_FORM);
+					}
+				},	
+				error : function(x,s,m) {
+					alert('결제화면으로 이동 중 에러 발생 : '+m);
 				}
+			});
+			/// 카드번호 정규식 ///
+			$('#card_number').keyup(function(e) {
+				if((e.which >=48 && e.which <= 57) || (e.which >=96 && e.which <= 105) || e.which==189 || e.which==8 || e.which==109){
+					var cardNum = $(this).val();
+					if(cardNum.length > 18){
+						if(card_util.card_num_checker($(this).val())){
+							$('#card_error').html('<font color="black">올바른 카드 번호</font>');
+							// 나중에 flag 만들어서 모두 참일 때만 다음버튼 활성화 해야 함. 여기가 1번
+							$('#bt_agrees').prop('disabled',false);
+							$('#paying_complete').toggle('disabled');
+						}else{
+							$('#card_error').html('<font color="black">잘못된 카드 번호 입니다</font>');
+							$(this).focus();
+						}	
+					}	
+				}else{
+					$(this).prop('value',$(this).prop('value').substring(0,$(this).prop('value').length-1));
+				}	
+			})
+	/*		
+			function agreeCheck(frm)
+			{
+				if (frm.bt_paying.disabled==true)
+					frm.bt_paying.disabled=false
+					else
+					frm.bt_paying.disabled=true
+			}
+			
+			$('#pub_artcle').on('click','#bt_agrees', function agreeCheck(frm) {
+				frm.preventDefault();
+				
+			});*/
+			///////////////////////////////////////
+			$('#pub_article').on('click','#bt_agrees', function() {
+				$('#paying_complete').toggle('disabled');
+				
+				/*if($('#paying_complete').prop('disabled')==false){
+					$('#paying_complete').prop('disabled',true);
+				}else{
+					$('#paying_complete').prop('disabled',false);					
+				}	*/
+			})
+			/// 결제화면 에서 결제버튼 ///
+			$('#paying_complete').click(function(e) {
+				e.preventDefault();
+				var pay_data = {
+					'cardNum' : $('#card_number').val()
+					/*'paymentSeq' : $(#'').val(),
+					'price' : $(#'').val(),
+					'paymentDate' : $(#'').val(),
+					'resvSeq' : $(#'').val()*/
+						}
 				$.ajax({
-					url : app.context()+'/booking/GoPay',
+					url : app.context()+'/booking/payment',
 					type : 'POST',
-					data : JSON.stringify(detail),
+					data : JSON.stringify(pay_data),
 					dataType : 'json',
 					contentType : 'application/json',
 					async : false,
 					success : function(data) {
-						if (data.houseSeq != 0) {
-							alert('결제화면으로 이동');
-							$('#pub_article').html(PAYING_FORM);
+						if (data.message === 'ok') {
+							alert('결제완료!');
+							$('#pub_article').html(CANCEL_FORM);
 						}
 					},	
 					error : function(x,s,m) {
-						alert('결제화면으로 이동 중 에러 발생 : '+m);
+						alert('결제 중 에러 발생 : '+m);
 					}	
 				});
-				/// 카드번호 정규식 ///
-				$('#card_number').keyup(function(e) {
-					if((e.which >=48 && e.which <= 57) || (e.which >=96 && e.which <= 105) || e.which==189 || e.which==8 || e.which==109){
-						var cardNum = $(this).val();
-						if(cardNum.length > 18){
-							if(card_util.card_num_checker($(this).val())){
-								$('#card_error').html('<font color="black">올바른 카드 번호</font>');
-								// 나중에 flag 만들어서 모두 참일 때만 다음버튼 활성화 해야 함. 여기가 1번
-								$('#bt_agrees').prop('disabled',false);
-								$('#paying_complete').toggle('disabled');
-							}else{
-								$('#card_error').html('<font color="black">잘못된 카드 번호 입니다</font>');
-								$(this).focus();
-							}	
-						}	
-					}else{
-						$(this).prop('value',$(this).prop('value').substring(0,$(this).prop('value').length-1));
-					}	
-				})
-		/*		
-				function agreeCheck(frm)
-				{
-					if (frm.bt_paying.disabled==true)
-						frm.bt_paying.disabled=false
-						else
-						frm.bt_paying.disabled=true
-				}
-				
-				$('#pub_artcle').on('click','#bt_agrees', function agreeCheck(frm) {
-					frm.preventDefault();
-					
-				});*/
-				///////////////////////////////////////
-				$('#pub_article').on('click','#bt_agrees', function() {
-					$('#paying_complete').toggle('disabled');
-					
-					/*if($('#paying_complete').prop('disabled')==false){
-						$('#paying_complete').prop('disabled',true);
-					}else{
-						$('#paying_complete').prop('disabled',false);					
-					}	*/
-				})
-				/// 결제화면 에서 결제버튼 ///
-				$('#paying_complete').click(function(e) {
-					e.preventDefault();
-					var pay_data = {
-						'cardNum' : $('#card_number').val()
-						/*'paymentSeq' : $(#'').val(),
-						'price' : $(#'').val(),
-						'paymentDate' : $(#'').val(),
-						'resvSeq' : $(#'').val()*/
-							}
-					$.ajax({
-						url : app.context()+'/booking/payment',
-						type : 'POST',
-						data : JSON.stringify(pay_data),
-						dataType : 'json',
-						contentType : 'application/json',
-						async : false,
-						success : function(data) {
-							if (data.message === 'ok') {
-								alert('결제완료!');
-								$('#pub_article').html(CANCEL_FORM);
-							}
-						},	
-						error : function(x,s,m) {
-							alert('결제 중 에러 발생 : '+m);
-						}	
+			});
+			////////////////////////////////////////
+			
+/*			$.getJSON(app.context()+'/booking/list/'+pgNum,function(data){
+				var frame = '';
+				var startPg = data.startPg;
+				var lastPg = data.lastPg;
+				var pgSize = data.pgSize;
+				var totPg = data.totPg;
+				var groupSize = data.groupSize;
+				console.log('스타트페이지'+startPg);
+				console.log('라스트페이지'+lastPg);
+				console.log('페이지사이즈'+pgSize);
+				console.log('토탈페이지'+totPg);
+				console.log('그룹사이즈'+groupSize);
+				var booking_list =  
+					'<div id="cancel_form" class="formbox2">'
+					+'<h2>예약취소</h2>'
+					+'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.</p>'
+					+'<table class="table table-striped">'
+					+'<caption><h4 style="text-align:center">예약정보</h4></caption>'
+					+'<thead>'
+					+'<tr>'
+					+'<th scope="col">예약신청일</th>'
+					+'<th scope="col">이용기간</th>'
+					+'<th scope="col">예약장소</th>'
+					+'<th scope="col">취소</th>'
+					+'</tr>'
+					+'</thead>'
+					+'<tbody>'
+					+'</tbody>'
+					+'</table>';
+				if(data.count == 0){
+					booking_list+='<td colspan="10"><center>신청하신 내역이 없습니다.</center></td>';
+				}else{
+					$.each(data.list, function(i, booking) {
+						booking_list+=
+							+'<tr>'
+							+'<th scope="col">'+booking.paymentDate+'</th>'
+							+'<th scope="col">'+booking.checkinDate+'</th>~<th scope="col">'+booking.checkoutDate+'</th>'
+							+'<th scope="col">'+house.state+'</th>'
+							+'<th scope="col"><a class="regist" id=resv_cancel>취소</a>'
+							+'</tr>';
 					});
-				});
-				////////////////////////////////////////
-				
-	/*			$.getJSON(app.context()+'/booking/list/'+pgNum,function(data){
-					var frame = '';
-					var startPg = data.startPg;
-					var lastPg = data.lastPg;
-					var pgSize = data.pgSize;
-					var totPg = data.totPg;
-					var groupSize = data.groupSize;
-					console.log('스타트페이지'+startPg);
-					console.log('라스트페이지'+lastPg);
-					console.log('페이지사이즈'+pgSize);
-					console.log('토탈페이지'+totPg);
-					console.log('그룹사이즈'+groupSize);
-					var booking_list =  
-						'<div id="cancel_form" class="formbox2">'
-						+'<h2>예약취소</h2>'
-						+'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.</p>'
-						+'<table class="table table-striped">'
-						+'<caption><h4 style="text-align:center">예약정보</h4></caption>'
-						+'<thead>'
-						+'<tr>'
-						+'<th scope="col">예약신청일</th>'
-						+'<th scope="col">이용기간</th>'
-						+'<th scope="col">예약장소</th>'
-						+'<th scope="col">취소</th>'
-						+'</tr>'
-						+'</thead>'
-						+'<tbody>'
-						+'</tbody>'
-						+'</table>';
-					if(data.count == 0){
-						booking_list+='<td colspan="10"><center>신청하신 내역이 없습니다.</center></td>';
-					}else{
-						$.each(data.list, function(i, booking) {
-							booking_list+=
-								+'<tr>'
-								+'<th scope="col">'+booking.paymentDate+'</th>'
-								+'<th scope="col">'+booking.checkinDate+'</th>~<th scope="col">'+booking.checkoutDate+'</th>'
-								+'<th scope="col">'+house.state+'</th>'
-								+'<th scope="col"><a class="regist" id=resv_cancel>취소</a>'
-								+'</tr>';
-						});
+				}
+				booking_list += '</tbody></table>'
+					var pagination='<nav aria-label="Page navigation" align="center"><ul class="pagination">';
+					if((startPg-lastPg) > 0){
+						pagination += 
+							+'<li>'
+							+'<a href="'+app.context()+'/booking/list/'+(startPg-lastPg)+'" aria-label="Previous">'
+							+'<span aria-hidden="true">&laquo;</span>'
+							+'</a>'
+							+'</li>';
 					}
-					booking_list += '</tbody></table>'
-						var pagination='<nav aria-label="Page navigation" align="center"><ul class="pagination">';
-						if((startPg-lastPg) > 0){
-							pagination += 
-								+'<li>'
-								+'<a href="'+app.context()+'/booking/list/'+(startPg-lastPg)+'" aria-label="Previous">'
-								+'<span aria-hidden="true">&laquo;</span>'
-								+'</a>'
-								+'</li>';
+					for(var i=startPg; i<=lastPg; i++){
+						if(i==pgNum){
+							pagination +='<font color="red">'+i+'</font>';
+						}else{
+							pagination += '<a href="#" onclick="booking_list('+i+')">'+i+'</a>';
 						}
-						for(var i=startPg; i<=lastPg; i++){
-							if(i==pgNum){
-								pagination +='<font color="red">'+i+'</font>';
-							}else{
-								pagination += '<a href="#" onclick="booking_list('+i+')">'+i+'</a>';
-							}
-						}
-						if(startPg + pgSize <= totPg){
-							pagination += 
-								+'<li>'
-								+'<a href="'+app.context()+'/booking/list/'+(startPg-pgSize)+'}" aria-label="Next">'
-								+ '<span aria-hidden="true">&laquo;</span>'
-								+'</a>'
-								+'</li>';
-						}
-						pagination += +'</ul></nav>'
-						
-						frame += booking_list;
-						frame += pagination;
-						$('#pub_article').html(frame);
-				});*/
-			})
-		});
+					}
+					if(startPg + pgSize <= totPg){
+						pagination += 
+							+'<li>'
+							+'<a href="'+app.context()+'/booking/list/'+(startPg-pgSize)+'}" aria-label="Next">'
+							+ '<span aria-hidden="true">&laquo;</span>'
+							+'</a>'
+							+'</li>';
+					}
+					pagination += +'</ul></nav>'
+					
+					frame += booking_list;
+					frame += pagination;
+					$('#pub_article').html(frame);
+			});*/
+		})
 	}
 	return {
-		init : init
+		init : init,
+		show_detail : function(house_seq) {
+			
+			$.ajax({
+				url : app.context()+'/booking/detail/'+house_seq,
+				type : 'GET',
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					if (data.houseSeq != 0) {
+						var house = data.house;
+						var DETAIL_FORM = '<div id="room">'
+							+'<link href="https://a1.muscache.com/airbnb/static/packages/common_o2.1-50a45a2f41dab81f98765e60188dc94c.css" media="all" rel="stylesheet" type="text/css" />'
+							+'<link href="https://a0.muscache.com/airbnb/static/packages/common-c797852784aa37fdff8ec44a848e3d10.css" media="all" rel="stylesheet" type="text/css" />'
+							+'<link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />'
+							+'<div id="photos" class="with-photos with-modal"><img alt="img" src="'+app.img()+'/booking/'+house.picture+'" width="100%" height="550px" style="padding-bottom : 5%;"/>'
+							+'</div>'
+							+'<div id="summary" class="panel room-section">'
+							+'<div class="page-container-responsive">'
+							+'<div class="row">'
+							+'<div class="col-lg-8">'
+							+'<div>'
+							+'<div class="summary-component">'
+							+'<div class="space-4 space-top-4">'
+							+'<div class="row">'
+							+'<div class="col-md-3 space-sm-4 text-center space-sm-2">'
+							+'<div class="media-photo-badge"><a class="media-photo media-round"><img alt="사용자 프로필 이미지" class="host-profile-image" height="115" width="115" data-pin-nopin="true" src="/web/resources/img/booking/default.jpg" ></a>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<h1 class="overflow h3 space-1 text-center-sm" id="listing_name">Ocean Front Condo by Owner</h1>'
+							+'<div id="display-address" class="space-2 text-muted text-center-sm"><a href="#neighborhood" class="link-reset">노스 머틀 비치, 사우스캐롤라이나, 미국</a>'
+							+'<span> &nbsp; </span>'
+							+'</div>'
+							+'<div class="row row-condensed text-muted text-center">'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-entire-place icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-group icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-rooms icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-double-bed icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted text-center hide-sm">'
+							+'<a href="#host-profile" class="link-reset text-wrap">Donald</a>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row row-condensed text-muted text-center">'
+							+'<div class="col-sm-3">집 전체</div>'
+							+'<div class="col-sm-3">숙박 인원 3명</div>'
+							+'<div class="col-sm-3">침실 1개</div>'
+							+'<div class="col-sm-3">침대 1개</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							 +'<div class="col-lg-4">'
+							 +'<div class="mobile-bookit-btn-container js-bookit-btn-container panel-btn-sm panel-btn-fixed-sm hide hide-md hide-lg">'
+							+'<button name="paying_go" class="btn btn-primary btn-block btn-large js-book-it-sm-trigger">'
+							+'<span class="book-it__btn-text">예약 요청</span>'
+							 +'<span class="book-it__btn-text--contact-host">호스트에게 연락하기</span>'
+							+'<span class="book-it__btn-text--instant"><i class="icon icon-bolt icon-beach h4"></i>즉시 예약 </span>'
+							 +'</button>'
+							+'</div>'
+							+''
+							+'<div id="tax-descriptions-tip" class="tooltip tooltip-top-middle" role="tooltip" data-sticky="true" data-trigger="#tax-descriptions-tooltip">'
+							+'</div>'
+							+''
+							+''
+							 +'<div>'
+							+'<div class="book-it__container js-book-it-container fixed" style="top: 40px;">'
+							+'<div>'
+							+'<div>'
+							+'<div class="">'
+							+'<div class="book-it__price fixed" style="height: 40px;">'
+							+'<div class="row">'
+							+'<div class="col-sm-8">'
+							+'<div class="book-it__price-amount text-special">'
+							+'<span class="h3"><span>₩74315</span></span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-sm-4">'
+							+'<div class="book-it__payment-period-container pull-right">'
+							+'<div class="book-it__payment-period"><span>1박</span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<form method="post">'
+							+'<div class="panel book-it-panel">'
+							+'<div class="panel-body panel-light">'
+							+'<div class="row row-condensed space-3">'
+							+'<div class="col-md-9">'
+							+'<div class="row row-condensed">'
+							+'<div class="col-sm-6">'
+							+'<label class="book-it__label" for="datespan-checkin">체크인</label>'
+							+'<input id="checkin_date" type="text" name="checkin" class="checkin ui-datepicker-target" placeholder="년/월/일">'
+							+'</div>'
+							+'<div class="col-sm-6">'
+							+'<label class="book-it__label" for="datespan-checkout">체크아웃</label>'
+							+'<input id="checkout_date" type="text" name="checkout" class="checkout ui-datepicker-target" placeholder="년/월/일">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-3">'
+							+'<div>'
+							+'<label for="number_of_guests_21674" class="book-it__label"><span>숙박 인원</span></label>'
+							+'<div class="select select-block">'
+							+'<select id="guest_cnt" name="number_of_guests">'
+							+'<option selected="selected" value="1">1</option>'
+							+'<option value="2">2</option>'
+							+'<option value="3">3</option>'
+							+'</select>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<button class="btn btn-primary btn-large btn-block" name="paying_go">'
+							+'<span>예약 요청</span>'
+							+'</button>'
+							+'<div class="bookit-message__container text-center text-muted">'
+							+'<small><span>"예약" 버튼을 클릭해도 대금이 바로 청구되지 않습니다.</span></small>'
+							+'</div>'
+							+'</div>'
+							+'<div class="hide">'
+							+'<button type="button" class="btn btn-primary btn-large btn-small btn-block">'
+							+'<span>호스트에게 연락하기</span>'
+							+'</button>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</form>'
+							+'</div>'
+							+'</div>'
+							 +'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+''
+							+'<div>'
+							+'<div>'
+							+'<div id="details" class="details-section webkit-render-fix">'
+							+'<div class="page-container-responsive">'
+							+'<div class="row">'
+							+'<div class="col-lg-8 js-details-column">'
+							+'<div class="space-8 space-top-8"><h4 class="space-4 text-center-sm"></h4>'
+							+'<div class="row row-condensed">'
+							+'<div class="contact-host-div col-12">'
+							+'<div>'
+							+'<button class="btn-link btn-link--bold" type="button">'
+							+'<span>호스트에게 연락하기</span>'
+							+'</button>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div><span>숙소</span></div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<div>'
+							+'<span>숙박 가능 인원:</span>'
+							+'<span></span><strong>3</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>욕실:</span>'
+							+'<span> </span><strong>1</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>침실:</span>'
+							+'<span> </span><strong>1</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>침대:</span>'
+							+'<span> </span><strong>1</strong>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-6">'
+							+'<div><span>체크인:</span>'
+							+'<span> </span><strong>15:00 이후</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>체크아웃:</span>'
+							+'<span> </span><strong>10:00</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>집 유형:</span>'
+							+'<span> </span><strong>아파트</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>숙소 유형 :</span>'
+							+'<span> </span><strong>집 전체</strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<strong><a href="#house-rules" class="react-house-rules-trigger" data-prevent-default="true"><span>숙소 이용규칙</span></a></strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row amenities">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>시설</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9 expandable expanded">'
+							+''
+							+'<div class="expandable-content expandable-content-full">'
+							+'<div class="row">'
+							+'<div class="col-sm-6">'
+							+'<div>'
+							+'<div class="space-1">'
+							+'<span><i class="icon h3 icon-meal"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+							+'<span id="amenity-long-tooltip-trigger-8"><strong>부엌</strong></span>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="space-1 text-muted">'
+							+'<span id="amenity-long-tooltip-trigger-40"><del>필수품목</del></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-sm-6">'
+							+'<div>'
+							+'<div class="space-1">'
+							+'<span><i class="icon h3 icon-tv"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+							+'<span id="amenity-long-tooltip-trigger-1"><strong>TV</strong></span>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="space-1 text-muted">'
+							+'<span id="amenity-long-tooltip-trigger-40"><del>필수품목</del></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>가격</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<div>'
+							+'<span>추가 인원 요금 :</span>'
+							+'<span> </span><strong>추가요금 없음</strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row description" id="description">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>설명</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content expandable-content-long">'
+							+'<div>'
+							+'<p><span>Small 14 Unit condo on the Beach in N. Myrtle Beach.</span></p>'
+							+'<p><span>설명</span></p>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row react-house-rules" id="house-rules">'
+							+'<div class="col-md-3">'
+							+'<div class="text-muted">'
+							+'<span>숙소 이용규칙</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="structured_house_rules">'
+							+'<div class="row col-sm-12">'
+							+'<span>체크인은 15:00 이후입니다.</span>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-sm-2">'
+							+'<hr class="structured_house_rules__hr">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content">'
+							+'<div>'
+							+'<p><span>Winter rates: $70.00 per night</span></p>'
+							+'</div>'
+							+'<div class="expandable-indicator"></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>안전 기능</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-sm-6">'
+							+'<div>'
+							+'<div class="space-1">'
+							+'<span id="amenity-short-tooltip-trigger-35"><span>화재 감지기</span></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-sm-6">'
+							+'<div>'
+							+'<div class="space-1">'
+							+'<span id="amenity-short-tooltip-trigger-39"><span>소화기</span></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>예약 가능 여부</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">최소 숙박일 <strong>3일</strong>.</div>'
+							+'<div class="col-md-6">'
+							+'<a id="view-calendar" href="#"><strong><span>달력 보기</span></strong></a>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div></div>'
+							+'<div id="host-profile" class="room-section webkit-render-fix">'
+							+'<div class="page-container-responsive space-top-8 space-8">'
+							+'<div class="row">'
+							+'<div class="col-lg-8">'
+							+'<h4 class="space-2 text-center-sm"><span>호스트</span></h4>'
+							+'<hr class="space-4 space-top-2">'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-center">'
+							+'<div class="media-photo-badge">'
+							+'<a href="#" class="media-photo media-round">'
+							+'<img alt="Donald" class="media-photo media-round" height="90" width="90" data-pin-nopin="true" src="/web/resources/img/booking/default.jpg" title="Donald"></a>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<h3 class="space-1">Donald</h3>'
+							+'<div class="row row-condensed space-2">'
+							+'<div class="col-md-12 text-muted">'
+							+'<span>Freeport, 뉴욕, 미국</span>'
+							+'<span> · </span>'
+							+'<span>회원가입 : 2009년 11월</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content expandable-content-long">'
+							+'<div><p><span>자기소개</span></p></div>'
+							+'<div class="expandable-indicator"></div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<span class="btn btn-primary btn-small"><span>호스트에게 연락하기</span></span>'
+							+'<div><noscript data-reactid=".1exo7crry0w.2.0.0.0.2.1.5.1.0"></noscript></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div id="neighborhood" class="room-section">'
+							+'<div style="position:relative;" class="page-container-responsive">'
+							+'<div class="p3-location--map">'
+							+'<div class="panel location-panel"></div>'
+							+'<ul id="guidebook-recommendations" class="hide">'
+							+'<li class="user-image"><img alt="Donald" data-pin-nopin="true" height="90" src="web/resources/img/booking/default.jpg" title="Donald" width="90"></li>'
+							+'</ul>'
+							+'<div id="hover-card" class="panel">'
+							+'<div class="panel-body">'
+							+'<div class="text-center">숙소 위치</div>'
+							+'<div class="text-center">'
+							+'<span class="listing-location"><span>노스 머틀 비치,</span><span>사우스 캐롤라이나,</span><span>미국</span></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>';
+						
+						
+						$('#pub_article').html(DETAIL_FORM);
+						$("#pub_footer").remove();
+						$('html,body').scrollTop(0);
+					}
+				},
+				error : function(x,s,m) {
+					alert('디테일 화면으로 이동 중 에러 발생 : '+m);
+				}
+			});
+			
+		}
 	}
 })();
 
@@ -202,429 +652,7 @@ var card_util = (function(){
 		}
 	};
 })();
-var DETAIL_FORM = '<div id="room">'
-+'<div id="photos" class="with-photos with-modal"><img alt="img" src="/web/resources/img/booking/default.jpg" width="100%" height="550px" style="padding-bottom : 5%;"/>'
-+'</div>'
-+'<div id="summary" class="panel room-section">'
-+'<div class="page-container-responsive">'
-+'<div class="row">'
-+'<div class="col-lg-8">'
-+'<div>'
-+'<div class="summary-component">'
-+'<div class="space-4 space-top-4">'
-+'<div class="row">'
-+'<div class="col-md-3 space-sm-4 text-center space-sm-2">'
-+'<div class="media-photo-badge"><a class="media-photo media-round"><img alt="사용자 프로필 이미지" class="host-profile-image" height="115" width="115" data-pin-nopin="true" src="/web/resources/img/booking/default.jpg" title="Donald"></a>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<h1 class="overflow h3 space-1 text-center-sm" id="listing_name">Ocean Front Condo by Owner</h1>'
-+'<div id="display-address" class="space-2 text-muted text-center-sm"><a href="#neighborhood" class="link-reset">노스 머틀 비치, 사우스캐롤라이나, 미국</a>'
-+'<span> &nbsp; </span>'
-+'</div>'
-+'<div class="row row-condensed text-muted text-center">'
-+'<div class="col-sm-3">'
-+'<i class="icon icon-entire-place icon-size-2" aria-hidden="true"></i>'
-+'</div>'
-+'<div class="col-sm-3">'
-+'<i class="icon icon-group icon-size-2" aria-hidden="true"></i>'
-+'</div>'
-+'<div class="col-sm-3">'
-+'<i class="icon icon-rooms icon-size-2" aria-hidden="true"></i>'
-+'</div>'
-+'<div class="col-sm-3">'
-+'<i class="icon icon-double-bed icon-size-2" aria-hidden="true"></i>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div class="row">'
-+'<div class="col-md-3 text-muted text-center hide-sm">'
-+'<a href="#host-profile" class="link-reset text-wrap">Donald</a>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="row row-condensed text-muted text-center">'
-+'<div class="col-sm-3">집 전체</div>'
-+'<div class="col-sm-3">숙박 인원 3명</div>'
-+'<div class="col-sm-3">침실 1개</div>'
-+'<div class="col-sm-3">침대 1개</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
- +'<div class="col-lg-4">'
- +'<div class="mobile-bookit-btn-container js-bookit-btn-container panel-btn-sm panel-btn-fixed-sm hide hide-md hide-lg">'
-+'<button name="paying_go" class="btn btn-primary btn-block btn-large js-book-it-sm-trigger">'
-+'<span class="book-it__btn-text">예약 요청</span>'
- +'<span class="book-it__btn-text--contact-host">호스트에게 연락하기</span>'
-+'<span class="book-it__btn-text--instant"><i class="icon icon-bolt icon-beach h4"></i>즉시 예약 </span>'
- +'</button>'
-+'</div>'
-+''
-+'<div id="tax-descriptions-tip" class="tooltip tooltip-top-middle" role="tooltip" data-sticky="true" data-trigger="#tax-descriptions-tooltip">'
-+'</div>'
-+''
-+''
- +'<div>'
-+'<div class="book-it__container js-book-it-container fixed" style="top: 40px;">'
-+'<div>'
-+'<div>'
-+'<div class="">'
-+'<div class="book-it__price fixed" style="height: 40px;">'
-+'<div class="row">'
-+'<div class="col-sm-8">'
-+'<div class="book-it__price-amount text-special">'
-+'<span class="h3"><span>₩74315</span></span>'
-+'</div>'
-+'</div>'
-+'<div class="col-sm-4">'
-+'<div class="book-it__payment-period-container pull-right">'
-+'<div class="book-it__payment-period"><span>1박</span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<form method="post">'
-+'<div class="panel book-it-panel">'
-+'<div class="panel-body panel-light">'
-+'<div class="row row-condensed space-3">'
-+'<div class="col-md-9">'
-+'<div class="row row-condensed">'
-+'<div class="col-sm-6">'
-+'<label class="book-it__label" for="datespan-checkin">체크인</label>'
-+'<input id="checkin_date" type="text" name="checkin" class="checkin ui-datepicker-target" placeholder="년/월/일">'
-+'</div>'
-+'<div class="col-sm-6">'
-+'<label class="book-it__label" for="datespan-checkout">체크아웃</label>'
-+'<input id="checkout_date" type="text" name="checkout" class="checkout ui-datepicker-target" placeholder="년/월/일">'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-3">'
-+'<div>'
-+'<label for="number_of_guests_21674" class="book-it__label"><span>숙박 인원</span></label>'
-+'<div class="select select-block">'
-+'<select id="guest_cnt" name="number_of_guests">'
-+'<option selected="selected" value="1">1</option>'
-+'<option value="2">2</option>'
-+'<option value="3">3</option>'
-+'</select>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div>'
-+'<button class="btn btn-primary btn-large btn-block" name="paying_go">'
-+'<span>예약 요청</span>'
-+'</button>'
-+'<div class="bookit-message__container text-center text-muted">'
-+'<small><span>"예약" 버튼을 클릭해도 대금이 바로 청구되지 않습니다.</span></small>'
-+'</div>'
-+'</div>'
-+'<div class="hide">'
-+'<button type="button" class="btn btn-primary btn-large btn-small btn-block">'
-+'<span>호스트에게 연락하기</span>'
-+'</button>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</form>'
-+'</div>'
-+'</div>'
- +'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+''
-+'<div>'
-+'<div>'
-+'<div id="details" class="details-section webkit-render-fix">'
-+'<div class="page-container-responsive">'
-+'<div class="row">'
-+'<div class="col-lg-8 js-details-column">'
-+'<div class="space-8 space-top-8"><h4 class="space-4 text-center-sm"></h4>'
-+'<div class="row row-condensed">'
-+'<div class="contact-host-div col-12">'
-+'<div>'
-+'<button class="btn-link btn-link--bold" type="button">'
-+'<span>호스트에게 연락하기</span>'
-+'</button>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row">'
-+'<div class="col-md-3 text-muted">'
-+'<div><span>숙소</span></div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="row">'
-+'<div class="col-md-6">'
-+'<div>'
-+'<span>숙박 가능 인원:</span>'
-+'<span></span><strong>3</strong>'
-+'</div>'
-+'<div>'
-+'<span>욕실:</span>'
-+'<span> </span><strong>1</strong>'
-+'</div>'
-+'<div>'
-+'<span>침실:</span>'
-+'<span> </span><strong>1</strong>'
-+'</div>'
-+'<div>'
-+'<span>침대:</span>'
-+'<span> </span><strong>1</strong>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-6">'
-+'<div><span>체크인:</span>'
-+'<span> </span><strong>15:00 이후</strong>'
-+'</div>'
-+'<div>'
-+'<span>체크아웃:</span>'
-+'<span> </span><strong>10:00</strong>'
-+'</div>'
-+'<div>'
-+'<span>집 유형:</span>'
-+'<span> </span><strong>아파트</strong>'
-+'</div>'
-+'<div>'
-+'<span>숙소 유형 :</span>'
-+'<span> </span><strong>집 전체</strong>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div class="row">'
-+'<div class="col-md-6">'
-+'<strong><a href="#house-rules" class="react-house-rules-trigger" data-prevent-default="true"><span>숙소 이용규칙</span></a></strong>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row amenities">'
-+'<div class="col-md-3 text-muted">'
-+'<div>'
-+'<span>시설</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9 expandable expanded">'
-+''
-+'<div class="expandable-content expandable-content-full">'
-+'<div class="row">'
-+'<div class="col-sm-6">'
-+'<div>'
-+'<div class="space-1">'
-+'<span><i class="icon h3 icon-meal"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
-+'<span id="amenity-long-tooltip-trigger-8"><strong>부엌</strong></span>'
-+'</div>'
-+'</div>'
-+'<div>'
-+'<div class="space-1 text-muted">'
-+'<span id="amenity-long-tooltip-trigger-40"><del>필수품목</del></span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div class="col-sm-6">'
-+'<div>'
-+'<div class="space-1">'
-+'<span><i class="icon h3 icon-tv"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
-+'<span id="amenity-long-tooltip-trigger-1"><strong>TV</strong></span>'
-+'</div>'
-+'</div>'
-+'<div>'
-+'<div class="space-1 text-muted">'
-+'<span id="amenity-long-tooltip-trigger-40"><del>필수품목</del></span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row">'
-+'<div class="col-md-3 text-muted">'
-+'<div>'
-+'<span>가격</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="row">'
-+'<div class="col-md-6">'
-+'<div>'
-+'<span>추가 인원 요금 :</span>'
-+'<span> </span><strong>추가요금 없음</strong>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row description" id="description">'
-+'<div class="col-md-3 text-muted">'
-+'<div>'
-+'<span>설명</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div>'
-+'<div class="react-expandable expanded">'
-+'<div class="expandable-content expandable-content-long">'
-+'<div>'
-+'<p><span>Small 14 Unit condo on the Beach in N. Myrtle Beach.</span></p>'
-+'<p><span>설명</span></p>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row react-house-rules" id="house-rules">'
-+'<div class="col-md-3">'
-+'<div class="text-muted">'
-+'<span>숙소 이용규칙</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="structured_house_rules">'
-+'<div class="row col-sm-12">'
-+'<span>체크인은 15:00 이후입니다.</span>'
-+'</div>'
-+'<div class="row">'
-+'<div class="col-sm-2">'
-+'<hr class="structured_house_rules__hr">'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div>'
-+'<div class="react-expandable expanded">'
-+'<div class="expandable-content">'
-+'<div>'
-+'<p><span>Winter rates: $70.00 per night</span></p>'
-+'</div>'
-+'<div class="expandable-indicator"></div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row">'
-+'<div class="col-md-3 text-muted">'
-+'<div>'
-+'<span>안전 기능</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="row">'
-+'<div class="col-sm-6">'
-+'<div>'
-+'<div class="space-1">'
-+'<span id="amenity-short-tooltip-trigger-35"><span>화재 감지기</span></span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div class="col-sm-6">'
-+'<div>'
-+'<div class="space-1">'
-+'<span id="amenity-short-tooltip-trigger-39"><span>소화기</span></span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<hr>'
-+'<div class="row">'
-+'<div class="col-md-3 text-muted">'
-+'<div>'
-+'<span>예약 가능 여부</span>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<div class="row">'
-+'<div class="col-md-6">최소 숙박일 <strong>3일</strong>.</div>'
-+'<div class="col-md-6">'
-+'<a id="view-calendar" href="#"><strong><span>달력 보기</span></strong></a>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div></div>'
-+'<div id="host-profile" class="room-section webkit-render-fix">'
-+'<div class="page-container-responsive space-top-8 space-8">'
-+'<div class="row">'
-+'<div class="col-lg-8">'
-+'<h4 class="space-2 text-center-sm"><span>호스트</span></h4>'
-+'<hr class="space-4 space-top-2">'
-+'<div class="row">'
-+'<div class="col-md-3 text-center">'
-+'<div class="media-photo-badge">'
-+'<a href="#" class="media-photo media-round">'
-+'<img alt="Donald" class="media-photo media-round" height="90" width="90" data-pin-nopin="true" src="/web/resources/img/booking/default.jpg" title="Donald"></a>'
-+'</div>'
-+'</div>'
-+'<div class="col-md-9">'
-+'<h3 class="space-1">Donald</h3>'
-+'<div class="row row-condensed space-2">'
-+'<div class="col-md-12 text-muted">'
-+'<span>Freeport, 뉴욕, 미국</span>'
-+'<span> · </span>'
-+'<span>회원가입 : 2009년 11월</span>'
-+'</div>'
-+'</div>'
-+'<div class="react-expandable expanded">'
-+'<div class="expandable-content expandable-content-long">'
-+'<div><p><span>자기소개</span></p></div>'
-+'<div class="expandable-indicator"></div>'
-+'</div>'
-+'</div>'
-+'<div>'
-+'<span class="btn btn-primary btn-small"><span>호스트에게 연락하기</span></span>'
-+'<div><noscript data-reactid=".1exo7crry0w.2.0.0.0.2.1.5.1.0"></noscript></div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'<div id="neighborhood" class="room-section">'
-+'<div style="position:relative;" class="page-container-responsive">'
-+'<div class="p3-location--map">'
-+'<div class="panel location-panel"></div>'
-+'<ul id="guidebook-recommendations" class="hide">'
-+'<li class="user-image"><img alt="Donald" data-pin-nopin="true" height="90" src="web/resources/img/booking/default.jpg" title="Donald" width="90"></li>'
-+'</ul>'
-+'<div id="hover-card" class="panel">'
-+'<div class="panel-body">'
-+'<div class="text-center">숙소 위치</div>'
-+'<div class="text-center">'
-+'<span class="listing-location"><span>노스 머틀 비치,</span><span>사우스 캐롤라이나,</span><span>미국</span></span>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>'
-+'</div>';
+
 var CANCEL_FORM = '<div id="cancel_form" class="formbox2">'
 +'<h2>예약취소</h2>'
 +'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.</p>'

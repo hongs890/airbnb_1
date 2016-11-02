@@ -6,11 +6,9 @@ var booking = (function() {
 	};
 	var onCreate = function() {
 		setContentView();
+		// MAIN 화면에서 지역/날짜/게스트수 검색 버튼 이벤트
 		$('#pub_article').on('click','#submit_location', function(){
-			
 			$('#pub_footer').remove();
-			
-			
 			if($('#autocomplete').val()===''){
 				alert('검색할 국가/도시 명을 입력해 주세요.');
 				$('#autocomplete').focus();
@@ -28,49 +26,50 @@ var booking = (function() {
 			}
 			booking.search_result_form(1);
 		});
-		
-		
-		
+		// 예약가능 리스트 페이지에서 필터검색 적용 버튼
 		$('#pub_article').on('click','#option_submit',function(){
-			
-			
-			
 			booking.search_result_form(1);
-			
 		});
+		// 필터검색 클릭 시 확장 옵션 리스트 보여주는 event 
 		$('#pub_article').on('click','#show_more_fac',function(){
 			$('#more_fac').toggleClass('collapse');
 			$('#show_more_fac i').toggleClass('icon-caret-down');
 			$('#show_more_fac i').toggleClass('icon-caret-up');
-			$('#option_submit').prop('disabled',false);
-		/*	$('#show_more_fac i').attr('class',)*/
 		});
-	
-		$('#pub_article').on('click','button[name=paying_go]',function(e){
+		
+	/*	$('#pub_article').on('click','button[name=paying_go]',function(e){
 			e.preventDefault();
 			$('#pub_article').html(PAYING_FORM);
 		});
 		$('#pub_article').on('click','#booking-item',function(){
 			$('#pub_article').html(CANCEL_FORM);
-		});
+		});*/
+		
+		// 필터적용 버튼 활성화 시켜주는 이벤트 들 
+		$('#pub_article').on('change','#div_option select,#min_price,#max_price', function() {
+			if($('#option_submit').prop('disabled')==true){
+				$('#option_submit').prop('disabled',false);
+			}
+		})
+		$('#pub_article').on('click','#div_option input[type=checkbox]', function() {
+			if($('#option_submit').prop('disabled')==true){
+				$('#option_submit').prop('disabled',false);
+			}
+		})
 	}
-	var show_detail = function(house_seq) {
-		alert(house_seq);
-		$('#pub_article').html(DETAIL_FORM);
-	}
+	// 리스트에서 이미지 클릭시 해당 화면으로 이동하는 이벤트 핸들러
+	
+	// 검색 페이지 보여주는 이벤트 핸들러
 	var search_result_form = function(page_num) {
-		
-		
 		var location = '';
-		
 		var search_data = {};
-		
+		// 예약시작일 , 종료일 임의적으로 체크인은 15시 체크아웃은 10시로 고정 
 		var check_in = $('#checkin').val();
 		var check_out = $('#checkout').val();
 		check_in = check_in.includes(':') ? check_in : check_in + ' 15:00:00';
 		check_out = check_out.includes(':') ? check_out : check_out + ' 10:00:00';
+		// 첫 페이지에서 검색한 주소를 분할(ex: 서울특별시 강남구)
 		if($('#autocomplete').val() !== undefined){
-			
 			location =  $('#autocomplete').val().split(' ');
 			search_data = {
 					'longitude':$('#lng').val(),'latitude':$('#lat').val(),'checkin':check_in,
@@ -80,18 +79,24 @@ var booking = (function() {
 			}
 		}
 		else{
+			// 첫화면에서 넘어온게 아닌 해당 페이지에서 재 검색 수행시 이 블록 수행
+			// 룸타입은 3개의 체크박스, 각각 1,2,4의 값을 주어 더하기 형식으로 체크한 값들 저장
 			var room_type = ($('#facet-checkbox-entire-place').prop('checked')==true ? 1 : 0)
 			+ ($('#facet-checkbox-private-room').prop('checked')==true ? 2 : 0)
 			+ ($('#facet-checkbox-shared-room').prop('checked')==true ? 4 : 0)
 			
+			// 지역 검색을 위해 체크박스들을 체크했을 경우 지역 값들을 저장
 			var loc_option = '';
 			$('input[name=loc_option]').each(function(i) {
 				if($(this).prop('checked')==true){
-					loc_option += $(this).val()+':'
+					loc_option += $(this).val()+',';
 				}
 			})
 			loc_option = loc_option.substring(0,loc_option.length-1);
 			
+			// 지역 검색 단계 별로 체크박스로 체크한 지역 값들을 저장
+			//ex: 시로 검색했을 경우 구단위가 체크박스로 나오며 그 값들은 city에 저장 
+			//city(구,군) 으로 검색했을 경우 동,거리 단위가 체크 박스로 나오며 값들은 street에 저장
 			if(loc_option!==''){
 				if($('#state').val()==='NONE'){
 					$('#state').val(loc_option);
@@ -101,7 +106,7 @@ var booking = (function() {
 					$('#street').val(loc_option);
 				}
 			}
-			
+			// 편의시설 선택한 값들 저장
 			var fac_option = '';
 			$('input[name=fac_option]').each(function(i) {
 				if($(this).prop('checked')==true){
@@ -110,7 +115,7 @@ var booking = (function() {
 					fac_option += '_-';
 				}
 			})
-			
+			// 안전시설 선택한 값들 저장
 			var safety_option = '';
 			$('input[name=safety_option]').each(function(i) {
 				if($(this).prop('checked')==true){
@@ -130,10 +135,7 @@ var booking = (function() {
 					'bathroomCnt':$('#bathroom_cnt option:selected').val(),'bedCnt':$('#bed_cnt option:selected').val(),
 					'convenience':fac_option,safetyFac:safety_option
 			}
-			
 		}
-		
-		
 		$.ajax({
 			url : app.context()+'/booking/search',
 			type : 'POST',
@@ -142,8 +144,8 @@ var booking = (function() {
 			contentType : 'application/json',
 			async : false,
 			success : function(data){
-				var start = data.start;
-				var end = data.end;
+				var check_in = data.checkIn;
+				var check_out = data.checkOut;
 				var guestCnt = data.guestCnt;
 			
 				var BOOK_FORM = 
@@ -151,6 +153,7 @@ var booking = (function() {
 					+'<link href="https://a1.muscache.com/airbnb/static/packages/common_o2.1-50a45a2f41dab81f98765e60188dc94c.css" media="all" rel="stylesheet" type="text/css" />'
 					+'<link href="https://a0.muscache.com/airbnb/static/packages/common-c797852784aa37fdff8ec44a848e3d10.css" media="all" rel="stylesheet" type="text/css" />'
 					+'<link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />'
+					+'<link rel="stylesheet" href="'+app.css()+'/datepicker/bootstrap-datepicker.css" />'
 					+'<div class="map-search">'
 					+'<div class="sidebar" style="top: 10%; bottom: 10%;">'
 					+'<div id="katamari-container">'
@@ -158,9 +161,9 @@ var booking = (function() {
 					+'<div>'
 					+'<div>'
 					+'<div>'
-					+'<div class="filters collapse" style="">'
+					+'<div id="div_option" class="filters collapse" style="">'
 					+'<div id="filter_options">';
-			
+				//========================== 검색 DIV(날짜,인원수)==========================
 				BOOK_FORM += '<div class="filters-section panel-body panel-light intro-filter">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -173,11 +176,11 @@ var booking = (function() {
 				+'<div class="input-daterange">'
 				+'<div class="col-md-4 col-sm-6 space-1-sm">'
 				+'<label class="screen-reader-only" for="checkin">체크인</label>'
-				+'<input id="checkin" type="text" name="start" class="checkin input-contrast" value="'+start+'" placeholder="체크인">'
+				+'<input id="checkin" type="text" name="start" class="checkin input-contrast" value="'+check_in+'" placeholder="체크인">'
 				+'</div>'
 				+'<div class="col-md-4 col-sm-6 space-1-sm">'
 				+'<label class="screen-reader-only" for="checkout">체크아웃</label>'
-				+'<input id="checkout" type="text" name="end" class="checkout input-contrast" value="'+end+'" placeholder="체크아웃">'
+				+'<input id="checkout" type="text" name="end" class="checkout input-contrast" value="'+check_out+'" placeholder="체크아웃">'
 				+'</div>'
 				+'</div>'
 				+'<div class="col-md-4 col-sm-12 space-sm-1">'
@@ -208,7 +211,7 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				
-				//
+				//========================== 검색 DIV(숙소유형)==========================
 				+'<div class="filters-section panel-body panel-light intro-filter">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -256,11 +259,7 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-				
-				
-				
-				
-				
+				//========================== 검색 DIV(가격)==========================
 				+'<div class="filters-section panel-body panel-light intro-filter">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -281,9 +280,7 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-				
-				
-				
+				//========================== 검색 DIV(규모:침대 갯수 등)==========================
 				+'<div id="div_size" class="filters-section panel-body panel-light">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -370,9 +367,7 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-				
-				
-				
+				//========================== 검색 DIV(지역)==========================
 				+'<div id="filter_location" class="filters-section panel-body panel-light">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -383,24 +378,14 @@ var booking = (function() {
 				+'<div class="col-lg-9 col-md-11">'
 				+'<div>'
 				+'<div class="row row-condensed">'
-				// location for statement start
-				
 				$.each(data.locList, function(i, loc) {
-					
-					
-					
 					BOOK_FORM += '<div class="col-md-4">'
 						+'<div>'
 						+'<input type="checkbox" name="loc_option" value="'+loc+'">'+loc+''
 						+'</div>'
 						+'</div>'
 				})
-				
-				
-				
-				
-				
-				// location for end
+				//========================== 검색 DIV(편의시설,안전시설)==========================
 				BOOK_FORM += '</div>'
 				+'</div>'
 				+'</div>'
@@ -408,9 +393,6 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-				
-				
-				
 				+'<div id="option_fac" class="filters-section panel-body panel-light">'
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
@@ -485,6 +467,7 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
+				//========================== 검색 DIV(검색필터 확장)==========================
 				+'<div id="show_more_fac" class="col-md-1">'
 				+'<button class="btn-link btn-link--icon sectionLabel_rcr7sj">'
 				+'<i class="icon icon-caret-down hide-sm"></i>'
@@ -510,10 +493,6 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-				
-				
-				
-				
 				+'<div id="div_filter" class="sidebar-header panel-body clearfix panel-light">'
 				+'<div class="pull-left">'
 				+'<div>'
@@ -528,14 +507,15 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'<div>'
+				//========================== 검색 DIV(리스트)==========================
 				+'<div class="crossfading-panel__container text-right pull-right show-lg">'
 				+'<div class="crossfading-panel crossfading-panel__vertically-centered-container crossfading-panel--right crossfading-panel--invisible"><h1 class="crossfading-panel--vertically-centered h6 text-right pull-right">'
-				+'<span>예약 가능 숙소 146 개</span>'
-				+'<span><span> · </span><span>도쿄</span></span></h1>'
+				+'<span>예약 가능 숙소 '+data.totCount+' 개</span>'
+				+'<span><span> · </span><span></span></span></h1>'
 				+'</div>'
 				+'<div class="crossfading-panel crossfading-panel--right pull-right urgency-commitment-panel"><i class="icon pull-right urgency-commitment-panel--icon icon-calendar-trend crossfading-panel--margin-left"></i>'
 				+'<div class="pull-right crossfading-panel__text--lg">'
-				+'<strong>이 날짜에는 숙소가 2%만 남아있습니다.</strong>'
+				+'<strong>이 날짜에는 숙소가 '+data.totCount+' 곳이 남아있습니다.</strong>'
 				+'<div>'
 				+'<div class="crossfading-panel-body-text text-muted">'
 				+'<div class="ucBody_1elyhsq">곧 예약하시는 걸 권해드립니다.</div>'
@@ -547,14 +527,14 @@ var booking = (function() {
 				+'</div>'
 				+'<div class="crossfading-panel__container text-left pull-left crossfading-panel__container--md show-md">'
 				+'<div class="crossfading-panel crossfading-panel__vertically-centered-container crossfading-panel--invisible"><h1 class="crossfading-panel--vertically-centered h6 text-left crossfading-panel--margin-left">'
-				+'<span>예약 가능 숙소 146 개</span>'
+				+'<span>예약 가능 숙소 '+data.totCount+' 개</span>'
 				+'<span><span> · </span>'
 				+'<span>도쿄</span>'
 				+'</span></h1>'
 				+'</div>'
 				+'<div class="crossfading-panel crossfading-panel--left pull-left urgency-commitment-panel"><i class="icon pull-left urgency-commitment-panel--icon icon-calendar-trend crossfading-panel--margin-right hide-sm"></i>'
 				+'<div class="pull-left text-center-sm crossfading-panel__text--md">'
-				+'<strong>이 날짜에는 숙소가 2%만 남아있습니다.</strong>'
+				+'<strong>이 날짜에는 숙소가 '+data.totCount+' 곳이 남아있습니다.</strong>'
 				+'<div>'
 				+'<div class="crossfading-panel-body-text text-muted">'
 				+'<div class="ucBody_1elyhsq">곧 예약하시는 걸 권해드립니다.</div>'
@@ -575,80 +555,83 @@ var booking = (function() {
 				+'</div>'
 				+'</div>'
 				+'</div>'
-	
-				
 				
 				+'<div id="result_list" aria-live="polite" class="search-results">'
 				+'<div class="outer-listings-container space-2">'
 				+'<div class="listings-container">'
 				+'<div class="row">'
-				
-				
-				// house seq , picture, price*night
-				+'<div class="listing-card-wrapper col-sm-12 space-2 col-md-6">'
-				+'<div class="listing">'
-				+'<div class="panel-image listing-img">'
-				+'<div><a name="detail_go" href="#" class="media-photo media-cover"><input type="hidden" value="test"/>'
-				+'<div class="listing-img-container media-cover text-center">'
-				+'<img src="" class="img-responsive-height" alt="test">'
-				+'</div></a>'
-				+'<div class="panel-overlay-bottom-left panel-overlay-label panel-overlay-listing-label">'
-				+'<div class="price-label">'
-				+'<span><sup class="currency-prefix">₩</sup><span class="price-amount">193341</span>'
-				+'<span> </span>'
-				+'</span>'
-				+'<span><span> </span>'
-				+'<span>'
-				+'<span> </span>'
-				+'<span class="instant-book-trigger-wrapper">'
-				+'<span><i class="icon icon-instant-book icon-flush-sides icon-beach"></i></span>'
-				+'</span>'
-				+'</span>'
-				+'</span>'
+				// house seq , picture
+				$.each(data.list, function(i, house) {
+					BOOK_FORM += '<div class="listing-card-wrapper col-sm-12 space-2 col-md-6">'
+						+'<div class="listing">'
+						+'<div class="panel-image listing-img">'
+						+'<div><a name="detail_go" href="#" class="media-photo media-cover"><input type="hidden" value="'+house.houseSeq+'"/>'
+						+'<div class="listing-img-container media-cover text-center">'
+						+'<img src="'+app.img()+'/booking/'+house.picture+'" class="img-responsive-height" alt="'+house.title+'">'
+						+'</div></a>'
+						+'<div class="panel-overlay-bottom-left panel-overlay-label panel-overlay-listing-label">'
+						+'<div class="price-label">'
+						+'<span><sup class="currency-prefix">₩</sup><span class="price-amount">'+house.price+'</span>'
+						+'<span> </span>'
+						+'</span>'
+						+'<span><span> </span>'
+						+'<span>'
+						+'<span> </span>'
+						+'<span class="instant-book-trigger-wrapper">'
+						+'<span><i class="icon icon-instant-book icon-flush-sides icon-beach"></i></span>'
+						+'</span>'
+						+'</span>'
+						+'</span>'
+						+'</div>'
+						+'</div>'
+						+'</div>'
+						+'</div>'
+						+'<div class="panel-body panel-card-section">'
+						+'<div class="media"><h3 title="'+house.title+'" class="h5 listing-name text-truncate space-top-1"><span></span><span> </span></span><a href="#" class="text-normal"><span class="listing-name--display">'+house.title+'</span></a></h3><a href="#" class="text-normal link-reset">'
+						+'<div class="text-muted listing-location text-truncate">'
+						+'<div><span>'+house.roomType+'</span><span class="person-capacity hide-md"><span> · </span><span>숙박 인원 '+house.guestCnt+'명</span></span></div>'
+						+'</div></a>'
+						+'</div>'
+						+'</div>'
+						+'</div>'
+						+'</div>'
+				})
+				//========================== 검색 DIV(리스트 페이징)==========================
+				BOOK_FORM += '</div>'
 				+'</div>'
 				+'</div>'
-				+'<div class="panel-overlay-top-right wl-social-connection-panel">'
-				+'<span class="rich-toggle wish_list_button wishlist-button not_saved" role="button" style="display:block;width:32px;height:32px;"></span>'
-				+'</div>'
-				+'</div>'
-				+'</div>'
-				+'<div class="panel-body panel-card-section">'
-				+'<div class="media"><h3 title="2LDK(88㎡)Shinjuku 6min train!PrivateHouse!FreeWifi" class="h5 listing-name text-truncate space-top-1"><span></span><span> </span></span><a href="#" class="text-normal"><span class="listing-name--display">2LDK(88㎡)Shinjuku 6min train!PrivateHouse!FreeWifi</span></a></h3><a href="#" class="text-normal link-reset">'
-				+'<div class="text-muted listing-location text-truncate">'
-				+'<div><span>집 전체</span><span class="person-capacity hide-md"><span> · </span><span>숙박 인원 11명</span></span></div>'
-				+'</div></a>'
-				+'</div>'
-				+'</div>'
-				+'</div>'
-				+'</div>'
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				
-				+'</div>'
-				+'</div>'
-				+'</div>'
-				+'<div class="results-footer">'
+				+'<center class="results-footer">'
 				+'<div class="pagination-buttons-container space-8">'
 				+'<div class="results_count">'
-				+'<span><span><span>예약 가능 숙소 146 개</span></span><span> 중 </span><span>1</span><span> – </span><span>18</span></span>'
+				+'<span><span><span>예약 가능 숙소 '+data.totCount+' 개</span></span><span> 중 </span><span>'+data.start+'</span><span> – </span><span>'+data.end+'</span></span>'
 				+'</div>'
 				+'<div class="pagination pagination-responsive">'
-
-
-
+				+'<ul>'
+				var startPg = data.startPg;
+				var groupSize = data.groupSize;
+				var lastPg = data.lastPg;
+				var totPg = data.totPg;
+				if(startPg-groupSize > 0){
+					BOOK_FORM += '<li><a href="#" onClick="booking.search_result_form('+(startPg-1)+')"  aria-label="Previous"> <span aria-hidden="true">&laquo;</span>'
+					+'</a></li>';
+				}
+				for(var i=startPg; i<=lastPg; i++){
+					if(i==page_num){
+						BOOK_FORM+='<li><a href="#" onClick="booking.search_result_form('+i+')" style="color: red;">'+i+'</a></li>';
+					}else{
+						BOOK_FORM+='<li><a href="#" onClick="booking.search_result_form('+i+')">'+i+'</a></li>';
+					}
+				}
+				if(lastPg+1 <= totPg){
+					BOOK_FORM += '<li><a href="#" onClick="booking.search_result_form('+(lastPg+1)+')" aria-label="Next"> <span aria-hidden="true">&raquo;</span>'
+					+'</a></li>';
+				}
+				BOOK_FORM += '</ul>'
 				+'</div>'
 				+'</div>'
+				+'</center>'
 				+'</div>'
-				+'</div>'
-				
-				
+				//========================== 검색 DIV(검색어들 저장 HIDDEN)==========================
 				+'</div>'
 				+'</div>'
 				+'</div>'
@@ -666,22 +649,18 @@ var booking = (function() {
 				+'</div>';
 				+'</div>'
 				$('#pub_article').html(BOOK_FORM);
-				
+				//========================== 지도 DIV(검색 리스트)==========================
 				var myLatLng = {lat: parseFloat(data.lat), lng: parseFloat(data.lng)};
-
 				  var map = new google.maps.Map(document.getElementById('map'), {
 				    zoom: 15,
 				    center: myLatLng
 				  });
-				
 				var image = new google.maps.MarkerImage(app.img() + '/booking/icon3.png', null, null, null, new google.maps.Size(100,25));
 				
 				var markers = new Array(data.list.length);
 				var infoWindow = new google.maps.InfoWindow();
-				
 				$.each(data.list, function(i, item) {
 					var latlng = {lat: parseFloat(item.latitude),lng: parseFloat(item.longitude)};
-					
 					markers[i] = new google.maps.Marker({
 					    position: latlng,
 					    map : map,
@@ -692,9 +671,8 @@ var booking = (function() {
 					    icon: image,
 					    
 					 });
-					
 					var contentString = 
-						'<div style="width:200px;height:200px;"><img src="'+app.img()+'/booking/'+item.picture+'" width="100%" height="70%" />'
+						'<div style="width:200px;height:200px;"><a href="#" name="detail_go"><input type="hidden" value="'+item.houseSeq+'"/><img src="'+app.img()+'/booking/'+item.picture+'" width="100%" height="70%"/></a>'
 						+'<br /><h4>' + item.title +'</h4>'
 						+'</div>';
 					markers[i].addListener('click', function() {
@@ -702,10 +680,8 @@ var booking = (function() {
 						infoWindow.open(map, markers[i]);
 					});
 				})
-				
-				
+				//========================== 이전 검색값들 페이지에 적용==========================
 				$('#guests option:nth-child('+guestCnt+')').prop('selected',true);
-				
 				if(data.roomType!=null){
 					var room_type = parseInt(data.roomType);
 					if(room_type%2==1){
@@ -762,21 +738,19 @@ var booking = (function() {
 						}
 					})
 				}
-				// 여기가 조오오오오오온나 길어질꺼야
+				//========================== 달력 ==========================
 				$('.input-daterange').datepicker({
 				    language: "kr",
 					format: "yyyy/mm/dd",
-				    startDate: "+0d"
+				    startDate: "+0d",
+				    autoClose : true
 				});
-				
 			},
 			error:function(request,status,error){
 			    alert("code:"+request.status+"\n"+"message:"+request.responseText+"\n"+"error:"+error);}
 			
 		});	
-		
-	
-		
+		//========================== 검색필터 확장==========================
 		$('#pub_article').on('click','#btn_filter',function(){
 			$('#div_filter').hide();
 			$('#result_list').hide();
@@ -787,6 +761,7 @@ var booking = (function() {
 			$('input[name=fac_option]').css('margin-bottom','10px');
 			$('input[name=safety_option]').css('margin-bottom','10px');
 		});	
+		//==========================검색필터 축소==========================
 		$('#pub_article').on('click','#option_cancel',function(){
 			$('#div_filter').show();
 			$('#result_list').show();
@@ -795,12 +770,11 @@ var booking = (function() {
 			$('#option_fac').hide();
 			$('#filter_submit').hide();
 		});	
-		
 	}
 	return{
 		init : init,
-		search_result_form : search_result_form,
-		show_detail : show_detail
+		search_result_form : search_result_form
+	
 	}
 })();
 

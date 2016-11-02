@@ -8,6 +8,7 @@ var app = (function() {
 		memApp.init(context);
 		sangho.init();
 		u_header.init();
+		member.init();
 	};
 	var context = function() {
 		return session.getContextPath();
@@ -32,8 +33,7 @@ var app = (function() {
 	var onCreate = function() {
 		setContentView();
 		$.getScript('https://maps.googleapis.com/maps/api/js?key=AIzaSyDmPCXXMQxNDjMHsC9AT66JGelMu5XDh4E&signed_in=true&libraries=places&callback=initAutocomplete');
-		$('#h_logo').click(function(){
-		
+		$('#h_logo').click(function(){		
 			location.href = app.context() + '/'
 		});
 	};
@@ -83,29 +83,7 @@ var main = (function() {
 	};
 	var onCreate = function() {
 		setContentView();
-		$('#pub_article').on('click','#b_detail1',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_detail2',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_detail3',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_main1',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_main2',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_main3',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_main4',function(){
-			$('#pub_article').html(DETAIL_FORM);
-		});
-		$('#pub_article').on('click','#b_main5',function(){
-			$('#pub_article').html(DETAIL_FORM);});
+		
 		$('#g_main1').click(function(){
 			$.ajax({
 				url : app.context() + '/guidebook/g_Seoul',

@@ -44,8 +44,6 @@ public class AdminController {
 	public @ResponseBody Retval goAdminMain(){
 		logger.info("Welcome home! The client locale is admin{}", "  goAdminMain");
 		retval.setMessage("success");
-		
-	
 		return retval;
 	}
 	@RequestMapping("/header")

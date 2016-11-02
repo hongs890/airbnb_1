@@ -33,8 +33,8 @@
 		<result property="latitude" column="latitude"/>
 		<result property="longitude" column="longitude"/>	
 	</resultMap>
-
-	<select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal">
+	
+	<!-- <select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal">
 		SELECT count(*) as count
 		FROM houses_view 
 		WHERE country = #{country}
@@ -121,10 +121,36 @@
 		
 		
 		
+	</select> -->
+	<select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal" statementType="CALLABLE">
+		{call sp_house_cnt(
+			#{country},
+			#{state},
+			#{city},
+			#{street},
+			#{checkin},
+			#{checkout},
+			#{nights},
+			#{guestCnt},
+			#{roomType},
+			#{minPrice},
+			#{maxPrice},
+			#{bedCnt},
+			#{bathroomCnt},
+			#{convenience},
+			#{safetyFac}
+		)}
 	</select>
 	
 	<select id="findLoc" resultType="String" parameterType="com.airbnb.web.domains.SearchVal">
-		<choose>
+		{call sp_addr_list(
+			#{country},
+			#{state},
+			#{city},
+			#{street},
+			#{addrDepth}
+		)}
+		<!-- <choose>
 			<when test="addrDepth == 1">
 				SELECT DISTINCT state FROM address WHERE country = #{country}
 			</when>
@@ -149,12 +175,30 @@
 		 		#{item}
 		 		</foreach>
 			</otherwise>
-		</choose>
+		</choose> -->
 	</select>
 	
  	<select id="find" resultMap="houseMap" parameterType="com.airbnb.web.domains.SearchVal">
-		
-		SELECT @RNUM := @RNUM +1 AS ROWNUM,h.* FROM (
+		{call sp_house_list(
+			#{country},
+			#{state},
+			#{city},
+			#{street},
+			#{checkin},
+			#{checkout},
+			#{nights},
+			#{guestCnt},
+			#{roomType},
+			#{minPrice},
+			#{maxPrice},
+			#{bedCnt},
+			#{bathroomCnt},
+			#{convenience},
+			#{safetyFac},
+			#{start},
+			#{end}
+		)}
+	<!-- SELECT @RNUM := @RNUM +1 AS ROWNUM,h.* FROM (
 		
 		SELECT house_seq,room_type,guest_cnt,bed_cnt,bathroom_cnt,picture,explaination,title,other_rule,checkin_term,checkin_time,period,min_nights,max_nights,
     	       price*${nights} as price,reg_date,rules,convenience,safety_fac,space,email,type,country,state,city,street,optional,zip_code,latitude,longitude
@@ -240,7 +284,7 @@
 		<if test="safetyFac != null">
 			AND safety_fac like #{safetyFac}
 		</if>
-		) h, (SELECT @RNUM :=0 )R LIMIT #{start},#{end};
+		) h, (SELECT @RNUM :=0 )R LIMIT #{start},#{end}; -->
 	</select> 
 	
 	

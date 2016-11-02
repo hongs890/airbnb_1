@@ -13,6 +13,7 @@
 <!doctype html>
 <html lang="en">
 <head>
+<script src="https://www.google.com/jsapi"></script>
 	<title><tiles:getAsString name="title"/></title>
 	<link rel="stylesheet" href="${css}/application.css" type="text/css"/>
 	<link rel="stylesheet" href="${css}/bootstrap.css" type="text/css"/>
@@ -20,6 +21,24 @@
 	<link rel="stylesheet" href="${css}/font-awesome.css" type="text/css"/>
    <link rel="stylesheet" href="${css}/admin/jquery-ui.theme.min.css" type="text/css" media="screen"/> 
    <link rel="stylesheet" href="${css}/admin/ui.jqgrid.css" type="text/css" media="screen"/> 
+   <script src="${js}/jquery-1.10.2.js"></script>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/free-jqgrid/4.13.4/js/i18n/grid.locale-en.min.js"></script>
+<script src="https://cdn.jsdelivr.net/free-jqgrid/4.13.4/js/jquery.jqgrid.min.js"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+    <!-- Bootstrap Js -->
+    <script src="${js}/bootstrap.min.js"></script>
+    <!-- Metis Menu Js -->
+    <script src="${js}/jquery.metisMenu.js"></script>
+    <!-- Morris Chart Js -->
+   <%--  <script src="${js}/morris/raphael-2.1.0.min.js"></script> --%>
+    <!-- Custom Js -->
+    <%-- <script src="${js}/morris/morris.js"></script> --%>
+    <script src="${js}/morris/custom-scripts.js"></script>
+<script src="${js}/inchul.js"></script>
+<script src="${js}/application.js"></script>
+
 </head>
 <body>
 
@@ -44,24 +63,11 @@
 		 </div>
 	</footer>
 </body>
-<script src="${js}/jquery-1.10.2.js"></script>
 
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
-<script src="https://cdn.jsdelivr.net/free-jqgrid/4.13.4/js/i18n/grid.locale-en.min.js"></script>
-<script src="https://cdn.jsdelivr.net/free-jqgrid/4.13.4/js/jquery.jqgrid.min.js"></script>
-    <!-- Bootstrap Js -->
-    <script src="${js}/bootstrap.min.js"></script>
-    <!-- Metis Menu Js -->
-    <script src="${js}/jquery.metisMenu.js"></script>
-    <!-- Morris Chart Js -->
-    <script src="${js}/morris/raphael-2.1.0.min.js"></script>
-    <script src="${js}/morris/morris.js"></script>
-    <!-- Custom Js -->
-    <script src="${js}/morris/custom-scripts.js"></script>
-<script src="${js}/inchul.js"></script>
-<script src="${js}/application.js"></script>
+
 <script type="text/javascript">
 	admin.init();
+	
 </script>
 
 </html>

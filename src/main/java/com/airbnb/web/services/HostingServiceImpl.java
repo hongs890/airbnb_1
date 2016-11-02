@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import com.airbnb.web.domains.Command;
 import com.airbnb.web.domains.HostingDTO;
-import com.airbnb.web.domains.Retval;
 import com.airbnb.web.mappers.HostingMapper;
 
 @Service
@@ -26,36 +25,79 @@ public class HostingServiceImpl implements HostingService{
 		return sqlSession.getMapper(HostingMapper.class).regist_address(param);
 	}
 	@Override
-	public Integer manage2(HostingDTO param) {
-		return sqlSession.getMapper(HostingMapper.class).manage2(param);
+	public Integer regist_block(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).regist_block(command);
 	}
 	@Override
-	public Retval update(HostingDTO param) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer delete_block(Command command){
+		return sqlSession.getMapper(HostingMapper.class).delete_block(command);
 	}
 	@Override
-	public Retval delete(HostingDTO param) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer update_price(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_price(param);
 	}
 	@Override
-	public Retval count() {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer update_rules(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_rules(param);
 	}
 	@Override
-	public List<HostingDTO> find(Command command) {
-		// TODO Auto-generated method stub
-		return null;
+	public Integer update_checkin(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_checkin(param);
+	}
+	@Override
+	public Integer update_house_option(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_house_option(param);
+	}
+	@Override
+	public Integer update_explaination(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_explaination(param);
+	}
+	@Override
+	public Integer update_googleMap(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_googleMap(param);
+	}
+	@Override
+	public Integer update_convenience(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_convenience(param);
+	}
+	@Override
+	public Integer update_picture(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_picture(param);
+	}
+	@Override
+	public Integer update_safety_fac(HostingDTO param) {
+		return sqlSession.getMapper(HostingMapper.class).update_safety_fac(param);
+	}
+	
+
+	@Override
+	public List<HostingDTO> house_list(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).house_list(command);
+	}
+	@Override
+	public List<String> address_country(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).address_country(command);
+	}
+	@Override
+	public List<String> house_seq(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).house_seq(command);
+	}
+	@Override
+	public Integer house_seq_max(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).house_seq_max(command);
 	}
 	@Override
 	public List<String> building_list() {
 		return sqlSession.getMapper(HostingMapper.class).building_list();
 	}
 	@Override
-	public Integer house_seq(Command command) {
-		return sqlSession.getMapper(HostingMapper.class).house_seq(command);
+	public Integer house_count(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).house_count(command);
 	}
+
+
+
+
+
 
 }

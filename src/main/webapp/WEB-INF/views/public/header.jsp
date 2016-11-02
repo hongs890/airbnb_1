@@ -7,6 +7,7 @@
 <c:set var="img" value="${context}/resources/img" />
 <c:set var="css" value="${context}/resources/css" />
 <c:set var="js" value="${context}/resources/js"/>
+<link rel="shortcut icon" href="favicon.ico">
 <body class="with-new-header home_view v2 p1 fixed-header">
 	<span class="screen-reader-only"> 에어비앤비 </span>
 	<div id="header" class="airbnb-header new ">
@@ -24,6 +25,7 @@
 			<div class="search-modal-container"></div>
 		</div>
 		<header class="regular-header clearfix hide-sm" id="new-header"	role="banner">
+		
 			<div class="comp pull-left" style="margin-bottom:-2%; padding-bottom:-20%;">
 				<div  id="h_logo"style="margin-top: 0% auto" class="hdr-btn link-reset belo-container" aria-label="에어비앤비">
 				 <i class="icon icon-pos--lower icon-airbnb-alt h2 show-login"></i> 

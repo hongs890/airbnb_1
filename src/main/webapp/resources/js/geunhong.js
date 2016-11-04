@@ -4,6 +4,7 @@ var hosting = (function(){
 	var setContentView = function(){};
 	var onCreate = function (){
 		setContentView();
+
 	var hosting_main_met = function(){
 			$('#pub_article').html(hosting_main);		
 		};
@@ -30,7 +31,7 @@ var hosting = (function(){
 							if (member.message === 'fail_login') {
 								alert('로그인이 필요한 서비스입니다.');
 								$('#pub_article').html(SIGNIN);
-						/*		$('#user-login-btn').click(function(e){
+								$('#user-login-btn').click(function(e){
 								e.preventDefault();
 								$.ajax({
 									url : app.context()+'/member/signin',
@@ -39,16 +40,20 @@ var hosting = (function(){
 											'pw' : $('#signin_password').val()},
 									dataType : 'json',
 									success : function(data){
+										alert('input data value: '+data.email);
+										alert('input data value: '+data.pw);
 										if (data.email==='admin') {
 											location.href = memApp.context()+'/admin/main';
 										} else {
 											$('#pub_header').empty().load(app.context()+ '/member/logined/header');
 											$('#pub_article').empty().load(app.context()+'member/logined/main');
+										
 										}
+									
 									},
 									error : function(x,s,m){alert('error '+m+'==가입되지 않은 아이디입니다.');}
 								});
-								});*/
+								});
 							}
 						},
 						error : function(x,s,m){
@@ -108,30 +113,34 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_regist_3',function(){
 			$('#hosting_bed_cnt_foot').prop('value',$('#host_bed_cnt').val());
 			$('#hosting_bathroom_cnt_foot').prop('value',$('#host_bathroom_cnt').val());
-			$('#pub_article').html(hosting_regist_3);
-		
+			$('#pub_article').html(hosting_regist_3);	
 			initAutocomplete();
-			$('#postal_code').keyup(function(){
-				if (hosting.pwChecker2($('#postal_code').val()) === 'yes') {
-				}else{
-					alert('우편번호는 숫자만 입력 가능합니다.');
-					$('#postal_code').val('').focuson();
+			$('#autocomplete').keyup(function(e){
+				if (e.keyCode == 13) {
+					$('#country').prop('value','');
+					$('#host_state').prop('value','');
+					$('#locality').prop('value','');
+					$('#street_number').prop('value','');
+					$('#host_optional').prop('value','');
+					$('#country').prop('value',$('#autocomplete').val().split(' ')[0]);
+					$('#host_state').prop('value',$('#autocomplete').val().split(' ')[1]);
+					$('#locality').prop('value',$('#autocomplete').val().split(' ')[2]);
+					$('#street_number').prop('value',$('#autocomplete').val().split(' ')[3]);
+					$('#host_optional').prop('value',$('#autocomplete').val().split(' ')[4]);
+					$('#hosting_autocomplete_foot').prop('value', $('#autocomplete').val()) 
 				}
 			});
+			
+			$('#postal_code').keyup(function(){
+				if ($('#postal_code').val() !== "") {
+					if (hosting.pwChecker2($('#postal_code').val()) === 'yes') {
+					}else{
+						alert('우편번호는 숫자만 입력 가능합니다.');
+						$('#postal_code').val('').focuson();
+					}
+				}				
+			});
 		})
-		$('#pub_article').on('click', '#autocomplete_submit', function(){
-			$('#country').prop('value','');
-			$('#host_state').prop('value','');
-			$('#locality').prop('value','');
-			$('#street_number').prop('value','');
-			$('#host_optional').prop('value','');
-			$('#country').prop('value',$('#autocomplete').val().split(' ')[0]);
-			$('#host_state').prop('value',$('#autocomplete').val().split(' ')[1]);
-			$('#locality').prop('value',$('#autocomplete').val().split(' ')[2]);
-			$('#street_number').prop('value',$('#autocomplete').val().split(' ')[3]);
-			$('#host_optional').prop('value',$('#autocomplete').val().split(' ')[4]);
-			$('#hosting_autocomplete_foot').prop('value', $('#autocomplete').val()) 
-		});
 		$('#pub_article').on('click','#hosting_regist_4',function(){
 			if ($('#host_state').val() === '' || $('#locality').val() === '' || $('#street_number').val() === ''
 				|| $('#host_optional').val() === '' || $('#postal_code').val() === '' || $('#country').val() === '') {
@@ -399,30 +408,30 @@ var hosting = (function(){
 				$('#hosting_price_foot').prop('value', $('#host_price').val());
 				
 				var regist_insert = {
-					'room_type' : $('#hosting_room_type_foot').val(),
-					'guest_cnt' : $('#hosting_guest_cnt_foot').val(),
-					'building_seq' : $('#hosting_building_seq_foot').val(),
-					'bed_cnt' : $('#hosting_bed_cnt_foot').val(),
-					'bathroom_cnt' : $('#hosting_bathroom_cnt_foot').val(),
+					'roomType' : $('#hosting_room_type_foot').val(),
+					'guestCnt' : $('#hosting_guest_cnt_foot').val(),
+					'buildingSeq' : $('#hosting_building_seq_foot').val(),
+					'bedCnt' : $('#hosting_bed_cnt_foot').val(),
+					'bathroomCnt' : $('#hosting_bathroom_cnt_foot').val(),
 					'convenience' : $('#hosting_convenience_foot').val(),
-					'safety_fac' : $('#hosting_safety_fac_foot').val(),
+					'safetyFac' : $('#hosting_safety_fac_foot').val(),
 					'space' : $('#hosting_space_foot').val(),
 					'picture' : $('#hosting_picture_foot').val(),
 					'explaination' : $('#hosting_explaination_foot').val(),
 					'title' : $('#hosting_title_foot').val(),
 					'rules' : $('#hosting_rules_foot').val(),
-					'other_rule' : $('#hosting_other_rule_foot').val(),
-					'checkin_term' : $('#hosting_checkin_term_foot').val(),
-					'checkin_time' : $('#hosting_checkin_time_foot').val(),
-					'min_nights' : $('#hosting_min_nights_foot').val(),
-					'max_nights' : $('#hosting_max_nights_foot').val(),
+					'otherRule' : $('#hosting_other_rule_foot').val(),
+					'checkinTerm' : $('#hosting_checkin_term_foot').val(),
+					'checkinTime' : $('#hosting_checkin_time_foot').val(),
+					'minNights' : $('#hosting_min_nights_foot').val(),
+					'maxNights' : $('#hosting_max_nights_foot').val(),
 					'price' : $('#hosting_price_foot').val(),
 					'country' : $('#hosting_country_foot').val(),
 					'state' : $('#hosting_state_foot').val(),
 					'city' : $('#hosting_city_foot').val(),
 					'street' : $('#hosting_street_foot').val(),
 					'optional' : $('#hosting_optional_foot').val(),
-					'zip_code' : $('#hosting_zip_code_foot').val(),
+					'zipCode' : $('#hosting_zip_code_foot').val(),
 					'latitude' : $('#hosting_latitude_foot').val(),
 					'longitude' : $('#hosting_longitude_foot').val(),
 				}
@@ -455,6 +464,18 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_manage_2',function(){
 			$('#pub_article').html(hosting_manage_menu)
 			$('#host_manage_detail_right1').html(hosting_manage_2)
+					$.ajax({
+					url : app.context()+'/hosting/manage2_2',
+					data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+					dataType : 'json',
+					success : function(data){
+						$('#host_calendar_min_div').html('<input type="text" style="color:blue" value="'+data.temp+'" readonly>');
+						$('#host_calendar_max_div').html('<input type="text" style="color:blue" value="'+data.temp2+'" readonly>');
+					},
+					error : function(x,s,m){
+						alert('manage_list시 error 발생 : ' + m);
+					}
+				});
 			$(function() {
 				function onClickHandler(date, obj) {
 			var $calendar = obj.calendar;
@@ -514,8 +535,8 @@ var hosting = (function(){
 	});
 			$('#host_manage_submit_2').click(function(){
 				var manage_data_2 = {
-					'block_date' : $('#host_calendar_min').val() + ',' + $('#host_calendar_max').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'blockDate' : $('#host_calendar_min').val() + ',' + $('#host_calendar_max').val(),
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage2',
@@ -526,6 +547,8 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage2') {
 							alert('수정완료');
+							$('#host_calendar_min_div').html('<input type="text" style="color:blue" value="'+data.temp+'" readonly>');
+							$('#host_calendar_max_div').html('<input type="text" style="color:blue" value="'+data.temp2+'" readonly>');
 						}
 					},
 					error : function(x,s,m){
@@ -539,11 +562,11 @@ var hosting = (function(){
 			$('#host_manage_detail_right1').html(hosting_manage_3)
 			$.ajax({
 					url : app.context()+'/hosting/manage_list',
-					data : {'house_seq' : $('#manage_house_seq_foot').val()},
+					data : {'houseSeq' : $('#manage_house_seq_foot').val()},
 					dataType : 'json',
 					success : function(data){
 						$.each(data, function(i, list){
-							$('#host_manage_price_div').html('<input type="text" placeholder="현재 설정되어 있는 가격 : '+list.price+' " class="host_regist_count2" id="host_manage_price">');
+							$('#host_manage_price_div').html('<h6>1박당 가격</h6><input type="text" style="color:blue" value="'+list.price+' 원" readonly>');
 						});
 					},
 					error : function(x,s,m){
@@ -552,30 +575,62 @@ var hosting = (function(){
 				});
 			
 			$('#host_manage_submit_3').click(function(){
+				if ($('#host_manage_price').val() === '') {
+					alert('변경할 가격을 입력해주세요');
+				}else{
 				var manage_data_3 = {
-					'price' : $('#host_manage_price').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
-				}
-				$.ajax({
-					url : app.context()+'/hosting/manage3',
-					type : 'POST',
-					data : JSON.stringify(manage_data_3),
-					dataType : 'json',
-					contentType : 'application/json',
-					success : function(data){
-						if (data.message === 'manage3') {
-							alert('수정완료');
-						}
-					},
-					error : function(x,s,m){
-						alert('manage3시 error 발생 : ' + m);
+						'price' : $('#host_manage_price').val(),
+						'houseSeq' : $('#manage_house_seq_foot').val()
 					}
-				});
+					$.ajax({
+						url : app.context()+'/hosting/manage3',
+						type : 'POST',
+						data : JSON.stringify(manage_data_3),
+						dataType : 'json',
+						contentType : 'application/json',
+						success : function(data){
+							if (data.message === 'manage3') {
+								alert('수정완료');
+								$('#host_manage_price_div').html('<h6>1박당 가격</h6><input type="text" style="color:blue" value="'+data.count+' 원" readonly>');
+							}
+						},
+						error : function(x,s,m){
+							alert('manage3시 error 발생 : ' + m);
+						}
+					});
+				
+				}
+				
 			});
 		})
 		$('#pub_article').on('click','#hosting_manage_4',function(){
 			$('#pub_article').html(hosting_manage_menu)
 			$('#host_manage_detail_right1').html(hosting_manage_4)
+		
+					$.ajax({
+					url : app.context()+'/hosting/manage_list',
+					data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+					dataType : 'json',
+					success : function(data){
+						$.each(data, function(i, list){
+							$('#host_manage_rules_div').html('<input type="checkbox" id="host_rule_check1">어린이(2~12세) 숙박에 적합함<br>'
+									+'<input type="checkbox" id="host_rule_check2">유아(2세 미만) 숙박에 적합함 <br>'
+									+'<input type="checkbox" id="host_rule_check3">반려동물 동반에 적합함 <br>'
+									+'<input type="checkbox" id="host_rule_check4">흡연 가능 <br>'
+									+'<input type="checkbox" id="host_rule_check5">행사나 파티 허용 <br>');
+							var rules = list.rules.split("-");
+							for (var int = 0; int < rules.length; int++) {
+								((rules[int] === 'T')?$('#host_rule_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_rule_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
+							}
+							$('#host_manage_other_rule_div').html('<input type="text" style="color:blue" value="'+list.otherRule+'" readonly>');
+						});
+					},
+					error : function(x,s,m){
+						alert('manage_list시 error 발생 : ' + m);
+					}
+				});
+			
+			
 			$('#host_manage_submit_4').click(function(){
 				var manage_rules = 
 					(($('#host_manage_rules_1').prop('checked') == true)?'T':'F') + '-' + 
@@ -585,12 +640,9 @@ var hosting = (function(){
 					(($('#host_manage_rules_5').prop('checked') == true)?'T':'F');
 				var manage_data_4 = {
 					'rules' : manage_rules,
-					'other_rule' : $('#host_manage_other_rule').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'otherRule' : $('#host_manage_other_rule').val(),
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
-				
-				
-				
 				$.ajax({
 					url : app.context()+'/hosting/manage4',
 					type : 'POST',
@@ -600,6 +652,16 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage4') {
 							alert('수정완료');
+							$('#host_manage_rules_div').html('<input type="checkbox" id="host_rule_check1">어린이(2~12세) 숙박에 적합함<br>'
+									+'<input type="checkbox" id="host_rule_check2">유아(2세 미만) 숙박에 적합함 <br>'
+									+'<input type="checkbox" id="host_rule_check3">반려동물 동반에 적합함 <br>'
+									+'<input type="checkbox" id="host_rule_check4">흡연 가능 <br>'
+									+'<input type="checkbox" id="host_rule_check5">행사나 파티 허용 <br>');
+							var rules2 = data.temp1.split("-");
+							for (var int = 0; int < rules2.length; int++) {
+								((rules2[int] === 'T')?$('#host_rule_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_rule_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
+							}
+							$('#host_manage_other_rule_div').html('<input type="text" style="color:blue" value="'+data.temp+'" readonly>');
 						}
 					},
 					error : function(x,s,m){
@@ -611,10 +673,23 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_manage_5',function(){
 			$('#pub_article').html(hosting_manage_menu2)
 			$('#host_manage_detail_right1').html(hosting_manage_5)
+			$.ajax({
+				url : app.context()+'/hosting/manage_list',
+				data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+				dataType : 'json',
+				success : function(data){
+					$.each(data, function(i, list){
+						$('#host_manage_checkin_time_div').html('<input type="text" style="color:blue;" value="'+list.checkinTime+'시" readonly>');
+					});
+				},
+				error : function(x,s,m){
+					alert('manage_list시 error 발생 : ' + m);
+				}
+			});
 			$('#host_manage_submit_5').click(function(){
 				var manage_data_5 = {
-					'checkin_time' : $('#host_manage_checkin_time option:selected').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'checkinTime' : $('#host_manage_checkin_time option:selected').val(),
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage5',
@@ -625,6 +700,7 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage5') {
 							alert('수정완료');
+							$('#host_manage_checkin_time_div').html('<input type="text" style="color:blue;" value="'+data.temp+'시" readonly>');
 						}
 					},
 					error : function(x,s,m){
@@ -635,19 +711,138 @@ var hosting = (function(){
 		})
 		$('#pub_article').on('click','#hosting_manage_6',function(){
 			$('#pub_article').html(hosting_manage_menu)
-			$('#host_manage_detail_right1').html(hosting_manage_6)
+			$('#host_manage_detail_right1').html(hosting_manage_6) 
+		})
+		$('#pub_article').on('click','#host_bed_cnt_plus_manage',function(){
+			_bed_count += 1;
+			$('#div_host_bed_cnt_manage').html('<input type="text" value="'+_bed_count+'" class="host_regist_count" id="host_manage_bed_cnt" readonly>');
+		})
+		$('#pub_article').on('click','#host_bed_cnt_minus_manage',function(){
+			if (_bed_count <= 0) {
+				alert('침대의 갯수는 - 가 될 수 없습니다.');
+			}else{
+				_bed_count -= 1;
+				$('#div_host_bed_cnt_manage').html('<input type="text" value="'+_bed_count+'" class="host_regist_count" id="host_manage_bed_cnt" readonly>');
+			}
+		})
+		$('#pub_article').on('click','#host_bathroom_cnt_plus_manage',function(){
+			_bathroom_count += 1;
+			$('#div_host_bathroom_cnt_manage').html('<input type="text" value="'+_bathroom_count+'" class="host_regist_count" id="host_manage_bathroom_cnt" readonly>');
+		})
+		$('#pub_article').on('click','#host_bathroom_cnt_minus_manage',function(){
+			if (_bathroom_count <= 0) {
+				alert('욕실의 갯수는 - 가 될 수 없습니다.');
+			}else{
+				_bathroom_count -= 1;
+				$('#div_host_bathroom_cnt_manage').html('<input type="text" value="'+_bathroom_count+'" class="host_regist_count" id="host_manage_bathroom_cnt" readonly>');
+			}
 		})
 		$('#pub_article').on('click','#hosting_manage_7',function(){
-			$('#pub_article').html(hosting_manage_menu3)
-			$('#host_manage_detail_right1').html(hosting_manage_7)
+			$('#pub_article').html(hosting_manage_menu3)		
+		
+			_bathroom_count = 0;
+			_bed_count = 0;
+			$.ajax({
+				url : app.context()+'/hosting/manage_list',
+				data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+				dataType : 'json',
+				success : function(data){
+					$.each(data, function(i, list){
+						$('#host_manage_type_div').html('<h6>현재 설정되어 있는 집 유형</h6><input type="text" style="color:blue" value="'+list.type+'" readonly>');
+						$('#host_manage_room_type_div').html('<h6>현재 설정되어 있는 숙소 유형</h6><input type="text" style="color:blue" value="'+list.roomType+'" readonly>');
+						$('#host_manage_guest_cnt_div').html('<h6>현재 설정되어 있는 수용 인원</h6><input type="text" style="color:blue" value="'+list.guestCnt+'" readonly>');
+						$('#host_manage_bed_cnt_div').html('<h6>현재 설정되어 있는 침실 수</h6><input type="text" style="color:blue" value="'+list.bedCnt+'" readonly>');
+						$('#host_manage_bathroom_cnt_div').html('<h6>현재 설정되어 있는 욕실 수</h6><input type="text" style="color:blue" value="'+list.bathroomCnt+'" readonly>');
+					});
+				},
+				error : function(x,s,m){
+					alert('manage_list시 error 발생 : ' + m);
+				}
+			});	
+			$.ajax({
+				url : app.context()+'/hosting/regist_building',
+				type : 'POST',
+				dataType : 'json',
+				async : false,
+				success : function(data){
+					var hosting_manage_7 =
+						+'<div id="host_manage_detail_right1">'
+						+'<div id="host_manage_detail_right2">'
+						+'<div id="host_manage_detail_right2_2">'
+						+'<h2><b>숙소</b></h2><br>'
+						+'<h4>집 유형</h4>'
+						+'<select class="host_regist_select1" id="host_manage_building_type">';
+						for (var int = 0; int < data.length; int++) {
+					hosting_manage_7 +=
+						'<option selected="selected" value="'+(int+1)+'">'+data[int]+'</option>';
+						}
+					hosting_manage_7 +=
+						'</select>'
+						+'<h4>숙소 유형</h4>'
+						+'<select class="host_regist_select1" id="host_manage_room_type">'
+						+'<option selected="selected" value="집전체">집 전체</option>'
+						+'<option value="개인실">개인실</option>'
+						+'<option value="다인실">다인실</option>'
+						+'</select><br>'
+						+'<h4>수용 인원</h4>'
+						+'<select class="host_regist_select1" id="host_manage_guest_cnt">'
+						+'<option selected="selected" value="1">게스트  1명</option>'
+						+'<option value="2">게스트  2명</option>'
+						+'<option value="3">게스트  3명</option>'
+						+'<option value="4">게스트  4명</option>'
+						+'<option value="5">게스트  5명</option>'
+						+'<option value="6">게스트  6명</option>'
+						+'<option value="7">게스트  7명</option>'
+						+'<option value="8">게스트  8명</option>'
+						+'<option value="9">게스트  9명</option>'
+						+'<option value="10">게스트  10명</option>'
+						+'<option value="11">게스트  11명</option>'
+						+'<option value="12">게스트  12명</option>'
+						+'<option value="13">게스트  13명</option>'
+						+'<option value="14">게스트  14명</option>'
+						+'<option value="15">게스트  15명</option>'
+						+'</select>'
+						+'</div><hr>'
+						+'<div id="host_manage_detail_right2_2">'
+						+'<h2><b>침실 및 욕실</b></h2><br>'
+						+'<h4>침실 수</h4>'
+						+'<div id="div_host_bed_cnt_manage"><input type="text" value="'+hosting._bed_count+'" class="host_regist_count" id="host_manage_bed_cnt" readonly></div>'
+						+'<input type="button" value="+" class="btn btn-default host_regist_cal" id="host_bed_cnt_plus_manage"><input type="button" value="-" class="btn btn-default host_regist_cal" id="host_bed_cnt_minus_manage"><br>'
+						+'<h4>욕실 수</h4>'	
+						+'<div id="div_host_bathroom_cnt_manage"><input type="text" value="'+hosting._bathroom_count+'" class="host_regist_count" id="host_manage_bathroom_cnt" readonly></div>'
+						+'<input type="button" value="+" class="btn btn-default host_regist_cal" id="host_bathroom_cnt_plus_manage"><input type="button" value="-" class="btn btn-default host_regist_cal" id="host_bathroom_cnt_minus_manage"><br>'
+						+'<hr>'
+						+'<a href="#" id="host_manage_submit_7"><input type="button" value="수정" class="btn btn-danger host_regist_next"></a>'
+						+'</div>'
+						+'</div>'
+						+'<div id="host_manage_detail_right_3">'
+						+'<div id="host_regist_div_right3">'
+						+'<div id="host_regist_div_right4">'
+						+'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
+						+'<h5>현재 설정되어 있는 숙소 정보입니다.</h5><br>'
+						+'<div id="host_manage_type_div"></div><br>'
+						+'<div id="host_manage_room_type_div"></div><br>'
+						+'<div id="host_manage_guest_cnt_div"></div><br>'
+						+'<div id="host_manage_bed_cnt_div"></div><br>'
+						+'<div id="host_manage_bathroom_cnt_div"></div><br>'
+						+'</div>'
+						+'</div>'
+						+'</div>'
+						+'</div>';
+					$('#host_manage_detail_right1').html(hosting_manage_7)
+				},
+				error : function(x,s,m){
+					alert('regist_building시 error 발생 : ' + m);
+				}
+			});
 			$('#host_manage_submit_7').click(function(){
 				var manage_data_7 = {
-					'building_seq' : $('#host_manage_building_type option:selected').val(),
-					'room_type' : $('#host_manage_room_type option:selected').val(),
-					'guest_cnt' : $('#host_manage_guest_cnt option:selected').val(),
-					'bed_cnt' : $('#host_manage_bed_cnt option:selected').val(),
-					'bathroom_cnt' : $('#host_manage_bathroom_cnt option:selected').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'buildingSeq' : $('#host_manage_building_type option:selected').val(),
+					'roomType' : $('#host_manage_room_type option:selected').val(),
+					'guestCnt' : $('#host_manage_guest_cnt option:selected').val(),
+					'bedCnt' : $('#host_manage_bed_cnt').val(),
+					'bathroomCnt' : $('#host_manage_bathroom_cnt').val(),
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage7',
@@ -658,6 +853,11 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage7') {
 							alert('수정완료');
+							$('#host_manage_type_div').html('<h6>현재 설정되어 있는 집 유형</h6><input type="text" style="color:blue" value="'+data.temp+'" readonly>');
+							$('#host_manage_room_type_div').html('<h6>현재 설정되어 있는 숙소 유형</h6><input type="text" style="color:blue" value="'+data.temp2+'" readonly>');
+							$('#host_manage_guest_cnt_div').html('<h6>현재 설정되어 있는 수용 인원</h6><input type="text" style="color:blue" value="'+data.temp3+'" readonly>');
+							$('#host_manage_bed_cnt_div').html('<h6>현재 설정되어 있는 침실 수</h6><input type="text" style="color:blue" value="'+data.temp4+'" readonly>');
+							$('#host_manage_bathroom_cnt_div').html('<h6>현재 설정되어 있는 욕실 수</h6><input type="text" style="color:blue" value="'+data.temp5+'" readonly>');
 						}
 					},
 					error : function(x,s,m){
@@ -671,11 +871,26 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_manage_8',function(){
 			$('#pub_article').html(hosting_manage_menu)
 			$('#host_manage_detail_right1').html(hosting_manage_8)
+			$.ajax({
+				url : app.context()+'/hosting/manage_list',
+				data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+				dataType : 'json',
+				success : function(data){
+					$.each(data, function(i, list){
+						$('#host_manage_title_div').html('<input type="text" style="color:blue" value="'+list.title+'" readonly>');
+						$('#host_manage_explaination_div').html('<input type="text" style="color:blue" value="'+list.explaination+'" readonly>');
+					});
+				},
+				error : function(x,s,m){
+					alert('manage_list시 error 발생 : ' + m);
+				}
+			});	
+			
 			$('#host_manage_submit_8').click(function(){
 				var manage_data_8 = {
 					'title' : $('#host_manage_title').val(),
 					'explaination' : $('#host_manage_explaination').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage8',
@@ -686,6 +901,8 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage8') {
 							alert('수정완료');
+							$('#host_manage_title_div').html('<input type="text" style="color:blue" value="'+data.temp+'" readonly>');
+							$('#host_manage_explaination_div').html('<input type="text" style="color:blue" value="'+data.temp2+'" readonly>');
 						}
 					},
 					error : function(x,s,m){
@@ -697,59 +914,158 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_manage_9',function(){
 			$('#pub_article').html(hosting_manage_menu)
 			$('#host_manage_detail_right1').html(hosting_manage_9)
-			var map;
-			var myCenter = new google.maps.LatLng(39.025165, 125.796194);
-				var mapProp = {
-					center:myCenter,
-					zoom : 13,
-					mapTypeId : google.maps.MapTypeId.ROADMAP
-				};
-				map = new google.maps.Map(document.getElementById("googleMap_manage"),mapProp);
-				google.maps.event.addListener(map, 'click', function(event){
-					placeMarker(event.latLng);
-				});
-			function placeMarker(location){
-				var marker = new google.maps.Marker({
-					position : location,
-					map : map,
-				});
-				var infowindow = new google.maps.InfoWindow({
-					content : 'Latitude: ' + location.lat() + '<br>Longitude : ' + location.lng()
-				});
-				infowindow.open(map,marker);
-				$('#hosting_manage_map_lat').prop('value', location.lat());
-				$('#hosting_manage_map_long').prop('value', location.lng());
-				google.maps.event.addListener(map, 'click', function(event){
-					marker.setMap(null);
-				});
-			}
+			$.ajax({
+				url : app.context()+'/hosting/manage_list',
+				data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+				dataType : 'json',
+				success : function(data){
+					$.each(data, function(i, list){
+						 var map = new google.maps.Map(document.getElementById('googleMap_manage'), {
+							    center: {lat: list.latitude *= 1, lng: list.longitude *= 1},
+							    zoom: 13,
+							    mapTypeId: google.maps.MapTypeId.ROADMAP
+							  });
+						 var map2 = new google.maps.Map(document.getElementById("googleMap_manage"),map);
+							google.maps.event.addListener(map2, 'click', function(event){
+								placeMarker(event.latLng);
+							});
+							
+							var input = document.getElementById('pac-input_manage');
+							var searchBox = new google.maps.places.SearchBox(input);
+							map2.controls[google.maps.ControlPosition.TOP_LEFT].push(input);
+							map2.addListener('bounds_changed', function() {
+							    searchBox.setBounds(map2.getBounds());
+							  });
+							
+							var markers = [];
+							  // Listen for the event fired when the user selects a prediction and retrieve
+							  // more details for that place.
+							  searchBox.addListener('places_changed', function() {
+							    var places = searchBox.getPlaces();
 
-			$('#host_manage_submit_9').click(function(){
-				var manage_data_9 = {
-					'latitude' : $('#hosting_manage_map_lat').val(),
-					'longitude' : $('#hosting_manage_map_long').val(),
-					'house_seq' : $('#manage_house_seq_foot').val()
-				}
-				$.ajax({
-					url : app.context()+'/hosting/manage9',
-					type : 'POST',
-					data : JSON.stringify(manage_data_9),
-					dataType : 'json',
-					contentType : 'application/json',
-					success : function(data){
-						if (data.message === 'manage9') {
-							alert('수정완료');
+							    if (places.length == 0) {
+							      return;
+							    }
+
+							    // Clear out the old markers.
+							    markers.forEach(function(marker) {
+							      marker.setMap(null);
+							    });
+							    markers = [];
+
+							    // For each place, get the icon, name and location.
+							    var bounds = new google.maps.LatLngBounds();
+							    places.forEach(function(place) {
+							      var icon = {
+							        url: place.icon,
+							        size: new google.maps.Size(71, 71),
+							        origin: new google.maps.Point(0, 0),
+							        anchor: new google.maps.Point(17, 34),
+							        scaledSize: new google.maps.Size(25, 25)
+							      };
+
+							      // Create a marker for each place.
+							      markers.push(new google.maps.Marker({
+							        map: map,
+							        icon: icon,
+							        title: place.name,
+							        position: place.geometry.location
+							      }));
+
+							      if (place.geometry.viewport) {
+							        // Only geocodes have viewport.
+							        bounds.union(place.geometry.viewport);
+							      } else {
+							        bounds.extend(place.geometry.location);
+							      }
+							    });
+							    map2.fitBounds(bounds);
+							  });
+							  
+							  
+							
+						function placeMarker(location){
+							var marker = new google.maps.Marker({
+								position : location,
+								map : map,
+							});
+							var infowindow = new google.maps.InfoWindow({
+								content : 'Latitude: ' + location.lat() + '<br>Longitude : ' + location.lng()
+							});
+							infowindow.open(map2,marker);
+							$('#hosting_manage_map_lat').prop('value', location.lat());
+							$('#hosting_manage_map_long').prop('value', location.lng());
+							google.maps.event.addListener(map2, 'click', function(event){
+								marker.setMap(null);
+							});
 						}
-					},
-					error : function(x,s,m){
-						alert('manage9시 error 발생 : ' + m);
-					}
-				});
-			});	
+
+						$('#host_manage_submit_9').click(function(){
+							var manage_data_9 = {
+								'latitude' : $('#hosting_manage_map_lat').val(),
+								'longitude' : $('#hosting_manage_map_long').val(),
+								'houseSeq' : $('#manage_house_seq_foot').val()
+							}
+							$.ajax({
+								url : app.context()+'/hosting/manage9',
+								type : 'POST',
+								data : JSON.stringify(manage_data_9),
+								dataType : 'json',
+								contentType : 'application/json',
+								success : function(data){
+									if (data.message === 'manage9') {
+										alert('수정완료');
+									}
+								},
+								error : function(x,s,m){
+									alert('manage9시 error 발생 : ' + m);
+								}
+							});
+						});	
+						
+					});
+				},
+				error : function(x,s,m){
+					alert('manage_list시 error 발생 : ' + m);
+				}
+			});				
+			
+			
+			
 		})
 		$('#pub_article').on('click','#hosting_manage_10',function(){
 			$('#pub_article').html(hosting_manage_menu4)
 			$('#host_manage_detail_right1').html(hosting_manage_10)
+			$.ajax({
+					url : app.context()+'/hosting/manage_list',
+					data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+					dataType : 'json',
+					success : function(data){
+						$.each(data, function(i, list){							
+							var conv = list.convenience.split("-");
+							$('#host_manage_convenience_div').html('<input type="checkbox" id="host_convenience_check1">필수 품목<br>'
+									+'<input type="checkbox" id="host_convenience_check2">무선인터넷<br>'
+									+'<input type="checkbox" id="host_convenience_check3">샴푸<br>'
+									+'<input type="checkbox" id="host_convenience_check4">옷장/서랍장<br>'
+									+'<input type="checkbox" id="host_convenience_check5">TV<br>'
+									+'<input type="checkbox" id="host_convenience_check6">난방<br>'
+									+'<input type="checkbox" id="host_convenience_check7">에어컨<br>'
+									+'<input type="checkbox" id="host_convenience_check8">조식,커피,차<br>'
+									+'<input type="checkbox" id="host_convenience_check9">책상/작업공간<br>'
+									+'<input type="checkbox" id="host_convenience_check10">벽난로<br>'
+									+'<input type="checkbox" id="host_convenience_check11">다리미<br>'
+									+'<input type="checkbox" id="host_convenience_check12">헤어 드라이기<br>'
+									+'<input type="checkbox" id="host_convenience_check13">집에서 키우는 반려동물<br>'
+							);
+							for (var int = 0; int < conv.length; int++) {
+								((conv[int] === 'T')?$('#host_convenience_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_convenience_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
+							}		
+						});
+					},
+					error : function(x,s,m){
+						alert('manage_list시 error 발생 : ' + m);
+					}
+				});
 			$('#host_manage_submit_10').click(function(){
 				var convenience = 
 				(($('#host_manage_convenience_1').prop('checked') == true)?'T':'F') + '-' + 
@@ -767,7 +1083,7 @@ var hosting = (function(){
 				(($('#host_manage_convenience_13').prop('checked') == true)?'T':'F');
 				var manage_data_10 = {
 					'convenience' : convenience,
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage10',
@@ -778,6 +1094,10 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage10') {
 							alert('수정완료');
+							var conv2 = data.temp.split("-");
+							for (var int = 0; int < conv2.length; int++) {
+								((conv2[int] === 'T')?$('#host_convenience_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_convenience_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
+							}
 						}
 					},
 					error : function(x,s,m){
@@ -818,7 +1138,7 @@ var hosting = (function(){
 			$('#host_manage_submit_11').click(function(){
 				var manage_data_11 = {
 					'picture' : $('#host_upload_img').text(),
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage11',
@@ -842,6 +1162,29 @@ var hosting = (function(){
 		$('#pub_article').on('click','#hosting_manage_12',function(){
 			$('#pub_article').html(hosting_manage_menu)
 			$('#host_manage_detail_right1').html(hosting_manage_12)
+			$.ajax({
+					url : app.context()+'/hosting/manage_list',
+					data : {'houseSeq' : $('#manage_house_seq_foot').val()},
+					dataType : 'json',
+					success : function(data){
+						$.each(data, function(i, list){							
+							var safety = list.safetyFac.split("-");
+							$('#host_manage_safety_fac_div').html('<input type="checkbox" id="host_safety_fac_check1">연기 감지기<br>'
+									+'<input type="checkbox" id="host_safety_fac_check2">일산화탄소 감지기<br>'
+									+'<input type="checkbox" id="host_safety_fac_check3">구급상자<br>'
+									+'<input type="checkbox" id="host_safety_fac_check4">안전 카드<br>'
+									+'<input type="checkbox" id="host_safety_fac_check5">소화기<br>'
+									+'<input type="checkbox" id="host_safety_fac_check6">침실에 잠금장치<br>'
+							);
+							for (var int = 0; int < safety.length; int++) {
+								((safety[int] === 'T')?$('#host_safety_fac_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_safety_fac_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
+							}		
+						});
+					},
+					error : function(x,s,m){
+						alert('manage_list시 error 발생 : ' + m);
+					}
+				});
 			$('#host_manage_submit_12').click(function(){
 				var safety_fac = 
 					(($('#host_manage_safety_fac_1').prop('checked') == true)?'T':'F') + '-' + 
@@ -851,8 +1194,8 @@ var hosting = (function(){
 					(($('#host_manage_safety_fac_5').prop('checked') == true)?'T':'F') + '-' + 
 					(($('#host_manage_safety_fac_6').prop('checked') == true)?'T':'F');
 				var manage_data_12 = {
-					'safety_fac' : safety_fac,
-					'house_seq' : $('#manage_house_seq_foot').val()
+					'safetyFac' : safety_fac,
+					'houseSeq' : $('#manage_house_seq_foot').val()
 				}
 				$.ajax({
 					url : app.context()+'/hosting/manage12',
@@ -863,7 +1206,11 @@ var hosting = (function(){
 					success : function(data){
 						if (data.message === 'manage12') {
 							alert('수정완료');
+						var safety2 = data.temp.split("-");
+						for (var int = 0; int < safety2.length; int++) {
+							((safety2[int] === 'T')?$('#host_safety_fac_check'+(int+1)+'').prop('checked',true).prop('disabled','true'):$('#host_safety_fac_check'+(int+1)+'').prop('checked',false).prop('disabled','true'));
 						}
+					}
 					},
 					error : function(x,s,m){
 						alert('manage12시 error 발생 : ' + m);
@@ -872,6 +1219,84 @@ var hosting = (function(){
 			})
 		})
 	};
+	
+	 //////////////////////////////////// 승준 ////////////////////////////////////
+	$('#pub_article').on('click','#guidebook_go',function(){
+	$('#pub_article').html(hosting_manage_menu)
+	$('#host_manage_detail_right1').html(GUIDEBOOK)
+	$('#g_continue').on('click','#g_major_category')
+	         var map = new google.maps.Map(document.getElementById('map-canvas'),
+	                   {center :{ lat : 37.552623,lng : 126.937834}, scrollwheel: true, zoom : 12 });
+	            var input = document.getElementById('pac-input');
+	            var searchBox = new google.maps.places.SearchBox(input);
+	            map.addListener('bounds_changed', function() {
+	                searchBox.setBounds(map.getBounds({}));
+	              });
+	            var autocomplete = new google.maps.places.Autocomplete(input);
+	            autocomplete.bindTo('bounds', map);
+	            var markers = [];
+	            searchBox.addListener('places_changed', function() {
+	                var places = searchBox.getPlaces();
+	                if (places.length == 0) {
+	                  return;
+	                }
+	                markers.forEach(function(marker) {
+	                  marker.setMap(null);
+	                });
+	                markers = [];
+	                var bounds = new google.maps.LatLngBounds();
+	                places.forEach(function(place) {
+	                  markers.push(new google.maps.Marker({
+	                    map: map,
+	                    title: place.name,
+	                    position: place.geometry.location
+	                  }));
+	                  if (place.geometry.viewport) {
+	                    bounds.union(place.geometry.viewport);
+	                  } else {
+	                    bounds.extend(place.geometry.location);
+	                  }
+	                });
+	                map.fitBounds(bounds);
+	            });
+	            //////////////////// 카테고리 /////////////////////
+	            var mi_category0 = new Array("-선택-","");
+	            var mi_category1 = new Array("수석","보석","향수","우표","골동품","음반","전화카드","화폐");
+	            var mi_category2 = new Array("헹글라이딩","패러글라이딩","스카이다이빙","스쿠버다이빙","수상스키","카누/카약","래프팅(급류타기)","하이킹","사냥","번지점프","캠핑","등산","승마","스키","스노우보드","연날리기","R/C","낚시","서바이벌게임","드라이브");
+	            var mi_category3 = new Array("독서","영화/연극","사진","미술","악기연주","음악감상");
+	            var mi_category4 = new Array("골프", "농구", "댄스", "무예", "배구", "수영", "스노우보드", "승마", "스쿼시", "스키", "야구", "에어로빅","조깅","족구","테니스","헬스","카누/카약","축구");
+	            var mi_category5 = new Array("공예","사진","그림","문예","모형/프라모델","인형만들기");
+	            var mi_category6 = new Array("바둑","장기","체스","오델로","오목","컴퓨터 게임","서바이벌게임","카드");
+	            var mi_category7 = new Array("서예","수예/자수","꽃꽂이","요리","인형만들기","다도(차)","수족관","모형/프라모델","댄스","인터넷서핑");
+	            var mi_category8 = new Array("애완동물","분재","유머","천체관측","댄스","마술","아마추어 무선","로켓","운세/심리","원예","R/C","쇼핑","단전호흡","요요","요가","헬스");
+
+	            function category_change(item){
+	                var temp, i=0, j=0;
+	                var ccount, cselect;
+	                temp = document.signform.mi_category;
+	                for (i=(temp.options.length-1) ; i>0 ; i--){ temp.options[i] = null; }
+	                eval('ccount = mi_category' + item + '.length');
+	                for (j=0 ; j<ccount ; j++) {
+	                    eval('cselect = mi_category' + item + '[' + j + '];');
+	                    temp.options[j]= new Option(cselect,cselect); 
+	                }
+	                temp.options[0].selected=true;
+	                return true;
+	            }
+	//////////////////////////////////////////////////////////////////////////////////////
+	       $.ajax({
+	            url : app.context()+'/guidebook/manage13',
+	            success : function(data){
+	               if (data.message === 'success') {
+	            	   alert('가이드북 진입');
+	               }
+	            },
+	            error : function(x,s,m){
+	               alert('manage13시 error 발생 : ' + m);
+	               }
+	            });
+	            })
+	//////////////////////////////////////////////////////////////////////////////////////
 	return {
 		init : init, _bed_count : _bed_count, _bathroom_count : _bathroom_count, 
 		_max_nights_count : _max_nights_count, _min_nights_count : _min_nights_count, 
@@ -914,37 +1339,42 @@ var hosting = (function(){
 					+'</div>'
 					+'</div>'
 					+'<div id="host_manage_div_right1">'
-					+'<div id="host_manage_div_right3">'
-					+'<table style="width:100%;">'
+					+'<div id="host_manage_div_right3">';
+				if (data.totPg == 0) {
+					hosting_manage_1 += '<h2>등록된 숙소가 없습니다!</h2><br>'
+					+'<h4>에어비앤비에서 남는 공간을 빌려주고 수익을 올리세요. 전 세계에서 온 흥미로운 게스트들을 만나보세요!</h4><br>'
+					+'<input type="button" value="숙소 등록하기" class="btn btn-danger" id="hosting_regist_1">';
+				} else {
+					hosting_manage_1 += '<table style="width:100%;">'
 					+'<tbody>';
 					$.each(data.list, function(i,list){
-						$('#manage_house_seq_foot').prop('value', list.house_seq)
-				hosting_manage_1 += 
-						'<tr>'
-						+'<th colspan="2" style="background-color: #EAEAEA;">운영 중</th>'
-						+'</tr>'
-						+'<tr>'
-						+'<td rowspan="4">'+list.picture+'</td>'
-						+'<td>'+list.title+'</td>'
-						+'</tr>'
-						+'<tr>'
-						+'<td>'+country+'</td>'
-						+'</tr>'
-						+'<tr>'
-						+'<td>'+list.reg_date+'</td>'
-						+'</tr>'
-						+'<tr>'
-						+'<td><input type="button" value="달력 관리 및 설정" class="btn btn-default" id="hosting_manage_2">'
-						+'</td>'
-						+'</tr>';
+						$('#manage_house_seq_foot').prop('value', list.houseSeq)
+						hosting_manage_1 += 
+								'<tr>'
+								+'<th colspan="2" style="background-color: #EAEAEA;">운영 중</th>'
+								+'</tr>'
+								+'<tr>'
+								+'<td rowspan="4">'+list.picture+'</td>'
+								+'<td>'+list.title+'</td>'
+								+'</tr>'
+								+'<tr>'
+								+'<td>'+list.country+'</td>'
+								+'</tr>'
+								+'<tr>'
+								+'<td>'+list.regDate+'</td>'
+								+'</tr>'
+								+'<tr>'
+								+'<td><input type="button" value="달력 관리 및 설정" class="btn btn-default" id="hosting_manage_2">'
+								+'</td>'
+								+'</tr>';
 					});
 					hosting_manage_1 += '</tbody></table>';
 					hosting_manage_1 += '<center><ul class="pagination">';
 				for(var i=startPg; i<=lastPg; i++){
 						hosting_manage_1 += '<a href="#" onclick="hosting.hosting_manage_main('+i+')">'+i+'</a>';
 				}
-
 				hosting_manage_1 += '</ul></center>';
+				}
 				hosting_manage_1 +=
 					'</div>'
 					+'</div>'
@@ -955,10 +1385,7 @@ var hosting = (function(){
 	};
 })();
 var hosting_main = 
-'<script for="window" event="onunload" language="javascript">'
-+' browser_Event();'
-+'</script>'
-+'<div id="host_main_top_pic"><br/>'
+'<div id="host_main_top_pic"><br/>'
 +'<div id="host_main_top1">'
 +'<div id="host_main_top2">'
 +'<h1 style="color:white;"><b><br>에어비앤비<br>호스트가 되어<br>부수입을<br>올리세요.</b><br><br></h1>'
@@ -1151,7 +1578,6 @@ var hosting_regist_3 =
 +'<h4>주소를 입력해주세요</h4>'
 +'<div id="locationField">'
 +'<input id="autocomplete" placeholder="Enter your address" onFocus="geolocate()" class="host_regist_count2" type="text"></input>'
-+'<input type="button" value="확인" id="autocomplete_submit" class="btn btn-info" style="width:100%">'
 +'</div>'
 +'<h4>국가</h4>'
 +'<input type="text" id="country" class="host_regist_count2"><br>'
@@ -1189,7 +1615,7 @@ var hosting_regist_4 =
 +'<div id="host_regist_div_left3">'
 +'<div id="host_regist_div_left4">'
 +'<h2>숙소의 위치를 알려주세요.</h2><br>'
-+'<input id="pac-input" class="controls" type="text" placeholder="Search Box">'
++'<input id="pac-input" class="controls" type="text" placeholder="Search Box" >'
 +'<div id="googleMap" style="width:100%; height:380px;"></div>'
 +'<br><br>'
 +'<h4 style="color:grey;">원하는 위치를 선택해주세요.</h4><br><br><br>'
@@ -1551,12 +1977,24 @@ var hosting_manage_2 =
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_1">'
-+'<div id="host_manage_detail_right4" style="background-color:white; padding:5% 5% 5% 5%; border:1px solid #BDBDBD;">'
-+'<h5><b>예약 불가능일자</b></h5><br>'
++'<div id="host_regist_div_right3" style="margin-top:10%;">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 예약 불가능일자입니다.</h5><br>'
++'<h6>시작일자</h6>'
++'<div id="host_calendar_min_div"></div>'
++'<h6>종료일자</h6>'
++'<div id="host_calendar_max_div"></div><br>'
++'</div>'
++'</div>'
++'<div id="host_regist_div_right3" style="margin-top:5%;">'
++'<div id="host_regist_div_right4">'
++'<h5>새롭게 설정하는 예약 불가능일자</h5><br>'
 +'<h6>시작일자</h6>'
 +'<input type="text" id="host_calendar_min">'
 +'<h6>종료일자</h6>'
 +'<input type="text" id="host_calendar_max"><br>'
++'</div>'
 +'</div>'
 +'</div>'
 +'</div>';
@@ -1566,12 +2004,18 @@ var hosting_manage_3 =
 +'<div id="host_manage_detail_right2_2">'
 +'<h2><b>요금 설정</b></h2>'
 +'<h6>호스트가 원하는 요금을 설정할 수 있습니다.</h6><br><hr>'
-+'<div id="host_manage_price_div"><input type="text" placeholder="￦ / 박" class="host_regist_count2" id="host_manage_price"></div>'
++'<input type="text" placeholder="￦ / 박" class="host_regist_count2" id="host_manage_price"><br><br>'
 +'<hr><a href="#" id="host_manage_submit_3"><input type="button" value="수정" class="btn btn-danger host_regist_next"></a>'
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 숙소의 가격입니다.</h5><br>'
++'<div id="host_manage_price_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 var hosting_manage_4 =
@@ -1580,19 +2024,26 @@ var hosting_manage_4 =
 +'<div id="host_manage_detail_right2_2">'
 +'<h2><b>숙소 이용규칙</b></h2>'
 +'<h6>특정 유형의 예약을 허용하거나 제한하세요. 회원님이 정한 규칙에 동의한 게스트만 예약할 수 있습니다.'
-+'&nbsp;<a href="#">더 알아보기</a></h6><br><hr>'
++'</h6><br><hr>'
 +'<input type="checkbox" class="host_regist_input_box" id="host_manage_rules_1"><span class="host_regist_input_text">어린이(2~12세) 숙박에 적합함</span><br><br>'
 +'<input type="checkbox" class="host_regist_input_box" id="host_manage_rules_2"><span class="host_regist_input_text">유아(2세 미만) 숙박에 적합함 </span><br><br>'
 +'<input type="checkbox" class="host_regist_input_box" id="host_manage_rules_3"><span class="host_regist_input_text">반려동물 동반에 적합함 </span><br><br>'
 +'<input type="checkbox" class="host_regist_input_box" id="host_manage_rules_4"><span class="host_regist_input_text">흡연 가능 </span><br><br>'
 +'<input type="checkbox" class="host_regist_input_box" id="host_manage_rules_5"><span class="host_regist_input_text">행사나 파티 허용 </span><br><br>'
 +'<h2>추가규칙</h2><br>'
-+'<input type="text" placeholder="그 밖에 게스트가 알아두어야 하는 사항" class="host_regist_count2" id="host_manage_other_rule"><hr>'
++'<input type="text" placeholder="그 밖에 게스트가 알아두어야 하는 사항" class="host_regist_count2" id="host_manage_other_rule"><br><hr>'
 +'<a href="#" id="host_manage_submit_4"><input type="button" value="수정" class="btn btn-danger host_regist_next"></a>'
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 숙소의 규칙입니다.</h5><br>'
++'<div id="host_manage_rules_div"></div><br><br>'
++'<div id="host_manage_other_rule_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 var hosting_manage_5 = 
@@ -1604,12 +2055,18 @@ var hosting_manage_5 =
 +'<h2>체크인 시간</h2><br>'
 +'<select class="host_regist_select1" id="host_manage_checkin_time">'
 +'<option value="15" selected="selected">15:00</option>'
-+'</select><br><br><hr>'
++'</select><br><hr>'
 +'<a href="#" id="host_manage_submit_5"><input type="button" value="수정" class="btn btn-danger host_regist_next"></a>'
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 체크인 시간입니다.</h5><br>'
++'<div id="host_manage_checkin_time_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 var hosting_manage_6 = 
@@ -1631,57 +2088,6 @@ var hosting_manage_6 =
 +'&nbsp;'
 +'</div>'
 +'</div>';
-var hosting_manage_7 =
-+'<div id="host_manage_detail_right1">'
-+'<div id="host_manage_detail_right2">'
-+'<div id="host_manage_detail_right2_2">'
-+'<h2><b>숙소</b></h2><br>'
-+'<h4>집 유형</h4>'
-+'<select class="host_regist_select1" id="host_manage_building_type">'
-+'<option selected="selected" value="2">하나를 선택해주세요.</option>'
-+'</select>'
-+'<h4>숙소 유형</h4>'
-+'<select class="host_regist_select1" id="host_manage_room_type">'
-+'<option selected="selected" value="집전체">집 전체</option>'
-+'<option value="개인실">개인실</option>'
-+'<option value="다인실">다인실</option>'
-+'</select><br>'
-+'<h4>수용 인원</h4>'
-+'<select class="host_regist_select1" id="host_manage_guest_cnt">'
-+'<option selected="selected" value="1">게스트  1명</option>'
-+'<option value="2">게스트  2명</option>'
-+'<option value="3">게스트  3명</option>'
-+'<option value="4">게스트  4명</option>'
-+'<option value="5">게스트  5명</option>'
-+'<option value="6">게스트  6명</option>'
-+'<option value="7">게스트  7명</option>'
-+'<option value="8">게스트  8명</option>'
-+'<option value="9">게스트  9명</option>'
-+'<option value="10">게스트  10명</option>'
-+'<option value="11">게스트  11명</option>'
-+'<option value="12">게스트  12명</option>'
-+'<option value="13">게스트  13명</option>'
-+'<option value="14">게스트  14명</option>'
-+'<option value="15">게스트  15명</option>'
-+'</select>'
-+'</div><hr>'
-+'<div id="host_manage_detail_right2_2">'
-+'<h2><b>침실 및 욕실</b></h2><br>'
-+'<h4>침실 수</h4>'
-+'<select class="host_regist_select1" id="host_manage_bed_cnt">'
-+'<option selected="selected" value="1">1</option>'
-+'</select>'
-+'<h4>욕실 수</h4>'	
-+'<select class="host_regist_select1" id="host_manage_bathroom_cnt">'
-+'<option selected="selected" value="1">1</option>'
-+'</select><br><hr>'
-+'<a href="#" id="host_manage_submit_7"><input type="button" value="수정" class="btn btn-danger host_regist_next"></a>'
-+'</div>'
-+'</div>'
-+'<div id="host_manage_detail_right_3">'
-+'&nbsp;'
-+'</div>'
-+'</div>';
 var hosting_manage_8 =
 +'<div id="host_manage_detail_right1">'
 +'<div id="host_manage_detail_right2">'
@@ -1697,7 +2103,15 @@ var hosting_manage_8 =
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 숙소 이름입니다.</h5><br>'
++'<div id="host_manage_title_div"></div><br>'
++'<h5>현재 설정되어 있는 숙소 요약정보입니다.</h5><br>'
++'<div id="host_manage_explaination_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 var hosting_manage_9 =
@@ -1706,6 +2120,7 @@ var hosting_manage_9 =
 +'<div id="host_manage_detail_right2_2">'
 +'<h3><b>게스트가 숙소를 찾을 수 있도록 위치 정보를 제공하세요.</b></h3><br>'
 +'<h6>게스트는 이 정보를 활용하여 숙소를 찾습니다.</h6>'
++'<input id="pac-input_manage" class="controls" type="text" placeholder="Search Box">'
 +'<div id="googleMap_manage" style="width:100%; height:380px;"></div>'
 +'<input type="hidden" id="hosting_manage_map_lat">'
 +'<input type="hidden" id="hosting_manage_map_long">'
@@ -1740,7 +2155,13 @@ var hosting_manage_10 =
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right3_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 편의시설 입니다.</h5><br>'
++'<div id="host_manage_convenience_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 var hosting_manage_11 =
@@ -1776,8 +2197,78 @@ var hosting_manage_12 =
 +'</div>'
 +'</div>'
 +'<div id="host_manage_detail_right_2">'
-+'&nbsp;'
++'<div id="host_regist_div_right3">'
++'<div id="host_regist_div_right4">'
++'<img src="https://a0.muscache.com/airbnb/static/list_your_space/tip-icon-73f3ef1d10a9545bfd15fd266803da48.png" alt="" /><br><br>'
++'<h5>현재 설정되어 있는 안전시설 입니다.</h5><br>'
++'<div id="host_manage_safety_fac_div"></div><br>'
++'</div>'
++'</div>'
 +'</div>'
 +'</div>';
 
-
+var GUIDEBOOK =
+	   '<div id="host_manage_detail_right2" style="overflow: scroll; height: 820px;">'
+	   +'<div id="host_manage_detail_right2_2">'
+	   + '<h2>회원님이#도시이름#에서 좋아하는 것들을 소개해 주세요.</h2>'
+	      + '<hr>'
+	      + '<br>'
+	      + '<div>'
+	      + '<span>가장 좋아하는 음식점과 명소를 소개하는 가이드북을 만들어 보세요. 게스트가 이동 중에도 편리하게'
+	      + '볼 수 있게요!</span>'
+	      + '</div>'
+	      + '<br>'
+	      + '<div class="guidebook-form__sub-head-legal">'
+	      + '<span>어디에 표시되나요?</span>'
+	      + '<div class="guidebook-form__sub-head-legal">'
+	      + '<a href="#" target="_blank"><span><span>가이드북'
+	      + '인쇄하기 </span>»</span></a>'
+	      + '</div>'
+	      + '</div>'
+	      + '<hr>'
+	      + '<div>'
+	      + '<h3>가이드북 등록</h3>'
+	      + '<hr>'
+	      + '<div>'
+	      + '추천장소를 입력하시고 카테고리와 코멘트를 입력해주세요'
+	      + '<div>'
+	      + '<input id="pac-input" type="text" class="controls" placeholder="수정중1111">'
+	      + '</div>'
+	      ///// 셀렉트 ///
+	      + '<hr>'
+	      +'<div class="col-md-6">'
+	      + '   <select name=bighobby onChange=javascript:hobbychange(document.signform.bighobby.options.selectedIndex);>'
+	      + '    <option selected value="">-선택-</option>'
+	      + '    <option value=수집>수집</option>'
+	      + '    <option value=야외/레져>야외/레져</option>'
+	      + '    <option value=문화생활>문화생활</option>'
+	      + '    <option value=스포츠>스포츠</option>'
+	      + '    <option value=창작>창작</option>'
+	      + '    <option value=게임>게임</option>'
+	      + '    <option value=실내활동>실내활동</option>'
+	      + '    <option value=기타>기타</option>'
+	      + '   </select>'
+	      + '</div>'
+	      + '   </td>'
+	      + '   <td>'
+	      +'<div class="col-md-6">'
+	      + '   <select name=hobby size=1>'
+	      + '      <option selected value="">-선택-</option>'
+	      + '      <option value=""></option>'
+	      + '   </select>'
+	      + '</div>'
+	      + '</div>'
+	      ///////////////
+	      + '</div>'
+	      + '</div>'
+	      + '</div>'
+	      + '</div>'
+	   +'<div id="host_manage_detail_right_1">'
+	      + '<div class="map-container>'
+	      + '<div class="map-canvas-form" style="height: 100%; width: 100%;">'
+	      + '<div class = "map-canvas" id = "map-canvas" style="height: 95%; width: 97%; margin-top: 8%; ">'
+	      + '</div>'
+	      + '</div>'
+	      + '</div>'
+	      + '</div>'
+	      +'</div>';

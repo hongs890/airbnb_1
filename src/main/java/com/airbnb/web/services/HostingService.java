@@ -30,10 +30,11 @@ public interface HostingService{
 	public Integer update_convenience(HostingDTO param);
 	public Integer update_picture(HostingDTO param);
 	public Integer update_safety_fac(HostingDTO param);
-	public List<HostingDTO> house_list(Command command);
-	public List<String> address_country(Command command);
-	public List<String> building_list ();
-	public List<String> house_seq(Command command);
-	public Integer house_seq_max(Command command);
 	public Integer house_count(Command command);
+	public Integer exist_block(Command command);
+	public List<HostingDTO> house_list(Command command);
+	public List<String> building_list ();
+	public List<String> block_list (Command command);
+	public List<String> house_seq(Command command);
+
 }

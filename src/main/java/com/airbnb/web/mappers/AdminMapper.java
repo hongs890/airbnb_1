@@ -12,6 +12,7 @@ import com.airbnb.web.domains.MchartDTO;
 import com.airbnb.web.domains.RchartDTO;
 import com.airbnb.web.domains.Retval;
 import com.airbnb.web.domains.Command;
+import com.airbnb.web.domains.GoogleChartDTO;
 
 
 @Repository
@@ -27,6 +28,7 @@ public interface AdminMapper {
 	public List<MchartDTO> mchart();
 	public List<HchartDTO> hchart();
 	public List<RchartDTO> rchart();
+	public List<GoogleChartDTO> chart();
 	
 	public Retval regist(AdminDTO param);
 	public Retval update(AdminDTO param);

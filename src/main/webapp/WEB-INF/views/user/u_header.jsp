@@ -1,169 +1,292 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
-<!doctype html>
-<html lang="en">
-<head>
-<script type="text/template" id="qq-template-gallery">
-        <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="Drop files here">
-            <div class="qq-total-progress-bar-container-selector qq-total-progress-bar-container">
-                <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-total-progress-bar-selector qq-progress-bar qq-total-progress-bar"></div>
-            </div>
-            <div class="qq-upload-drop-area-selector qq-upload-drop-area" qq-hide-dropzone>
-                <span class="qq-upload-drop-area-text-selector"></span>
-            </div>
-            <div class="qq-upload-button-selector qq-upload-button">
-                <div>Upload a file</div>
-            </div>
-            <span class="qq-drop-processing-selector qq-drop-processing">
-                <span>Processing dropped files...</span>
-                <span class="qq-drop-processing-spinner-selector qq-drop-processing-spinner"></span>
-            </span>
-            <ul class="qq-upload-list-selector qq-upload-list" role="region" aria-live="polite" aria-relevant="additions removals">
-                <li>
-                    <span role="status" class="qq-upload-status-text-selector qq-upload-status-text"></span>
-                    <div class="qq-progress-bar-container-selector qq-progress-bar-container">
-                        <div role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" class="qq-progress-bar-selector qq-progress-bar"></div>
-                    </div>
-                    <span class="qq-upload-spinner-selector qq-upload-spinner"></span>
-                    <div class="qq-thumbnail-wrapper">
-                        <img class="qq-thumbnail-selector" qq-max-size="120" qq-server-scale>
-                    </div>
-                    <button type="button" class="qq-upload-cancel-selector qq-upload-cancel">X</button>
-                    <button type="button" class="qq-upload-retry-selector qq-upload-retry">
-                        <span class="qq-btn qq-retry-icon" aria-label="Retry"></span>
-                        Retry
-                    </button>
-
-                    <div class="qq-file-info">
-                        <div class="qq-file-name">
-                            <span class="qq-upload-file-selector qq-upload-file" id="host_upload_img"></span>
-                            <span class="qq-edit-filename-icon-selector qq-edit-filename-icon" aria-label="Edit filename"></span>
-                        </div>
-                        <input class="qq-edit-filename-selector qq-edit-filename" tabindex="0" type="text">
-                        <span class="qq-upload-size-selector qq-upload-size"></span>
-                        <button type="button" class="qq-btn qq-upload-delete-selector qq-upload-delete">
-                            <span class="qq-btn qq-delete-icon" aria-label="Delete"></span>
-                        </button>
-                        <button type="button" class="qq-btn qq-upload-pause-selector qq-upload-pause">
-                            <span class="qq-btn qq-pause-icon" aria-label="Pause"></span>
-                        </button>
-                        <button type="button" class="qq-btn qq-upload-continue-selector qq-upload-continue">
-                            <span class="qq-btn qq-continue-icon" aria-label="Continue"></span>
-                        </button>
-                    </div>
-                </li>
-            </ul>
-
-            <dialog class="qq-alert-dialog-selector">
-                <div class="qq-dialog-message-selector"></div>
-                <div class="qq-dialog-buttons">
-                    <button type="button" class="qq-cancel-button-selector">Close</button>
-                </div>
-            </dialog>
-
-            <dialog class="qq-confirm-dialog-selector">
-                <div class="qq-dialog-message-selector"></div>
-                <div class="qq-dialog-buttons">
-                    <button type="button" class="qq-cancel-button-selector">No</button>
-                    <button type="button" class="qq-ok-button-selector">Yes</button>
-                </div>
-            </dialog>
-            <dialog class="qq-prompt-dialog-selector">
-                <div class="qq-dialog-message-selector"></div>
-                <input type="text">
-                <div class="qq-dialog-buttons">
-                    <button type="button" class="qq-cancel-button-selector">Cancel</button>
-                    <button type="button" class="qq-ok-button-selector">Ok</button>
-                </div>
-            </dialog>
-        </div>
-    </script>
-</head>
+<%@ page language="java" contentType="text/html; charset=UTF-8"   pageEncoding="UTF-8"%>
+<%@ taglib uri="http://tiles.apache.org/tags-tiles" prefix="tiles" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
+<c:set var="context" value="<%=request.getContextPath()%>" />
+<c:set var="img" value="${context}/resources/img" />
+<c:set var="css" value="${context}/resources/css" />
+<c:set var="js" value="${context}/resources/js"/>
+<script src="${js}/application.js"></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
 <body class="with-new-header home_view v2 p1 fixed-header">
-	<span class="screen-reader-only"> 에어비앤비 </span>
-	<div  class="airbnb-header new ">
-		<div class="header--sm show-sm" aria-hidden="true">
-		<!-- 에어비앤비 로고 -->
-			<i class="icon icon-reorder icon-rausch"></i> <span class="screen-reader-only"> 에어비앤비 </span>
-			<div class="title--sm text-center">
-				<button class="btn btn-block search-btn--sm search-modal-trigger "
-					style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
-					<i class="icon icon-search icon-gray"></i> <span class="search-placeholder--sm"> 어디로 가세요? </span>
-				</button>
-			</div>
-			<div class="action--sm"></div>
-			<nav class="nav--sm" role="navigation"></nav>
-			<div class="search-modal-container"></div>
-		</div>
-		<header class="regular-header clearfix hide-sm" id="new-header"	role="banner">
-			<div class="comp pull-left" style="margin-bottom:-2%; padding-bottom:-20%;">
-				<div  id="h_logo_u" style="margin-top: 0% auto" class="hdr-btn link-reset belo-container cursor" aria-label="에어비앤비">
-				 <i class="icon icon-pos--lower icon-airbnb-alt h2 show-login"></i>
-				 <i class="icon icon-pos--lower icon-airbnb show-logout"></i>
-				</div>
-			</div>
-   
-   	<div class="comp pull-right show-logout">
-   	 <a class="no-crawl hdr-btn link-reset header-avatar-trigger needsclick">
-    <span class="value_name margin-right--tiny hide-md">user</span>
-    <div class="media-photo media-round user-profile-image header-icon icon-profile-alt-gray">
-    <img width="28" height="28" src="https://a2.muscache.com/im/pictures/0c825300-eb86-4356-a1ac-23b1cb633d04.jpg?aki_policy=profile_small" alt="">
-   </div>
-  </a>
-  <div class="panel  drop-down-menu avatar-tooltip--new">
-    <div class="panel-header no-border hide-lg">
-    </div>
-        <div id="m_edit" class=" panel-body link-reset hover-item no-crawl" >
-          <a class="hover-item_content"  >프로필 수정</a>
-        </div>
-        <div class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_dashboard" class="hover-item_content">마이페이지</a>
-        </div>
-          <aside  class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_logout" class="hover-item_content">로그아웃</a>
-           </aside>
-        </div>
-   </div>
-			<div id="js-header-help-menu">
-			<div class="comp pull-right help-trigger-wrapper no-border background-light-gray" >
-			<div  class="hdr-btn js-help-toggle link-reset needsclick">도움말<i class="header-icon icon-lifesaver-alt-gray"></i>
-					</div>
-				</div>
-			<div class="comp pull-right hide-host comp-become-a-host ">
-				<div  style="margin-top: 0% auto" class="hdr-btn link-reset lys-link js-become-a-host-link comp-become-a-host__link">
-				<span id="hosting_go" class="btn btn-small btn-become-a-host"> 호스팅 하기 <i class="icon icon-gift icon-host-referral-gift js-host-referral-gift-icon hide "></i>
-				</span>
-				<div class="panel  drop-down-menu avatar-tooltip--new">
-    <div class="panel-header no-border hide-lg">
-    </div>
-        <div class=" panel-body link-reset hover-item no-crawl" >
-          <a class="hover-item_content"  id="hosting_regist_1">호스팅 등록</a>
-        </div>
-        <div class=" panel-body link-reset hover-item no-crawl">
-          <a id="hosting_manage_1" class="hover-item_content">호스팅 관리</a>
-        </div>
-        <aside class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_inbox" class="hover-item_content">임시3</a>
-        </aside>
-        <aside class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_account" class="hover-item_content">임시완4</a>
-        </aside>
-          <aside  class=" panel-body link-reset hover-item no-crawl">
-          <a id="m_logout" class="hover-item_content">임시5</a>
-           </aside>
-        </div>
-				</div>
-			</div>
-			
-			</div>
-			<div class="comp pull-left back-to-search-results-wrapper"></div>
-			<div class="comp search-bar-wrapper" role="search">
-				<form action="/s" class="search-form">
-					<div class="search-bar">
-						<i class="header-icon icon-search-alt-gray search-icon"></i>
-						 <input	type="search" placeholder="어디로 가세요?" autocomplete="off" name="location" data-date-placeholder="년/월/일" class="location" />
-						<input type="hidden" name="source" value="hdr" />
-					</div>
-				</form>
-			</div>
+   <span class="screen-reader-only"> 에어비앤비 </span>
+   <div id="header" class="airbnb-header new ">
+      <div class="header--sm show-sm" aria-hidden="true">
+      <!-- 에어비앤비 로고 -->
+      <i class="icon icon-reorder icon-rausch"></i> <span
+         class="screen-reader-only"> 에어비앤비 </span>
+      <div class="title--sm text-center">
+         <button class="btn btn-block search-btn--sm search-modal-trigger "
+            style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+            <i class="icon icon-search icon-gray"></i> <span
+               class="search-placeholder--sm"> 어디로 가세요? </span>
+         </button>
+      </div>
+      <div class="action--sm"></div>
+      <nav class="nav--sm" role="navigation"></nav>
+      <div class="search-modal-container"></div>
+      </div>
+      <header class="regular-header clearfix hide-sm" id="new-header"   role="banner">
+      
+         <div class="comp pull-left" style="margin-bottom: -2%; padding-bottom: -20%;">
+            <div id="h_logo_u" style="margin-top: 0% auto"
+               class="hdr-btn link-reset belo-container cursor" aria-label="에어비앤비">
+               <i class="icon icon-pos--lower icon-airbnb-alt h2 show-login"></i> <i
+                  class="icon icon-pos--lower icon-airbnb show-logout"></i>
+            </div>
+         </div>
+         <div class="comp pull-right show-logout">
+            <a class="no-crawl hdr-btn link-reset header-avatar-trigger needsclick">
+               <span class="value_name margin-right--tiny hide-md">user</span>
+               <div class="media-photo media-round user-profile-image header-icon icon-profile-alt-gray">
+                  <img width="28" height="28"
+                     src="https://a2.muscache.com/im/pictures/0c825300-eb86-4356-a1ac-23b1cb633d04.jpg?aki_policy=profile_small"
+                     alt="">
+               </div>
+            </a>
+            <div class="panel  drop-down-menu avatar-tooltip--new">
+               <div class="panel-header no-border hide-lg"></div>
+               <div id="m_edit" class=" panel-body link-reset hover-item no-crawl">
+                  <a class="hover-item_content">프로필 수정</a>
+               </div>
+               <div class=" panel-body link-reset hover-item no-crawl">
+                  <a id="m_dashboard" class="hover-item_content">마이페이지</a>
+               </div>
+               <aside class=" panel-body link-reset hover-item no-crawl">
+                  <a id="m_logout" class="hover-item_content">로그아웃</a>
+               </aside>
+            </div>
+         </div>
 
-			</header>
+         <div id="js-header-help-menu">
+            <div class="comp pull-right help-trigger-wrapper no-border background-light-gray" >
+               
+            <div class="comp pull-right hide-host comp-become-a-host ">
+               <div style="margin-top: 0% auto"
+                  class="hdr-btn link-reset lys-link js-become-a-host-link comp-become-a-host__link">
+                  <span id="hosting_go" class="btn btn-small btn-become-a-host">
+                     호스팅 하기 <i
+                     class="icon icon-gift icon-host-referral-gift js-host-referral-gift-icon hide "></i>
+                  </span>
+                  <div class="panel  drop-down-menu avatar-tooltip--new">
+                     <div class="panel-header no-border hide-lg"></div>
+                     <div class=" panel-body link-reset hover-item no-crawl">
+                        <a class="hover-item_content" id="hosting_regist_1">호스팅 등록</a>
+                     </div>
+                     <div class=" panel-body link-reset hover-item no-crawl">
+                        <a id="hosting_manage_1" class="hover-item_content">호스팅 관리</a>
+                     </div>
+                     <aside class=" panel-body link-reset hover-item no-crawl">
+                        <a class="hover-item_content" id="resv_cancel">예약 현황</a>
+                     </aside>
+                     <aside class=" panel-body link-reset hover-item no-crawl">
+                        <a id="m_account" class="hover-item_content">임시완4</a>
+                     </aside>
+                     <aside class=" panel-body link-reset hover-item no-crawl">
+                        <a id="m_logout" class="hover-item_content">임시5</a>
+                     </aside>
+                  </div>
+               </div>
+            </div>
+         </div>
+         <div class="comp pull-right help-trigger-wrapper no-border background-light-gray">
+                  <div class="hdr-btn js-help-toggle link-reset needsclick">
+                     도움말<i class="header-icon icon-lifesaver-alt-gray"></i>
+                  </div>
+         </div>
+         </div>
+         <div class="pull-left back-to-search-results-wrapper"></div>
+            <div class="search-bar-wrapper" role="search">
+               <div class="search-bar" id="locationField">
+               <i class="header-icon icon-search-alt-gray search-icon"></i> <input
+                  type="search" placeholder="어디로 가세요?" id="location" name="location"
+                  data-date-placeholder="년/월/일" class="location" /> <input
+                  type="hidden" name="source" value="hdr" />
+            </div>
+            <div id="header-search-settings"
+               class="panel search-settings header-menu">
+               <div>
+                  <div class="panel-body clearfix">
+                     <div class="row row-condensed">
+                        <div class="col-sm-12">
+                           <div class="row row-condensed input-daterange">
+                              <div class="col-sm-6">
+                                 <label for="header-search-checkin" class="field-label">
+                                    <strong>체크인</strong>
+                                 </label> <input type="text" id="header-search-checkin" name="start"
+                                    class="checkin ui-datepicker-target" placeholder="년/월/일">
+                              </div>
+                              <div class="col-sm-6">
+                                 <label for="header-search-checkout" class="field-label">
+                                    <strong>체크아웃</strong>
+                                 </label> <input type="text" id="header-search-checkout"
+                                    class="checkout ui-datepicker-target" name="end"
+                                    placeholder="년/월/일">
+                              </div>
+                           </div>
+                        </div>
+                        <div class="col-sm-12 space-top-2">
+                           <label for="header-search-guests" class="field-label"> <strong>숙박
+                                 인원</strong>
+                           </label>
+                           <div class="select select-block select-large">
+                              <select id="guests_top" name="guests">
+                                 <option value="1">숙박 인원 1명</option>
+                                 <option value="2">숙박 인원 2명</option>
+                                 <option value="3">숙박 인원 3명</option>
+                                 <option value="4">숙박 인원 4명</option>
+                                 <option value="5">숙박 인원 5명</option>
+                                 <option value="6">숙박 인원 6명</option>
+                                 <option value="7">숙박 인원 7명</option>
+                                 <option value="8">숙박 인원 8명</option>
+                                 <option value="9">숙박 인원 9명</option>
+                                 <option value="10">숙박 인원 10명</option>
+                                 <option value="11">숙박 인원 11명</option>
+                                 <option value="12">숙박 인원 12명</option>
+                                 <option value="13">숙박 인원 13명</option>
+                                 <option value="14">숙박 인원 14명</option>
+                                 <option value="15">숙박 인원 15명</option>
+                                 <option value="16">숙박 인원 16+명</option>
+                              </select>
+                              <div>
+                                 <div class="GuestPicker hide">
+                                    <div class="GuestPickerRow row row-condensed">
+                                       <div class="col-sm-8 GuestPickerRow__label">
+                                          <strong aria-live="polite">성인 1명</strong>
+                                       </div>
+                                       <div class="col-sm-4 increment-btn-container">
+                                          <div class="increment-btn">
+                                             <button class="btn btn-decrement" aria-label="성인 수 줄이기">
+                                                <i class="icon icon-minus"></i>
+                                             </button>
+                                             <button class="btn btn-increment" aria-label="성인 수 늘리기">
+                                                <i class="icon icon-add"></i>
+                                             </button>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="GuestPickerRow row row-condensed">
+                                       <div class="col-sm-8 GuestPickerRow__label">
+                                          <strong aria-live="polite">어린이 0명</strong>
+                                          <div class="pull-right text-muted text-small">2 ~ 12세
+                                          </div>
+                                       </div>
+                                       <div class="col-sm-4 increment-btn-container">
+                                          <div class="increment-btn">
+                                             <button class="btn btn-decrement" aria-label="어린이 수 줄이기">
+                                                <i class="icon icon-minus"></i>
+                                             </button>
+                                             <button class="btn btn-increment" aria-label="어린이 수 늘리기">
+                                                <i class="icon icon-add"></i>
+                                             </button>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="GuestPickerRow row row-condensed">
+                                       <div class="col-sm-8 GuestPickerRow__label">
+                                          <strong aria-live="polite">유아 0명</strong>
+                                          <div class="pull-right text-muted text-small">2세 미만</div>
+                                       </div>
+                                       <div class="col-sm-4 increment-btn-container">
+                                          <div class="increment-btn">
+                                             <button class="btn btn-decrement" aria-label="유아 수 줄이기">
+                                                <i class="icon icon-minus"></i>
+                                             </button>
+                                             <button class="btn btn-increment" aria-label="유아 수 늘리기">
+                                                <i class="icon icon-add"></i>
+                                             </button>
+                                          </div>
+                                       </div>
+                                    </div>
+                                    <div class="GuestPickerFooter text-muted text-small">
+                                       <div class="row row-condensed">
+                                          <div class="col-sm-9"></div>
+                                          <div class="col-sm-3 text-right GuestPickerFooter__close">
+                                             <button class="btn-link" type="button">
+                                                <span>닫기</span>
+                                             </button>
+                                          </div>
+                                       </div>
+                                    </div>
+                                 </div>
+                              </div>
+                           </div>
+                           <input type="hidden" name="adults" value="1"> <input
+                              type="hidden" name="children" value="0"> <input
+                              type="hidden" name="infants" value="0"> <input
+                              type="hidden" name="guests" value="1">
+                        </div>
+                     </div>
+                  </div>
+                  <fieldset>
+                     <div class="panel-header menu-header normal-line-height">
+                        <strong><small> <legend id="room-type-legend">숙소
+                                 유형</legend></small></strong>
+                     </div>
+                     <div class="panel-body">
+                        <div class="space-4">
+                           <label class="checkbox menu-item" for="room_type_0"> <input
+                              type="checkbox" aria-describedby="room-type-legend"
+                              id="room_type_0" name="room_types[]" value="Entire home/apt">
+                              <i class="icon icon-entire-place horizontal-margin-medium"></i>
+                              <span>집 전체</span>
+                           </label> <label class="checkbox menu-item" for="room_type_1"> <input
+                              type="checkbox" aria-describedby="room-type-legend"
+                              id="room_type_1" name="room_types[]" value="Private room">
+                              <i class="icon icon-private-room horizontal-margin-medium"></i>
+                              <span data-reactid=".0.0.1.0.1.1.0.1.2">개인실</span>
+                           </label> <label class="checkbox menu-item" for="room_type_2"> <input
+                              type="checkbox" aria-describedby="room-type-legend"
+                              id="room_type_2" name="room_types[]" value="Shared room">
+                              <i class="icon icon-shared-room horizontal-margin-medium"></i>
+                              <span>다인실</span>
+                           </label>
+                        </div>
+                     </div>
+                  </fieldset>
+                  <div class="panel-body">
+                     <span id="submit_head_location" type="submit"
+                        class="btn btn-primary btn-block"><i
+                        class="icon icon-search"></i> <span>숙소 찾기</span> </span>
+                  </div>
+               </div>
+            </div>   
+         </div>
+      </header>
+       <input type="hidden" id="lng">
+	   <input type="hidden" id="lat"> 
+   </div>
+   <noscript>
+      <div class="alert alert-with-icon alert-error no-js-alert">
+         <i class="icon alert-icon icon-alert-alt"></i> 죄송합니다. 에어비앤비 웹사이트의 일부는
+         자바스크립트가 활성화되어 있지 않으면 제대로 작동하지 않습니다.
+      </div>
+   </noscript>
+   
+   <script type="text/javascript">
+   
+	   $('.input-daterange').datepicker({
+		    language: "kr",
+			format: "yyyy/mm/dd",
+		    startDate: "+0d",
+		    autoClose : true
+		});
+         autocomplete3 = new google.maps.places.Autocomplete(
+	 	      /** @type {!HTMLInputElement} */(document.getElementById('location')),
+	 	      {types: ['geocode'],componentRestrictions: {country: 'kr'}});
+    	   autocomplete3.addListener('place_changed', fillInAddress3);
+ 		  function fillInAddress3() {
+ 			  // Get the place details from the autocomplete object.
+ 			  var place = autocomplete3.getPlace();
+ 			  $('#lat').prop('value',place.geometry.location.lat());
+ 			  $('#lng').prop('value',place.geometry.location.lng());
+ 			  console.log(place.formatted_address);
+ 			 
+ 			  document.getElementById('header-search-settings').className = 'panel search-settings header-menu shown';
+ 			  console.log(document.getElementById('header-search-settings').className);
+ 			  // Get each component of the address from the place details
+ 			  // and fill the corresponding field on the form.
+ 			 
+ 			}
+   </script>

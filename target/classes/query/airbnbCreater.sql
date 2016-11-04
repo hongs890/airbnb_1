@@ -12,10 +12,11 @@ where constraint_schema = 'review'
 SELECT * FROM information_schema.REFERENTIAL_CONSTRAINTS
 where constraint_schema = 'member'
 delete from member where name = '1';
-
+ cat .mysql_history
 
 -- houses
 DROP TABLE IF EXISTS houses RESTRICT;
+
 -- address
 DROP TABLE IF EXISTS address RESTRICT;
 
@@ -139,8 +140,8 @@ ALTER TABLE block
 -- reservation
 CREATE TABLE reservation (
 	resv_seq      INT         NOT NULL, -- resv_seq
-	checkin_date  DATE        NOT NULL, -- checkin_date
-	checkout_date DATE        NOT NULL, -- checkout_date
+	checkin_date  DATETIME    NOT NULL, -- checkin_date
+	checkout_date DATETIME    NOT NULL, -- checkout_date
 	guest_cnt     INT         NOT NULL, -- guest_cnt
 	house_seq     INT         NULL,     -- house_seq
 	email         VARCHAR(50) NULL      -- email
@@ -158,11 +159,11 @@ ALTER TABLE reservation
 
 -- payment
 CREATE TABLE payment (
-	payment_seq  INT  NOT NULL, -- payment_seq
-	card_num     INT  NOT NULL, -- card_num
-	price        INT  NOT NULL, -- price
-	payment_date DATE NOT NULL, -- payment_date
-	resv_seq     INT  NOT NULL  -- resv_seq
+	payment_seq  INT         NOT NULL, -- payment_seq
+	card_num     VARCHAR(20) NOT NULL, -- card_num
+	price        INT         NOT NULL, -- price
+	payment_date DATE        NOT NULL, -- payment_date
+	resv_seq     INT         NOT NULL  -- resv_seq
 );
 
 -- payment
@@ -177,10 +178,10 @@ ALTER TABLE payment
 
 -- Guide_Major
 CREATE TABLE Guide_Major (
-	Guide_seq      INT         NOT NULL, -- 상위카테고리_seq
-	place          VARCHAR(15) NULL,     -- 도시위치
-	Major_Category VARCHAR(15) NULL,     -- Major_Category
-	email          VARCHAR(50) NOT NULL  -- email
+	Guide_seq      INT          NOT NULL, -- 상위카테고리_seq
+	place          VARCHAR(100) NULL,     -- 도시위치
+	Major_Category VARCHAR(15)  NULL,     -- Major_Category
+	email          VARCHAR(50)  NOT NULL  -- email
 );
 
 -- Guide_Major
@@ -197,7 +198,7 @@ ALTER TABLE Guide_Major
 CREATE TABLE Guide_Minor (
 	Minor_category_seq INT          NOT NULL, -- 하위카테고리_seq
 	Minor_category     VARCHAR(15)  NOT NULL, -- Minor_Category
-	Host_Comment       VARCHAR(150) NULL,     -- Host_Comment
+	Host_Comment       VARCHAR(300) NULL,     -- Host_Comment
 	Guide_seq          INT          NOT NULL  -- 상위카테고리_seq
 );
 
@@ -218,7 +219,8 @@ CREATE TABLE member (
 	name       VARCHAR(20) NOT NULL, -- name
 	phone      VARCHAR(15) NOT NULL, -- phone
 	profileImg VARCHAR(40) NULL,     -- profileImg
-	reg_date   DATE        NULL      -- reg_date
+	reg_date   DATE        NULL,     -- reg_date
+	ssn        VARCHAR(15) NULL      -- ssn
 );
 
 -- member
@@ -365,3 +367,28 @@ ALTER TABLE review
 			email -- email
 		)
 		ON DELETE CASCADE;
+		
+--view
+CREATE OR REPLACE VIEW houses_view
+AS
+SELECT H.house_seq,room_type,guest_cnt,bed_cnt,bathroom_cnt,picture,explaination,title,other_rule,checkin_term,checkin_time,period,min_nights,max_nights,
+      price,reg_date,rules,convenience,safety_fac,space,email,type,country,state,city,street,optional,zip_code,latitude,longitude
+FROM HOUSES H JOIN BUILDING B ON H.building_seq = B.building_seq JOIN address A ON H.house_seq = A.house_seq;
+
+SELECT * FROM Guide_view;  
+        
+CREATE OR REPLACE VIEW Guide_view
+AS
+SELECT
+     m.Place AS Place,
+     m.Major_Category AS Major_Category,
+     mi.Minor_Category AS Minor_Category,
+     mi.Host_Comment AS Host_Comment
+FROM Guide_Major m, Guide_Minor mi
+WHERE m.Major_seq = mi.Major_seq;
+
+CREATE VIEW resv_view
+AS
+SELECT r.resv_seq as resvSeq, checkin_date as checkinDate, checkout_date as checkoutDate,guest_cnt as guestCnt
+  ,r.house_seq as houseSeq,email,payment_seq as paymentSeq, card_num as cardNum,price,payment_date as paymentDate, state
+  FROM reservation r join address a on r.house_seq = a.house_seq join payment p on r.resv_seq = p.resv_seq; 

@@ -39,5 +39,10 @@ public interface BookingService{
 	public Command resvCount(Command command);
 	public HouseDTO findOne(Command command);
 	public List<BookingDTO> resvList(Command command);
+	public List<String> getBlockList(Command command);
+	public MemberDTO findHost(Command command);
+	public Integer payment(BookingDTO bDto);
+	public Integer resvCancel(Command command);
+	public BookingDTO findResv(Command command);
 	
 }

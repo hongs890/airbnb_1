@@ -26,6 +26,20 @@ var booking = (function() {
 			}
 			booking.search_result_form(1);
 		});
+		$('#pub_header').on('click','#submit_head_location', function() {	
+			if($('#header-search-checkin').val()===''){
+				alert('예약 종료일을 선택해 주세요.');
+				$('#header-search-checkin').focus();
+				return;
+			}
+			if($('#header-search-checkout').val()===''){
+				alert('예약 시작일을 선택해 주세요.');
+				$('#header-search-checkout').focus();
+				return;
+			}
+			$('#header-search-settings').removeClass('shown');
+			booking.search_result_form(0);
+		})
 		// 예약가능 리스트 페이지에서 필터검색 적용 버튼
 		$('#pub_article').on('click','#option_submit',function(){
 			booking.search_result_form(1);
@@ -56,6 +70,487 @@ var booking = (function() {
 				$('#option_submit').prop('disabled',false);
 			}
 		})
+		
+		// 예약가능 리스트에서 리스트를 클릭하면 디테일로 향하는 버튼 //
+		$('#pub_article').on('click','a[name=detail_go]',function(e){
+			var house_seq = $(this).children('input').prop('value');
+			
+			booking.show_detail(house_seq,1);
+		});
+		// 디테일 에서 예약 요청 버튼(결제 화면 이동 버튼) //
+		$('#pub_article').on('click','button[name=paying_go]',function(e) {
+			e.preventDefault();
+			var check_in = $('#checkin_date').val();
+			var check_out =  $('#checkout_date').val();
+				
+			var detail = {
+				'checkinDate' : check_in.includes(' ')? check_in : check_in + ' 15:00:00',
+				'checkoutDate' : check_out.includes(' ')? check_out : check_out + ' 10:00:00',
+				'guestCnt' : $('#guest_cnt option:selected').val(),
+				'houseSeq' : $('#house_seq').val(),
+				'price' : $('#price').val()
+			}
+			$.ajax({
+				url : app.context()+'/booking/GoPay/'+$('#nights').val(),
+				type : 'POST',
+				data : JSON.stringify(detail),
+				dataType : 'json',
+				contentType : 'application/json',
+				async : false,
+				success : function(data) {
+					if(data.logined==false){
+						alert('로그인 후 예약 가능합니다');
+						return;
+					}
+					var info = data.bDto;
+					var host = data.host;
+					var house = data.house;
+					
+					if (info.houseSeq != 0) {
+						var PAYING_FORM = '<main id="site-content" role="main" style="margin-top : 10%;">'
+							+'<div data-hypernova-key="p4flash_messagebundlejs"><span></span></div>'
+							+'<div id="main-view" class="main-view page-container-responsive space-top-md-6 space-md-6 space-top-lg-6 space-lg-6">'
+							+'<div class="row">'
+							+'<div class="col-sm-12 p4-error-header space-1">'
+							+'<div class="alert alert-with-icon alert-error alert-block hide space-lg-2 space-md-2" id="form-errors">'
+							+'<i class="icon alert-icon icon-alert-alt"></i>'
+							+'<div class="h5 space-1 error-header">'
+							+'거의 끝났습니다!'
+							+'</div>'
+							+'<ul></ul>'
+							+'</div>'
+							+'<div class="alert alert-with-icon alert-success alert-block hide space-lg-2 space-md-2" id="coupon-success">'
+							+'<i class="icon alert-icon icon-star-circled"></i>'
+							+'<div class="h5 space-1 error-header">'
+							+'프로모션 요금이 적용되었습니다.'
+							+'</div>'
+							+'전체 숙박 요금에 프로모션을 적용했습니다. 이제 즐거운 여행을 하는 일만 남았네요!'
+							+'</div>'
+							+'<div class="alert alert-with-icon alert-error alert-block hide space-lg-2 space-md-2" id="server-error">'
+							+'<i class="icon alert-icon icon-alert-alt"></i>'
+							+'오류가 발생하여 요청이 접수되지 않았습니다. 에어비앤비 웹사이트가 점검 중이었거나 연결이 자동으로 중지되었을 수 있습니다. 다시 시도해 주세요.'
+							+'</div>'
+							+'<div class="alert alert-with-icon alert-error alert-block hide space-lg-2 space-md-2" id="verification-error">'
+							+'<i class="icon alert-icon icon-alert-alt"></i>'
+							+'회원님의 카드를 인증할 수 없습니다. 다른 카드로 시도해 보세요. 회원님의 카드에는 금액이 청구되지 않았습니다.'
+							+'</div>'
+							+'<div class="alert alert-with-icon alert-error alert-block hide space-lg-2 space-md-2" id="house-rules-error">'
+							+'<i class="icon alert-icon icon-alert-alt"></i>'
+							+'<div class="h5 space-1 error-header">'
+							+'숙소 이용규칙과 약관'
+							+'</div>'
+							+'<p>'
+							+'예약를 하려면, 숙소 이용규칙과 약관에 동의하세요.'
+							+'</p>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-md-5 col-md-push-7 space-lg-2 space-md-2 side-summary-container">'
+							+'<div data-hypernova-key="p4_sidebarbundlejs">'
+							+'<div class="summary-card col-center">'
+							+'<div class="background-cover summary-card__payments-listing-image" style="background-image:url();">'
+							+'</div>'
+							+'<div class="pull-right space-3 summary-card__host-profile-photo">'
+							+'<div class="media-photo media-round">'
+							+'<img class="summary-card__host-profile-photo-src" src="'+app.img()+'/member/'+host.profileImg+'" alt="'+host.name+'">'
+							+'</div>'
+							+'</div>'
+							+'<div class="panel">'
+							+'<div class="panel-body">'
+							+'<div class="text-muted space-2"><span>호스트: '+host.name+'님</span>'
+							+'</div>'
+							+'<div class="sidebar-text-large">'+house.explaination+''
+							+'</div>'
+							+'<div class="hide-sm text-muted">'
+							+'<ul class="list-layout summary-card__additional-details-list">'
+							+'<li>'+house.roomType+'</li>'
+							+'</ul>'
+							+'<div>'+house.street+', '+house.city+', '+house.state+' '+house.zipCode+', '+house.country+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="panel-body hide-sm">'
+							+'<div class="row row-condensed">'
+							+'<div class="col-sm-5">'
+							+'<div class="text-muted space-bottom-2"><span>체크인</span>'
+							+'</div><span>'+info.checkinDate+'</span>'
+							+'</div>'
+							+'<div class="col-sm-2 summary-card__check-in-icon">'
+							+'<i class="icon icon-chevron-right icon-light-gray"></i>'
+							+'</div>'
+							+'<div class="col-sm-5">'
+							+'<div class="text-muted space-bottom-2"><span>체크아웃</span>'
+							+'</div><span>'+info.checkoutDate+'</span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="panel-body hide-sm">'
+							+'<table class="summary-card__billing-table">'
+							+'<tbody>'
+							+'<tr class="price-item">'
+							+'<td><span>₩'+info.price+' x '+data.nights+'박</span><span>&nbsp;</span></td>'
+							+'<td class="text-right price-item__price"><div></div></td>'
+							+'</tr>'
+							+'</tbody>'
+							+'</table>'
+							+'</div>'
+							+'<div class="panel-body hide-sm">'
+							+'<span class="sidebar-text-large space-2 summary-card__total-price" tabindex="-1">'
+							+'<table class="summary-card__billing-table">'
+							+'<tbody>'
+							+'<tr class="price-item">'
+							+'<td><span></span><span>&nbsp;</span></td>'
+							+'<td class="text-right price-item__price">'
+							+'<div><span>결제 요금 : ₩'+parseInt(info.price*data.nights)+'</span><sup>KRW</sup></div>'
+							+'</td>'
+							+'</tr>'
+							+'</tbody>'
+							+'</table>'
+							+'</span>'
+							+'</div>'
+							+'<div class="show-sm panel-body text-center"><a><span>요금 및 여행 요약 보기</span></a></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="pwp-summary-container"></div>'
+							+'</div>'
+							+'<div class="urgency-commitment-message col-md-7 col-md-pull-5 space-lg-4 space-md-4 space-sm-2">'
+							+'<div data-hypernova-key="p4_urgency_commitment_messagebundlejs">'
+							+'<div><span class="hide-sm">'
+							+'<div class="panel UrgencyCommitmentWrapper--expanded">'
+							+'<div class="panel-body">'
+							+'<div class="icon-background-container icon-rare-find-background">'
+							+'<div class="UrgencyCommitmentWrapper__text">'
+							+'<strong>흔치 않은 기회입니다.</strong>'
+							+'<div class="media space-top-1">'+host.name+' 숙소는 보통 예약이 가득 차있습니다.</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</span>'
+							+'<div class="show-sm"><a href="#" class="link-reset">'
+							+'<div class="panel UrgencyCommitmentWrapper--expanded">'
+							+'<div class="panel-body">'
+							+'<div class="icon-background-container icon-rare-find-background">'
+							+'<div class="UrgencyCommitmentWrapper__text">'
+							+'<strong>흔치 않은 기회입니다.</strong>'
+							+'<div class="media space-top-1">'+host.name+'님의 숙소는 보통 예약이 가득 차있습니다.</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div></a>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div id="content-container" class="summary-card-page-content col-md-7 col-md-pull-5">'
+							+'<div class="accordion-panel" data-panel-name="Payment">'
+							+'<div id="payment-panel" class="accordion-panel__content accordion-panel-overflow text-lead accordion-panel--expanded">'
+							+'<div id="payment_selectors">'
+							+'<div>'
+							+'<div class="row space-4">'
+							+'<div class="col-sm-12"><span>호스트가 요청을 수락한 경우에만 비용이 청구됩니다. 호스트는 24시간 내로 요청을 수락 또는 거절해야 합니다.</span>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="row space-4">'
+							+'<div class="col-6">'
+							+'<div>'
+							+'<label for="payment_country"><span>결제 국가</span></label>'
+							+'<div class="select select-block">'
+							+'<select name="payment_country">'
+							+'<option selected="" value="KR">대한민국</option>'
+							+'</select>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="row">'
+							+'<div class="col-sm-12">'
+							+'<label for="payment_type"><span>결제 방법</span></label>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row space-4">'
+							+'<div class="col-md-6 col-sm-12">'
+							+'<div>'
+							+'<div class="select select-block">'
+							+'<select name="payment_type">'
+							+'<option selected="" value="0">신용카드</option>'
+							+'</select>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div>'
+							+'<div>'
+							+'<div class="row space-4">'
+							+'<div class="col-12">'
+							+'<div class="page-container-full">'
+							+'<div class="row">'
+							+'<div class="responsive-component col-12 cc-number space-4">'
+							+'<label for="credit-card-number" data-i18n="cc_number" class="text-lead">카드 번호</label>'
+							+'<div class="right-addon first-message-right-addon">'
+							+'<a href="#" id="tooltip-cc-icon-lock" class="icon icon-lock icon-light-gray h3 link-reset"></a>'
+							+'<input type="text" id="card_number" maxlength="19" name="credit-card-number" placeholder="XXXX-XXXX-XXXX-XXXX" class="first-message-input invalid">'
+							+'</div>'
+							+'<div id="card_error" class="label label-warning inline-error text-lead" name="credit-card-number-error">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="responsive-component col-6 cc-expiration">'
+							+'<label for="credit-card-month" class="text-lead">'
+							+'유효기간'
+							+'</label>'
+							+'<div class="row row-super-condensed">'
+							+'<div class="col-6">'
+							+'<div class="select select-block first-message-select-div">'
+							+'<select id="card_m" option="selected" name="credit-card-month" class="first-message-input">'
+							+'<option>MM</option>'
+							+'<option value="1">1</option>'
+							+'<option value="2">2</option>'
+							+'<option value="3">3</option>'
+							+'<option value="4">4</option>'
+							+'<option value="5">5</option>'
+							+'<option value="6">6</option>'
+							+'<option value="7">7</option>'
+							+'<option value="8">8</option>'
+							+'<option value="9">9</option>'
+							+'<option value="10">10</option>'
+							+'<option value="11">11</option>'
+							+'<option value="12">12</option>'
+							+'</select>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-6">'
+							+'<div class="select select-block first-message-select-div">'
+							+'<select name="credit-card-year" class="first-message-input">'
+							+'<option>YYYY</option>'
+							var year = 0;
+							var nowDate = new Date();
+							for(var idx=1;idx <=15;idx++){
+								year = nowDate.getFullYear();
+								PAYING_FORM += '<option value="'+year+'">'+year+'</option>';
+								nowDate.setFullYear(year+1);		
+							}
+							PAYING_FORM +='</select>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="label label-warning inline-error hide text-lead" name="credit-card-exp-date-past-error">'
+							+'</div>'
+							+'<div class="label label-warning inline-error hide text-lead" name="credit-card-exp-date-error">'
+							+'</div>'
+							+'</div>'
+							+'<div class="responsive-component col-6 cc-security-code">'
+							+'<label id="cvv-label" for="credit-card-cvv" class="text-lead">'
+							+'보안 코드'
+							+'</label>'
+							+'<div class="right-addon first-message-right-addon">'
+							+'<input type="text" name="credit-card-cvv" class="first-message-input">'
+							+'</div>'
+							+'<div class="label label-warning inline-error hide text-lead" name="credit-card-cvv-error">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row space-4">'
+							+'<div class="col-6">'
+							+'<div>'
+							+'<label for="credit_card[first_name]"><span>이름</span></label>'
+							+'<input name="credit_card[first_name]" type="text">'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-6">'
+							+'<div>'
+							+'<label for="credit_card[last_name]"><span>성</span></label>'
+							+'<input name="credit_card[last_name]" type="text">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row space-4">'
+							+'<div class="col-4">'
+							+'<div>'
+							+'<label for="credit_card[zip]"><span>우편번호</span></label>'
+							+'<input name="credit_card[zip]" type="text">'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="accordion-style-checkout__section">'
+							+'<div>'
+							+'<div>'
+							+'<div class="text-lead">'
+							+'<div class="media-body text-rausch">에어비앤비는 게스트가 호스트와 협의하여 직접 계약을 체결할 수 있도록 해주는 플랫폼을 제공합니다. 숙박은 호스트가 게스트에게 제공하며, 에어비앤비는 호스트의 행위나 숙박을 감독하지 않습니다. 에어비앤비는 게스트와 호스트 사이에 체결되는 어떠한 계약의 당사자도 아니므로, 이에 관한 어떠한 책임도 지지 않습니다.</div>'
+							+'<div class="terms media">'
+							+'<div class="media-body terms-media-body">'
+							+'<label name="form" for="agrees-to-terms" class="va-container">'
+							+'<div class="va-top accordion-checkbox">'
+							+'<input type="checkbox" id="bt_agrees" name="agree" value="1" disabled="disabled">'
+							+'</div>'
+							+'<div class="va-top" id="agrees-to-terms-text">'
+							+'<div><a href="#" class="house-rules-link" id="house-rules-modal-trigger">숙소 이용규칙</a>, <a href="#" class="cancel-policy-link" target="_blank">환불정책</a>, <a href="#" class="refund_policy_link" target="_blank">게스트 환불 정책</a>에 동의합니다. 서비스 수수료를 포함하여 표시된 총액을 지불하는 것에도 동의합니다.</div>'
+							+'</div>'
+							+'</label>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="space-top-3">'
+							+'<div id="payment-form-submit-wrapper">'
+							+'<button id="paying_complete" class="btn btn-large btn-primary">요청 보내기'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="show-sm space-top-2">'
+							+'<div class="accordion-style-checkout__section">'
+							+'<div>'
+							+'<div>'
+							+'<div class="sidebar-text-large">'
+							+'<div><span>합계</span><span>&nbsp;</span><span>₩78126</span></div>'
+							+'</div><a href="#"><span>요금 및 여행 요약 보기</span></a></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="modal" id="security-deposit-modal" role="dialog">'
+							+'<div class="modal-table">'
+							+'<div class="modal-cell">'
+							+'<div class="modal-content">'
+							+'<div class="panel-header">'
+							+'<a href="#" class="panel-close" data-behavior="modal-close">'
+							+'×'
+							+'<span class="screen-reader-only">'
+							+'보증금'
+							+'</span>'
+							+'</a>'
+							+'보증금'
+							+'</div>'
+							+'<div class="panel-body">'
+							+'<p>'
+							+'보증금은 체크인 하루 전에 회원님의 신용카드로 청구됩니다. 호스트가 문제를 제기하지 않는 경우, 체크아웃 48시간 후 청구 금액 전액이 취소됩니다.'
+							+'</p>'
+							+'<p>'
+							+'호스트가 문제를 제기할 경우에는, 에어비앤비에서 보증금의 지급을 유보하고 호스트와 게스트 양 당사자들로부터 추가 정보를 수집할 것입니다. 만약 호스트와 게스트 간에 합의가 이루어 지는 경우, 에어비앤비에서 해당 금액을 돌려드립니다. 주로 호스트가 피해 정도를 결정하지만, 에어비앤비는 모든 청구건들을 추적하여, 호스트가 보증금을 차지하기 위해 과도하게 청구를 하는 경향이 있다고 판단되면 이 호스트를 퇴출시킵니다.'
+							+'</p>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<input type="hidden" id="price" value="'+parseInt(info.price*data.nights)+'"/>'
+							+'<input type="hidden" id="check_in" value="'+info.checkinDate+'"/>'
+							+'<input type="hidden" id="check_out" value="'+info.checkoutDate+'"/>'
+							+'<input type="hidden" id="guest_cnt" value="'+info.guestCnt+'"/>'
+							+'<input type="hidden" id="house_seq" value="'+info.houseSeq+'"/>'
+							+'</main>';
+						
+						$('#pub_article').html(PAYING_FORM);
+						
+						
+						
+					}
+				},	
+				error : function(x,s,m) {
+					alert('결제화면으로 이동 중 에러 발생 : '+m);
+				}
+			});
+			/// 카드번호 정규식 ///
+			$('#card_number').keyup(function(e) {
+				if((e.which >=48 && e.which <= 57) || (e.which >=96 && e.which <= 105) || e.which==189 || e.which==8 || e.which==109){
+					var cardNum = $(this).val();
+					if(cardNum.length > 18){
+						if(card_util.card_num_checker($(this).val())){
+							$('#card_error').html('<font color="black">올바른 카드 번호</font>');
+							$('#bt_agrees').prop('disabled',false);
+							$('#paying_complete').toggle('disabled');
+						}else{
+							$('#card_error').html('<font color="black">잘못된 카드 번호 입니다</font>');
+							$(this).focus();
+						}	
+					}	
+				}else{
+					$(this).prop('value',$(this).prop('value').substring(0,$(this).prop('value').length-1));
+				}	
+			})
+	/*		
+			function agreeCheck(frm)
+			{
+				if (frm.bt_paying.disabled==true)
+					frm.bt_paying.disabled=false
+					else
+					frm.bt_paying.disabled=true
+			}
+			
+			$('#pub_artcle').on('click','#bt_agrees', function agreeCheck(frm) {
+				frm.preventDefault();
+				
+			});*/
+			
+			/// 결제화면 에서 결제버튼 ///
+			$('#paying_complete').click(function(e) {
+				e.preventDefault();
+				var pay_data = {
+					'cardNum' : $('#card_number').val(),
+					'price' : $('#price').val(),
+					'checkinDate' : $('#check_in').val(),
+					'checkoutDate' : $('#check_out').val(),
+					'guestCnt' : $('#guset_cnt').val(),
+					'houseSeq' : $('#house_seq').val()
+						}
+				$.ajax({
+					url : app.context()+'/booking/payment',
+					type : 'POST',
+					data : JSON.stringify(pay_data),
+					dataType : 'json',
+					contentType : 'application/json',
+					async : false,
+					success : function(data) {
+							alert('결제완료!');
+							booking.resv_cancel(1);
+					},	
+					error : function(x,s,m) {
+						alert('결제 중 에러 발생 : '+m);
+					}	
+				});
+			});
+		})
+		
+		$('#pub_article').on('click','#back', function() {
+			booking.resv_cancel(1);
+		})
+		
+		// 예약현황 버튼 (예약 취소) //
+		$('#pub_header').on('click','#resv_cancel',function(){
+			booking.resv_cancel(1);
+		});
+		// 요청보내기 토글 //
+		$('#pub_article').on('click','#bt_agrees', function() {
+			$('#paying_complete').toggle('disabled');
+			
+			/*if($('#paying_complete').prop('disabled')==false){
+				$('#paying_complete').prop('disabled',true);
+			}else{
+				$('#paying_complete').prop('disabled',false);					
+			}	*/
+		})
+		
+		
+		
+		
 	}
 	// 리스트에서 이미지 클릭시 해당 화면으로 이동하는 이벤트 핸들러
 	
@@ -64,18 +559,23 @@ var booking = (function() {
 		var location = '';
 		var search_data = {};
 		// 예약시작일 , 종료일 임의적으로 체크인은 15시 체크아웃은 10시로 고정 
-		var check_in = $('#checkin').val();
-		var check_out = $('#checkout').val();
+		var check_in = page_num==0? $('#header-search-checkin').val() : $('#checkin').val();
+		var check_out = page_num==0? $('#header-search-checkout').val() : $('#checkout').val();
+		
 		check_in = check_in.includes(':') ? check_in : check_in + ' 15:00:00';
 		check_out = check_out.includes(':') ? check_out : check_out + ' 10:00:00';
 		// 첫 페이지에서 검색한 주소를 분할(ex: 서울특별시 강남구)
 		if($('#autocomplete').val() !== undefined){
-			location =  $('#autocomplete').val().split(' ');
+			location = page_num==0? $('#location').val().split(' ') : $('#autocomplete').val().split(' ');
+			var room_type = ($('#room_type_0').prop('checked')==true ? 1 : 0)
+			+ ($('#room_type_1').prop('checked')==true ? 2 : 0)
+			+ ($('#room_type_2').prop('checked')==true ? 4 : 0)
+		
 			search_data = {
 					'longitude':$('#lng').val(),'latitude':$('#lat').val(),'checkin':check_in,
-					'checkout':check_out,'guestCnt':$('#guests option:selected').val(),'pageNum':1,
+					'checkout':check_out,'guestCnt': page_num==0? $('#guests_top option:selected').val():$('#guests option:selected').val(),'pageNum':page_num==0? 1 : page_num,
 					'country':location[0], 'state':location[1]===undefined? 'NONE' :location[1],'city':location[2]===undefined? 'NONE' :location[2],
-					'street':location[3]===undefined? 'NONE' :location[3]
+					'street':location[3]===undefined? 'NONE' :location[3],'roomType':room_type
 			}
 		}
 		else{
@@ -149,7 +649,9 @@ var booking = (function() {
 				var guestCnt = data.guestCnt;
 			
 				var BOOK_FORM = 
-					'<link href="https://a1.muscache.com/airbnb/static/packages/map_search-6524c10aa13b7d045b8eabe42cd2fb39.css" media="screen" rel="stylesheet" type="text/css" />'
+					'<script src="'+app.js()+'/application.js"></script>'
+					+'<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>'
+					+'<link href="https://a1.muscache.com/airbnb/static/packages/map_search-6524c10aa13b7d045b8eabe42cd2fb39.css" media="screen" rel="stylesheet" type="text/css" />'
 					+'<link href="https://a1.muscache.com/airbnb/static/packages/common_o2.1-50a45a2f41dab81f98765e60188dc94c.css" media="all" rel="stylesheet" type="text/css" />'
 					+'<link href="https://a0.muscache.com/airbnb/static/packages/common-c797852784aa37fdff8ec44a848e3d10.css" media="all" rel="stylesheet" type="text/css" />'
 					+'<link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />'
@@ -643,6 +1145,7 @@ var booking = (function() {
 				+'<input type="hidden" id="state" value="'+data.state+'">'
 				+'<input type="hidden" id="city" value="'+data.city+'">'
 				+'<input type="hidden" id="street" value="'+data.street+'">'		
+				+'<input type="hidden" id="nights" value="'+data.nights+'">'		
 				+'</div>'
 				+'</div>'
 				+'<div id="map" style="position:absolute; right: 0;top: 10%; bottom: 10%;width: 40%;">'
@@ -742,8 +1245,7 @@ var booking = (function() {
 				$('.input-daterange').datepicker({
 				    language: "kr",
 					format: "yyyy/mm/dd",
-				    startDate: "+0d",
-				    autoClose : true
+				    startDate: "+0d"
 				});
 			},
 			error:function(request,status,error){
@@ -770,2165 +1272,820 @@ var booking = (function() {
 			$('#option_fac').hide();
 			$('#filter_submit').hide();
 		});	
-	}
+	};
+	
+	
 	return{
 		init : init,
-		search_result_form : search_result_form
+		search_result_form : search_result_form,
+		show_detail : function(seq,type) {
+			$.ajax({
+				url : app.context()+'/booking/detail/'+seq,
+				data : {'check_in' : $('#checkin').val()===undefined?'NONE':$('#checkin').val(), 'check_out' : $('#checkout').val()===undefined?'NONE':$('#checkout').val(), 'guest_cnt': $('#guests').val()===undefined?'NONE':$('#guests').val(),'nights': $('#nights').val()===undefined?'NONE':$('#nights').val()},
+				type : 'GET',
+				dataType : 'json',
+				async : false,
+				success : function(data) {
+					if (data.house.houseSeq != 0) {
+						var house = data.house;
+						var DETAIL_FORM = 
+							'<script src="'+app.js()+'/application.js"></script>'
+							+'<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>'
+							+'<div id="room">'
+							+'<link href="https://a1.muscache.com/airbnb/static/packages/common_o2.1-50a45a2f41dab81f98765e60188dc94c.css" media="all" rel="stylesheet" type="text/css" />'
+							+'<link href="https://a0.muscache.com/airbnb/static/packages/common-c797852784aa37fdff8ec44a848e3d10.css" media="all" rel="stylesheet" type="text/css" />'
+							+'<link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />'
+							+'<link rel="stylesheet" href="'+app.css()+'/datepicker/bootstrap-datepicker.css" />'
+							+'<div id="photos" class="with-photos with-modal"><img alt="img" src="'+app.img()+'/booking/'+house.picture+'" width="100%" height="550px" style="padding-bottom : 5%;"/>'
+							+'</div>'
+							+'<div id="summary" class="panel room-section">'
+							+'<div class="page-container-responsive">'
+							+'<div class="row">'
+							+'<div class="col-lg-8">'
+							+'<div>'
+							+'<div class="summary-component">'
+							+'<div class="space-4 space-top-4">'
+							+'<div class="row">'
+							+'<div class="col-md-3 space-sm-4 text-center space-sm-2">'
+							+'<div class="media-photo-badge"><a class="media-photo media-round"><img alt="사용자 프로필 이미지" class="host-profile-image" height="115" width="115" data-pin-nopin="true" src="'+app.img()+'/booking/'+house.picture+'"></a>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<h1 class="overflow h3 space-1 text-center-sm" id="listing_name">'+house.title+'</h1>'
+							+'<div id="display-address" class="space-2 text-muted text-center-sm"><a href="#neighborhood" class="link-reset">'+house.country+', '+house.state+', '+house.city+', '+house.street+'</a>'
+							+'<span> &nbsp; </span>'
+							+'</div>'
+							+'<div class="row row-condensed text-muted text-center">'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-entire-place icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-group icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'<div class="col-sm-3">'
+							+'<i class="icon icon-rooms icon-size-2" aria-hidden="true"></i>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted text-center hide-sm">'
+							+'<a href="#host-profile" class="link-reset text-wrap"></a>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row row-condensed text-muted text-center">'
+							+'<div class="col-sm-3">'+house.roomType+'</div>'
+							+'<div class="col-sm-3">숙박 인원 : '+house.guestCnt+' 명</div>'
+							+'<div class="col-sm-3">침실 '+house.bathroomCnt+' 개</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							 +'<div class="col-lg-4">'
+							 +'<div class="mobile-bookit-btn-container js-bookit-btn-container panel-btn-sm panel-btn-fixed-sm hide hide-md hide-lg">'
+							+'<button name="paying_go" class="btn btn-primary btn-block btn-large js-book-it-sm-trigger">'
+							+'<span class="book-it__btn-text">예약 요청</span>'
+							 +'<span class="book-it__btn-text--contact-host">호스트에게 연락하기</span>'
+							+'<span class="book-it__btn-text--instant"><i class="icon icon-bolt icon-beach h4"></i>즉시 예약 </span>'
+							 +'</button>'
+							+'</div>'
+							+''
+							+'<div id="tax-descriptions-tip" class="tooltip tooltip-top-middle" role="tooltip" data-sticky="true" data-trigger="#tax-descriptions-tooltip">'
+							+'</div>'
+							+''
+							+''
+							 +'<div>'
+							+'<div class="book-it__container js-book-it-container fixed" style="top: 40px;">'
+							+'<div>'
+							+'<div>'
+							+'<div class="">'
+							+'<div class="book-it__price fixed" style="height: 40px;">'
+							+'<div class="row">'
+							+'<div class="col-sm-8">'
+							+'<div class="book-it__price-amount text-special">';
+							var bDto = data.bDto;
+						
+							DETAIL_FORM += type==1? '<span class="h3"><span>￦ '+ parseInt(house.price*data.nights)+'</span></span>'
+									:'<span class="h3"><span>￦ '+ bDto.price+'</span></span>';
+							DETAIL_FORM += '</div>'
+							+'</div>'
+							+'<div class="col-sm-4">'
+							+'<div class="book-it__payment-period-container pull-right">';
+							DETAIL_FORM += type==1?'<div class="book-it__payment-period"><span>'+data.nights+'박</span>'
+									: '<div class="book-it__payment-period"><span></span>'
+							DETAIL_FORM +='</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<form method="post">'
+							+'<div class="panel book-it-panel">'
+							+'<div class="panel-body panel-light">'
+							+'<div class="row row-condensed space-3">'
+							+'<div class="col-md-9 input-daterange">'
+							+'<div class="row row-condensed">'
+							+'<div class="col-sm-6">'
+							+'<label class="book-it__label" for="datespan-checkin">체크인</label>';
+							DETAIL_FORM += type==1?'<input id="checkin_date" type="text" name="start" class="checkin ui-datepicker-target" value="'+data.check_in+'">'
+									: '<span>'+bDto.checkinDate+'</span>';
+						
+							DETAIL_FORM +='</div>'
+							+'<div class="col-sm-6">'
+							+'<label class="book-it__label" for="datespan-checkout">체크아웃</label>'
+							DETAIL_FORM += type==1? '<input id="checkout_date" type="text" name="end" class="checkout ui-datepicker-target" value="'+data.check_out+'">'
+									:'<span>'+bDto.checkoutDate+'</span>'
+							
+							DETAIL_FORM +='</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-3">'
+							+'<div>'
+							+'<label for="number_of_guests_21674" class="book-it__label"><span>숙박 인원</span></label>'
+							+'<div class="select select-block">'
+							+'<select id="guest_cnt" name="number_of_guests">'
+							+'<option value="1">1</option>'
+							+'<option value="2">2</option>'
+							+'<option value="3">3</option>'
+							+'<option value="4">4</option>'
+							+'<option value="5">5</option>'
+							+'<option value="6">6</option>'
+							+'<option value="7">7</option>'
+							+'<option value="8">8</option>'
+							+'<option value="9">9</option>'
+							+'<option value="10">10</option>'
+							+'<option value="11">11</option>'
+							+'<option value="12">12</option>'
+							+'<option value="13">13</option>'
+							+'<option value="14">14</option>'
+							+'<option value="15">15</option>'
+							+'<option value="16">16+</option>'
+							+'</select>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>';
+							DETAIL_FORM += type==1? 
+							'<button class="btn btn-primary btn-large btn-block" name="paying_go">'
+							+'<span>예약 요청</span>'
+							+'</button>'
+							+'<div class="bookit-message__container text-center text-muted">'
+							+'<small><span>"예약" 버튼을 클릭해도 대금이 바로 청구되지 않습니다.</span></small>'
+							+'</div>'
+							: 
+							'<span class="btn btn-primary btn-large btn-block" id="back">'
+							+'<span>뒤 로</span>'
+							+'</span>'
+							+'<div class="bookit-message__container text-center text-muted">'
+							+'<small><span>"뒤로" 버튼을 클릭하면 예약현황으로 이동합니다</span></small>'
+							+'</div>';	
+						
+							DETAIL_FORM +='</div>'
+							+'<div class="hide">'
+							+'<button type="button" class="btn btn-primary btn-large btn-small btn-block">'
+							+'<span>호스트에게 연락하기</span>'
+							+'</button>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</form>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+''
+							+'<div>'
+							+'<div>'
+							+'<div id="details" class="details-section webkit-render-fix">'
+							+'<div class="page-container-responsive">'
+							+'<div class="row">'
+							+'<div class="col-lg-8 js-details-column">'
+							+'<div class="space-8 space-top-8"><h4 class="space-4 text-center-sm"></h4>'
+							+'<div class="row row-condensed">'
+							+'<div class="contact-host-div col-12">'
+							+'<div>'
+							+'<button class="btn-link btn-link--bold" type="button">'
+							+'<span>호스트에게 연락하기</span>'
+							+'</button>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div><span>숙소</span></div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<div>'
+							+'<span>숙박 가능 인원:</span>'
+							+'<span></span><strong>'+house.guestCnt+'</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>욕실:</span>'
+							+'<span> </span><strong>'+house.bathroomCnt+'</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>침실:</span>'
+							+'<span> </span><strong>'+house.bedCnt+'</strong>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-6">'
+							+'<div><span>체크인:</span>'
+							+'<span> </span><strong>15:00 이후</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>체크아웃:</span>'
+							+'<span> </span><strong>10:00</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>집 유형:</span>'
+							+'<span> </span><strong>'+house.type+'</strong>'
+							+'</div>'
+							+'<div>'
+							+'<span>숙소 유형 :</span>'
+							+'<span> </span><strong>'+house.roomType+'</strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<strong><a href="#house-rules" class="react-house-rules-trigger" data-prevent-default="true"><span>숙소 이용규칙</span></a></strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row amenities">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>시설</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9 expandable expanded">'
+							+''
+							+'<div class="expandable-content expandable-content-full">'
+							
+							+'<div class="row">'
+							+'<div class="col-sm-6">'
+							var conven = house.convenience.split('-');
+							// 왼쪽시설
+							
+							DETAIL_FORM += conven[0]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-essentials"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>필수품목</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>필수품목</del></span>'
+									+'</div>'
+									+'</div>'
+									
+							DETAIL_FORM += conven[2]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-shampoo"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>샴푸</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>샴푸</del></span>'
+									+'</div>'
+									+'</div>'
+							
+							DETAIL_FORM += conven[4]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-tv"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>TV</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>TV</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[6]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-air-conditioning"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>에어컨</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>에어컨</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[8]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-laptop"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>책상/작업공간</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>책상/작업공간</del></span>'
+									+'</div>'
+									+'</div>'							
+							DETAIL_FORM += conven[10]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-iron"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>다리미</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>다리미</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[12]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-paw"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>반려동물</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>반려동물</del></span>'
+									+'</div>'
+									+'</div>'
+							
+							
+							
+							+'</div>'
+							// 오른쪽 시설
+							+'<div class="col-sm-6">'
+									
+							DETAIL_FORM += conven[1]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-wifi"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>무선인터넷</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>무선인터넷</del></span>'
+									+'</div>'
+									+'</div>'
+							
+							DETAIL_FORM += conven[3]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-hangers"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>옷장/서랍장</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>옷장/서랍장</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[5]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-heating"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>난방</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>난방</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[7]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-cup"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>조식,커피,차</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>조식,커피,차</del></span>'
+									+'</div>'
+									+'</div>'							
+							DETAIL_FORM += conven[9]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-fireplace"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>벽난로</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>벽난로</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += conven[11]=='T' ?
+									'<div>'
+									+'<div class="space-1">'
+									+'<span><i class="icon h3 icon-hair-dryer"></i><span>&nbsp;&nbsp;&nbsp;</span></span>'
+									+'<span id="amenity-long-tooltip-trigger-8"><strong>헤어드라이어	</strong></span>'
+									+'</div>'
+									+'</div>'
+									:
+									'<div>'
+									+'<div class="space-1 text-muted">'
+									+'<span id="amenity-long-tooltip-trigger-40"><del>헤어드라이어</del></span>'
+									+'</div>'
+									+'</div>'
+							DETAIL_FORM += '</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>가격</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">'
+							+'<div>'
+							+'<span>1박 요금 : ￦ '+house.price+'</span>'
+							+'</div>'
+							+'<div>'
+							+'<span>추가 인원 요금 :</span>'
+							+'<span> </span><strong>추가요금 없음</strong>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row description" id="description">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>설명</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content expandable-content-long">'
+							+'<div>'
+							+'<p><span>'+house.explaination+'</span></p>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row react-house-rules" id="house-rules">'
+							+'<div class="col-md-3">'
+							+'<div class="text-muted">'
+							+'<span>숙소 이용규칙</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="structured_house_rules">'
+							+'<div class="row col-sm-12">'
+							+'<span>체크인은 15:00 이후입니다.</span>'
+							+'</div>'
+							var rules = house.rules.split('-');
+							DETAIL_FORM += rules[0]=='T' ? 
+								'<div class="row col-sm-12">'
+								+'<span>어린이(2~12세) 숙박에 적합함</span>'
+								+'</div>' : ' ';
+							DETAIL_FORM += rules[1]=='T' ? 
+								'<div class="row col-sm-12">'
+								+'<span>유아(2세 미만) 숙박에 적합함 </span>'
+								+'</div>' : ' ';
+							DETAIL_FORM += rules[2]=='T' ? 
+								'<div class="row col-sm-12">'
+								+'<span>반려동물 동반에 적합함</span>'
+								+'</div>' : ' ';
+							DETAIL_FORM += rules[3]=='T' ? 
+								'<div class="row col-sm-12">'
+								+'<span>흡연 가능</span>'
+								+'</div>' : ' ';
+							DETAIL_FORM += rules[4]=='T' ? 
+								'<div class="row col-sm-12">'
+								+'<span>행사나 파티 허용</span>'
+								+'</div>' : ' ';
+							DETAIL_FORM += '<div class="row col-sm-12">'
+							+'</div>'
+							+'<div class="row">'
+							+'<div class="col-sm-12">'
+							+'<hr class="structured_house_rules__hr">'
+							+'<span>'+house.otherRule+'</span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content">'
+							+'<div class="expandable-indicator"></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>안전 기능</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-sm-6">'
+							var safetys = house.safetyFac.split('-');
+							DETAIL_FORM += safetys[0]=='T' ? 
+								'<div>'
+								+'<div class="space-1">'
+								+'<span id="amenity-short-tooltip-trigger-35"><span>연기 감지기</span></span>'
+								+'</div>'
+								+'</div>' : ' ';
+							DETAIL_FORM += safetys[2]=='T' ? 
+								'<div>'
+								+'<div class="space-1">'
+								+'<span id="amenity-short-tooltip-trigger-35"><span>구급상자</span></span>'
+								+'</div>'
+								+'</div>' : ' ';
+							DETAIL_FORM += safetys[4]=='T' ? 
+								'<div>'
+								+'<div class="space-1">'
+								+'<span id="amenity-short-tooltip-trigger-35"><span>소화기</span></span>'
+								+'</div>'
+								+'</div>' : ' ';
+							
+							
+							DETAIL_FORM +='</div>'
+							+'<div class="col-sm-6">'
+							
+							
+							DETAIL_FORM += safetys[1]=='T' ? 
+									'<div>'
+									+'<div class="space-1">'
+									+'<span id="amenity-short-tooltip-trigger-35"><span>일산화탄소 감지기</span></span>'
+									+'</div>'
+									+'</div>' : ' ';
+								
+							DETAIL_FORM += safetys[3]=='T' ? 
+								'<div>'
+								+'<div class="space-1">'
+								+'<span id="amenity-short-tooltip-trigger-35"><span>안전 카드</span></span>'
+								+'</div>'
+								+'</div>' : ' ';
+							DETAIL_FORM += safetys[5]=='T' ? 
+								'<div>'
+								+'<div class="space-1">'
+								+'<span id="amenity-short-tooltip-trigger-35"><span>침실에 잠금장치</span></span>'
+								+'</div>'
+								+'</div>' : ' ';
+							
+							
+							DETAIL_FORM += '</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<hr>'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-muted">'
+							+'<div>'
+							+'<span>예약 가능 여부</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<div class="row">'
+							+'<div class="col-md-6">최소 숙박일 <strong>'+house.minNights+'일</strong>.</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div></div>'
+							+'<div id="host-profile" class="room-section webkit-render-fix">'
+							+'<div class="page-container-responsive space-top-8 space-8">'
+							+'<div class="row">'
+							+'<div class="col-lg-8">'
+							+'<h4 class="space-2 text-center-sm"><span>호스트</span></h4>'
+							+'<hr class="space-4 space-top-2">'
+							+'<div class="row">'
+							+'<div class="col-md-3 text-center">'
+							+'<div class="media-photo-badge">'
+							+'<a href="#" class="media-photo media-round">'
+							+'<img alt="'+data.host.name+'" class="media-photo media-round" height="90" width="90" data-pin-nopin="true" src="'+app.img()+'/member/'+data.host.profileImg+'"></a>'
+							+'</div>'
+							+'</div>'
+							+'<div class="col-md-9">'
+							+'<h3 class="space-1">'+data.host.name+'</h3>'
+							+'<div class="row row-condensed space-2">'
+							+'<div class="col-md-12 text-muted">'
+							+'<span>'+house.country+', '+house.state+'</span>'
+							+'<span> · </span>'
+							+'<span>회원가입 : '+data.host.regDate+'</span>'
+							+'</div>'
+							+'</div>'
+							+'<div class="react-expandable expanded">'
+							+'<div class="expandable-content expandable-content-long">'
+							+'<div class="expandable-indicator"></div>'
+							+'</div>'
+							+'</div>'
+							+'<div>'
+							+'<span class="btn btn-primary btn-small"><span>호스트에게 연락하기</span></span>'
+							+'<div></div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<div id="neighborhood" class="room-section">'
+							+'<div style="position:relative;" class="page-container-responsive">'
+							+'<div class="p3-location--map">'
+							+'<div class="panel location-panel"></div>'
+							+'<ul id="guidebook-recommendations" class="hide">'
+							+'<li class="user-image"><img alt="'+data.host.name+'" data-pin-nopin="true" height="90" src="'+app.img()+'/member/'+data.host.profileImg+'" title="'+data.host.name+'" width="90"></li>'
+							+'</ul>'
+							+'<div id="hover-card" class="panel">'
+							+'<div class="panel-body">'
+							+'<div class="text-center">숙소 위치</div>'
+							+'<div class="text-center">'
+							+'<span class="listing-location"><span>'+house.country+'</span><span>'+house.state+',</span><span>'+house.city+'</span></span>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'</div>'
+							+'<input type="hidden" id="price" value="'+house.price+'" />'
+							+'<input type="hidden" id="house_seq" value="'+house.houseSeq+'" />'
+							+'<input type="hidden" id="nights" value="'+data.nights+'"/>'
+							+'</div>';
+						$('#pub_article').html(DETAIL_FORM);
+						$("#pub_footer").remove();
+						$('#guest_cnt option:nth-child('+data.guest_cnt+')').prop('selected',true);
+						
+						if(type==1){
+							var blockDates = new Array();
+							$.each(data.blockDate, function(i,date) {
+								blockDates[i] = date;
+							})
+							$('.input-daterange').datepicker({
+							    language: "kr",
+								format: "yyyy/mm/dd",
+							    startDate: "+0d",
+							    datesDisabled : blockDates
+							});
+						}
+						$('html,body').scrollTop(0);
+					}
+				},
+				error : function(x,s,m) {
+					alert('디테일 화면으로 이동 중 에러 발생 : '+m);
+				}
+			});
+		},
+		resv_cancel : function(pgNum) {
+			$.getJSON(app.context()+'/booking/list/'+pgNum,function(data){
+				var startPg = data.startPg;
+				var lastPg = data.lastPg;
+				var pgSize = data.pgSize;
+				var totPg = data.totPg;
+				var groupSize = data.groupSize;
+				console.log('스타트페이지'+startPg);
+				console.log('라스트페이지'+lastPg);
+				console.log('페이지사이즈'+pgSize);
+				console.log('토탈페이지'+totPg);
+				console.log('그룹사이즈'+groupSize);
+				var booking_list =  
+					'<div id="cancel_form" class="formbox2">'
+					+'<h2>예약취소</h2>'
+					+'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.</p>'
+					+'<table class="table table-striped">'
+					+'<caption><h4 style="text-align:center">예약정보</h4></caption>'
+					+'<thead>'
+					+'<tr>'
+					+'<th scope="col">예약번호</th>'
+					+'<th scope="col">예약신청일</th>'
+					+'<th scope="col">이용기간</th>'
+					+'<th scope="col">예약장소</th>'
+					+'<th scope="col"></th>'
+					+'</tr>'
+					+'</thead>'
+					+'<tbody>'
+					;
+				if(data.totCount == 0){
+				
+					booking_list+='<tr><td colspan="5"><center>신청하신 내역이 없습니다.</center></td></tr>';
+				}else{
+					$.each(data.list, function(i, booking) {
+						booking_list+=
+							'<tr>'
+							+'<td scope="col"><a href="#" onClick="booking.show_detail('+booking.resvSeq+',2)">'+booking.resvSeq+'</a></td>'
+							+'<td scope="col">'+booking.paymentDate+'</td>'
+							+'<td scope="col">'+booking.checkinDate+'~'+booking.checkoutDate+'</td>'
+							+'<td scope="col">'+booking.state+'</td>'
+							+'<td scope="col"><span id="booking_cancel_bt" type="button" onClick="booking.cancel_booking('+booking.resvSeq+')" class="btn btn-danger" style="height: 30px;">취소</span></td>'
+							+'</tr>';
+					});
+				}
+				booking_list += '</tbody></table>';
+					booking_list +='<center class="pagination pagination-responsive" style="display: block"><ul>';
+					if((startPg-groupSize) > 0){
+						booking_list += 
+							'<li>'
+							+'<a href="#" onClick="booking.resv_cancel('+(startPg-1)+')" aria-label="Previous">'
+							+'<span aria-hidden="true">&laquo;</span>'
+							+'</a>'
+							+'</li>';
+					}
+					for(var i=startPg; i<=lastPg; i++){
+						if(i==pgNum){
+							booking_list +='<li><a style="color: red;">'+i+'</a></li>';
+						}else{
+							booking_list += '<li><a href="#" onclick="booking.resv_cancel('+i+')">'+i+'</a></li>';
+						}
+					}
+					if(lastPg+1 <= totPg){
+						booking_list += 
+							'<li>'
+							+'<a href="#" onClick="booking.resv_cancel('+(lastPg+1)+')" aria-label="Next">'
+							+ '<span aria-hidden="true">&raquo;</span>'
+							+'</a>'
+							+'</li>';
+					}
+					booking_list += '</ul></center></div>'
+					$('#pub_article').html(booking_list);
+			});
+		},
+		cancel_booking : function(resv_seq) {
+			if(confirm("예약을 취소 하시겠습니까?")==true){
+				$.ajax({
+					url : app.context()+'/booking/bookingCancel',
+					type : 'POST',
+					data : {'resvSeq' : resv_seq},
+					dataType : 'json',
+					success : function(data) {
+							alert('예약이 취소 되었습니다.');
+							booking.resv_cancel(1);
+					},	
+					error : function(x,s,m) {
+						alert('예약취소 중 에러 발생 : '+m);
+					}	
+				});
+			}
+		}
 	
 	}
 })();
 
-//  CALENDAR 
-(function(factory){
-    if (typeof define === "function" && define.amd) {
-        define(["jquery"], factory);
-    } else if (typeof exports === 'object') {
-        factory(require('jquery'));
-    } else {
-        factory(jQuery);
-    }
-}(function($, undefined){
-
-	function UTCDate(){
-		return new Date(Date.UTC.apply(Date, arguments));
-	}
-	function UTCToday(){
-		var today = new Date();
-		return UTCDate(today.getFullYear(), today.getMonth(), today.getDate());
-	}
-	function isUTCEquals(date1, date2) {
-		return (
-			date1.getUTCFullYear() === date2.getUTCFullYear() &&
-			date1.getUTCMonth() === date2.getUTCMonth() &&
-			date1.getUTCDate() === date2.getUTCDate()
-		);
-	}
-	function alias(method){
-		return function(){
-			return this[method].apply(this, arguments);
-		};
-	}
-	function isValidDate(d) {
-		return d && !isNaN(d.getTime());
-	}
-
-	var DateArray = (function(){
-		var extras = {
-			get: function(i){
-				return this.slice(i)[0];
-			},
-			contains: function(d){
-				// Array.indexOf is not cross-browser;
-				// $.inArray doesn't work with Dates
-				var val = d && d.valueOf();
-				for (var i=0, l=this.length; i < l; i++)
-					if (this[i].valueOf() === val)
-						return i;
-				return -1;
-			},
-			remove: function(i){
-				this.splice(i,1);
-			},
-			replace: function(new_array){
-				if (!new_array)
-					return;
-				if (!$.isArray(new_array))
-					new_array = [new_array];
-				this.clear();
-				this.push.apply(this, new_array);
-			},
-			clear: function(){
-				this.length = 0;
-			},
-			copy: function(){
-				var a = new DateArray();
-				a.replace(this);
-				return a;
-			}
-		};
-
-		return function(){
-			var a = [];
-			a.push.apply(a, arguments);
-			$.extend(a, extras);
-			return a;
-		};
-	})();
 
 
-	// Picker object
 
-	var Datepicker = function(element, options){
-		$(element).data('datepicker', this);
-		this._process_options(options);
+// card
 
-		this.dates = new DateArray();
-		this.viewDate = this.o.defaultViewDate;
-		this.focusDate = null;
-
-		this.element = $(element);
-		this.isInput = this.element.is('input');
-		this.inputField = this.isInput ? this.element : this.element.find('input');
-		this.component = this.element.hasClass('date') ? this.element.find('.add-on, .input-group-addon, .btn') : false;
-		this.hasInput = this.component && this.inputField.length;
-		if (this.component && this.component.length === 0)
-			this.component = false;
-		this.isInline = !this.component && this.element.is('div');
-
-		this.picker = $(DPGlobal.template);
-
-		// Checking templates and inserting
-		if (this._check_template(this.o.templates.leftArrow)) {
-			this.picker.find('.prev').html(this.o.templates.leftArrow);
-		}
-		if (this._check_template(this.o.templates.rightArrow)) {
-			this.picker.find('.next').html(this.o.templates.rightArrow);
-		}
-
-		this._buildEvents();
-		this._attachEvents();
-
-		if (this.isInline){
-			this.picker.addClass('datepicker-inline').appendTo(this.element);
-		}
-		else {
-			this.picker.addClass('datepicker-dropdown dropdown-menu');
-		}
-
-		if (this.o.rtl){
-			this.picker.addClass('datepicker-rtl');
-		}
-
-		this.viewMode = this.o.startView;
-
-		if (this.o.calendarWeeks)
-			this.picker.find('thead .datepicker-title, tfoot .today, tfoot .clear')
-						.attr('colspan', function(i, val){
-							return parseInt(val) + 1;
-						});
-
-		this._allow_update = false;
-
-		this.setStartDate(this._o.startDate);
-		this.setEndDate(this._o.endDate);
-		this.setDaysOfWeekDisabled(this.o.daysOfWeekDisabled);
-		this.setDaysOfWeekHighlighted(this.o.daysOfWeekHighlighted);
-		this.setDatesDisabled(this.o.datesDisabled);
-
-		this.fillDow();
-		this.fillMonths();
-
-		this._allow_update = true;
-
-		this.update();
-		this.showMode();
-
-		if (this.isInline){
-			this.show();
+var card_util = (function(){
+	return {
+		isNumber : function(value){
+			return typeof value === 'number' && isFinite(value);
+		},
+		card_num_checker : function(value){
+			var cnc_regex = /^\d{4}-\d{4}-\d{4}-\d{4}$/;
+			return cnc_regex.test(value)?true:false;
 		}
 	};
-
-	Datepicker.prototype = {
-		constructor: Datepicker,
-
-		_resolveViewName: function(view, default_value){
-			if (view === 0 || view === 'days' || view === 'month') {
-				return 0;
-			}
-			if (view === 1 || view === 'months' || view === 'year') {
-				return 1;
-			}
-			if (view === 2 || view === 'years' || view === 'decade') {
-				return 2;
-			}
-			if (view === 3 || view === 'decades' || view === 'century') {
-				return 3;
-			}
-			if (view === 4 || view === 'centuries' || view === 'millennium') {
-				return 4;
-			}
-			return default_value === undefined ? false : default_value;
-		},
-
-		_check_template: function(tmp){
-			try {
-				// If empty
-				if (tmp === undefined || tmp === "") {
-					return false;
-				}
-				// If no html, everything ok
-				if ((tmp.match(/[<>]/g) || []).length <= 0) {
-					return true;
-				}
-				// Checking if html is fine
-				var jDom = $(tmp);
-				return jDom.length > 0;
-			}
-			catch (ex) {
-				return false;
-			}
-		},
-
-		_process_options: function(opts){
-			// Store raw options for reference
-			this._o = $.extend({}, this._o, opts);
-			// Processed options
-			var o = this.o = $.extend({}, this._o);
-
-			// Check if "de-DE" style date is available, if not language should
-			// fallback to 2 letter code eg "de"
-			var lang = o.language;
-			if (!dates[lang]){
-				lang = lang.split('-')[0];
-				if (!dates[lang])
-					lang = defaults.language;
-			}
-			o.language = lang;
-
-			// Retrieve view index from any aliases
-			o.startView = this._resolveViewName(o.startView, 0);
-			o.minViewMode = this._resolveViewName(o.minViewMode, 0);
-			o.maxViewMode = this._resolveViewName(o.maxViewMode, 4);
-
-			// Check that the start view is between min and max
-			o.startView = Math.min(o.startView, o.maxViewMode);
-			o.startView = Math.max(o.startView, o.minViewMode);
-
-			// true, false, or Number > 0
-			if (o.multidate !== true){
-				o.multidate = Number(o.multidate) || false;
-				if (o.multidate !== false)
-					o.multidate = Math.max(0, o.multidate);
-			}
-			o.multidateSeparator = String(o.multidateSeparator);
-
-			o.weekStart %= 7;
-			o.weekEnd = (o.weekStart + 6) % 7;
-
-			var format = DPGlobal.parseFormat(o.format);
-			if (o.startDate !== -Infinity){
-				if (!!o.startDate){
-					if (o.startDate instanceof Date)
-						o.startDate = this._local_to_utc(this._zero_time(o.startDate));
-					else
-						o.startDate = DPGlobal.parseDate(o.startDate, format, o.language, o.assumeNearbyYear);
-				}
-				else {
-					o.startDate = -Infinity;
-				}
-			}
-			if (o.endDate !== Infinity){
-				if (!!o.endDate){
-					if (o.endDate instanceof Date)
-						o.endDate = this._local_to_utc(this._zero_time(o.endDate));
-					else
-						o.endDate = DPGlobal.parseDate(o.endDate, format, o.language, o.assumeNearbyYear);
-				}
-				else {
-					o.endDate = Infinity;
-				}
-			}
-
-			o.daysOfWeekDisabled = o.daysOfWeekDisabled||[];
-			if (!$.isArray(o.daysOfWeekDisabled))
-				o.daysOfWeekDisabled = o.daysOfWeekDisabled.split(/[,\s]*/);
-			o.daysOfWeekDisabled = $.map(o.daysOfWeekDisabled, function(d){
-				return parseInt(d, 10);
-			});
-
-			o.daysOfWeekHighlighted = o.daysOfWeekHighlighted||[];
-			if (!$.isArray(o.daysOfWeekHighlighted))
-				o.daysOfWeekHighlighted = o.daysOfWeekHighlighted.split(/[,\s]*/);
-			o.daysOfWeekHighlighted = $.map(o.daysOfWeekHighlighted, function(d){
-				return parseInt(d, 10);
-			});
-
-			o.datesDisabled = o.datesDisabled||[];
-			if (!$.isArray(o.datesDisabled)) {
-				o.datesDisabled = [
-					o.datesDisabled
-				];
-			}
-			o.datesDisabled = $.map(o.datesDisabled,function(d){
-				return DPGlobal.parseDate(d, format, o.language, o.assumeNearbyYear);
-			});
-
-			var plc = String(o.orientation).toLowerCase().split(/\s+/g),
-				_plc = o.orientation.toLowerCase();
-			plc = $.grep(plc, function(word){
-				return /^auto|left|right|top|bottom$/.test(word);
-			});
-			o.orientation = {x: 'auto', y: 'auto'};
-			if (!_plc || _plc === 'auto')
-				; // no action
-			else if (plc.length === 1){
-				switch (plc[0]){
-					case 'top':
-					case 'bottom':
-						o.orientation.y = plc[0];
-						break;
-					case 'left':
-					case 'right':
-						o.orientation.x = plc[0];
-						break;
-				}
-			}
-			else {
-				_plc = $.grep(plc, function(word){
-					return /^left|right$/.test(word);
-				});
-				o.orientation.x = _plc[0] || 'auto';
-
-				_plc = $.grep(plc, function(word){
-					return /^top|bottom$/.test(word);
-				});
-				o.orientation.y = _plc[0] || 'auto';
-			}
-			if (o.defaultViewDate) {
-				var year = o.defaultViewDate.year || new Date().getFullYear();
-				var month = o.defaultViewDate.month || 0;
-				var day = o.defaultViewDate.day || 1;
-				o.defaultViewDate = UTCDate(year, month, day);
-			} else {
-				o.defaultViewDate = UTCToday();
-			}
-		},
-		_events: [],
-		_secondaryEvents: [],
-		_applyEvents: function(evs){
-			for (var i=0, el, ch, ev; i < evs.length; i++){
-				el = evs[i][0];
-				if (evs[i].length === 2){
-					ch = undefined;
-					ev = evs[i][1];
-				}
-				else if (evs[i].length === 3){
-					ch = evs[i][1];
-					ev = evs[i][2];
-				}
-				el.on(ev, ch);
-			}
-		},
-		_unapplyEvents: function(evs){
-			for (var i=0, el, ev, ch; i < evs.length; i++){
-				el = evs[i][0];
-				if (evs[i].length === 2){
-					ch = undefined;
-					ev = evs[i][1];
-				}
-				else if (evs[i].length === 3){
-					ch = evs[i][1];
-					ev = evs[i][2];
-				}
-				el.off(ev, ch);
-			}
-		},
-		_buildEvents: function(){
-            var events = {
-                keyup: $.proxy(function(e){
-                    if ($.inArray(e.keyCode, [27, 37, 39, 38, 40, 32, 13, 9]) === -1)
-                        this.update();
-                }, this),
-                keydown: $.proxy(this.keydown, this),
-                paste: $.proxy(this.paste, this)
-            };
-
-            if (this.o.showOnFocus === true) {
-                events.focus = $.proxy(this.show, this);
-            }
-
-            if (this.isInput) { // single input
-                this._events = [
-                    [this.element, events]
-                ];
-            }
-            else if (this.component && this.hasInput) { // component: input + button
-                this._events = [
-                    // For components that are not readonly, allow keyboard nav
-                    [this.inputField, events],
-                    [this.component, {
-                        click: $.proxy(this.show, this)
-                    }]
-                ];
-            }
-			else {
-				this._events = [
-					[this.element, {
-						click: $.proxy(this.show, this),
-						keydown: $.proxy(this.keydown, this)
-					}]
-				];
-			}
-			this._events.push(
-				// Component: listen for blur on element descendants
-				[this.element, '*', {
-					blur: $.proxy(function(e){
-						this._focused_from = e.target;
-					}, this)
-				}],
-				// Input: listen for blur on element
-				[this.element, {
-					blur: $.proxy(function(e){
-						this._focused_from = e.target;
-					}, this)
-				}]
-			);
-
-			if (this.o.immediateUpdates) {
-				// Trigger input updates immediately on changed year/month
-				this._events.push([this.element, {
-					'changeYear changeMonth': $.proxy(function(e){
-						this.update(e.date);
-					}, this)
-				}]);
-			}
-
-			this._secondaryEvents = [
-				[this.picker, {
-					click: $.proxy(this.click, this)
-				}],
-				[$(window), {
-					resize: $.proxy(this.place, this)
-				}],
-				[$(document), {
-					mousedown: $.proxy(function(e){
-						// Clicked outside the datepicker, hide it
-						if (!(
-							this.element.is(e.target) ||
-							this.element.find(e.target).length ||
-							this.picker.is(e.target) ||
-							this.picker.find(e.target).length ||
-							this.isInline
-						)){
-							this.hide();
-						}
-					}, this)
-				}]
-			];
-		},
-		_attachEvents: function(){
-			this._detachEvents();
-			this._applyEvents(this._events);
-		},
-		_detachEvents: function(){
-			this._unapplyEvents(this._events);
-		},
-		_attachSecondaryEvents: function(){
-			this._detachSecondaryEvents();
-			this._applyEvents(this._secondaryEvents);
-		},
-		_detachSecondaryEvents: function(){
-			this._unapplyEvents(this._secondaryEvents);
-		},
-		_trigger: function(event, altdate){
-			var date = altdate || this.dates.get(-1),
-				local_date = this._utc_to_local(date);
-
-			this.element.trigger({
-				type: event,
-				date: local_date,
-				dates: $.map(this.dates, this._utc_to_local),
-				format: $.proxy(function(ix, format){
-					if (arguments.length === 0){
-						ix = this.dates.length - 1;
-						format = this.o.format;
-					}
-					else if (typeof ix === 'string'){
-						format = ix;
-						ix = this.dates.length - 1;
-					}
-					format = format || this.o.format;
-					var date = this.dates.get(ix);
-					return DPGlobal.formatDate(date, format, this.o.language);
-				}, this)
-			});
-		},
-
-		show: function(){
-			if (this.inputField.prop('disabled') || (this.inputField.prop('readonly') && this.o.enableOnReadonly === false))
-				return;
-			if (!this.isInline)
-				this.picker.appendTo(this.o.container);
-			this.place();
-			this.picker.show();
-			this._attachSecondaryEvents();
-			this._trigger('show');
-			if ((window.navigator.msMaxTouchPoints || 'ontouchstart' in document) && this.o.disableTouchKeyboard) {
-				$(this.element).blur();
-			}
-			return this;
-		},
-
-		hide: function(){
-			if (this.isInline || !this.picker.is(':visible'))
-				return this;
-			this.focusDate = null;
-			this.picker.hide().detach();
-			this._detachSecondaryEvents();
-			this.viewMode = this.o.startView;
-			this.showMode();
-
-			if (this.o.forceParse && this.inputField.val())
-				this.setValue();
-			this._trigger('hide');
-			return this;
-		},
-
-		destroy: function(){
-			this.hide();
-			this._detachEvents();
-			this._detachSecondaryEvents();
-			this.picker.remove();
-			delete this.element.data().datepicker;
-			if (!this.isInput){
-				delete this.element.data().date;
-			}
-			return this;
-		},
-
-		paste: function(evt){
-			var dateString;
-			if (evt.originalEvent.clipboardData && evt.originalEvent.clipboardData.types
-				&& $.inArray('text/plain', evt.originalEvent.clipboardData.types) !== -1) {
-				dateString = evt.originalEvent.clipboardData.getData('text/plain');
-			}
-			else if (window.clipboardData) {
-				dateString = window.clipboardData.getData('Text');
-			}
-			else {
-				return;
-			}
-			this.setDate(dateString);
-			this.update();
-			evt.preventDefault();
-		},
-
-		_utc_to_local: function(utc){
-			return utc && new Date(utc.getTime() + (utc.getTimezoneOffset()*60000));
-		},
-		_local_to_utc: function(local){
-			return local && new Date(local.getTime() - (local.getTimezoneOffset()*60000));
-		},
-		_zero_time: function(local){
-			return local && new Date(local.getFullYear(), local.getMonth(), local.getDate());
-		},
-		_zero_utc_time: function(utc){
-			return utc && new Date(Date.UTC(utc.getUTCFullYear(), utc.getUTCMonth(), utc.getUTCDate()));
-		},
-
-		getDates: function(){
-			return $.map(this.dates, this._utc_to_local);
-		},
-
-		getUTCDates: function(){
-			return $.map(this.dates, function(d){
-				return new Date(d);
-			});
-		},
-
-		getDate: function(){
-			return this._utc_to_local(this.getUTCDate());
-		},
-
-		getUTCDate: function(){
-			var selected_date = this.dates.get(-1);
-			if (typeof selected_date !== 'undefined') {
-				return new Date(selected_date);
-			} else {
-				return null;
-			}
-		},
-
-		clearDates: function(){
-			if (this.inputField) {
-				this.inputField.val('');
-			}
-
-			this.update();
-			this._trigger('changeDate');
-
-			if (this.o.autoclose) {
-				this.hide();
-			}
-		},
-		setDates: function(){
-			var args = $.isArray(arguments[0]) ? arguments[0] : arguments;
-			this.update.apply(this, args);
-			this._trigger('changeDate');
-			this.setValue();
-			return this;
-		},
-
-		setUTCDates: function(){
-			var args = $.isArray(arguments[0]) ? arguments[0] : arguments;
-			this.update.apply(this, $.map(args, this._utc_to_local));
-			this._trigger('changeDate');
-			this.setValue();
-			return this;
-		},
-
-		setDate: alias('setDates'),
-		setUTCDate: alias('setUTCDates'),
-		remove: alias('destroy'),
-
-		setValue: function(){
-			var formatted = this.getFormattedDate();
-			this.inputField.val(formatted);
-			return this;
-		},
-
-		getFormattedDate: function(format){
-			if (format === undefined)
-				format = this.o.format;
-
-			var lang = this.o.language;
-			return $.map(this.dates, function(d){
-				return DPGlobal.formatDate(d, format, lang);
-			}).join(this.o.multidateSeparator);
-		},
-
-		getStartDate: function(){
-			return this.o.startDate;
-		},
-
-		setStartDate: function(startDate){
-			this._process_options({startDate: startDate});
-			this.update();
-			this.updateNavArrows();
-			return this;
-		},
-
-		getEndDate: function(){
-			return this.o.endDate;
-		},
-
-		setEndDate: function(endDate){
-			this._process_options({endDate: endDate});
-			this.update();
-			this.updateNavArrows();
-			return this;
-		},
-
-		setDaysOfWeekDisabled: function(daysOfWeekDisabled){
-			this._process_options({daysOfWeekDisabled: daysOfWeekDisabled});
-			this.update();
-			this.updateNavArrows();
-			return this;
-		},
-
-		setDaysOfWeekHighlighted: function(daysOfWeekHighlighted){
-			this._process_options({daysOfWeekHighlighted: daysOfWeekHighlighted});
-			this.update();
-			return this;
-		},
-
-		setDatesDisabled: function(datesDisabled){
-			this._process_options({datesDisabled: datesDisabled});
-			this.update();
-			this.updateNavArrows();
-		},
-
-		place: function(){
-			if (this.isInline)
-				return this;
-			var calendarWidth = this.picker.outerWidth(),
-				calendarHeight = this.picker.outerHeight(),
-				visualPadding = 10,
-				container = $(this.o.container),
-				windowWidth = container.width(),
-				scrollTop = this.o.container === 'body' ? $(document).scrollTop() : container.scrollTop(),
-				appendOffset = container.offset();
-
-			var parentsZindex = [];
-			this.element.parents().each(function(){
-				var itemZIndex = $(this).css('z-index');
-				if (itemZIndex !== 'auto' && itemZIndex !== 0) parentsZindex.push(parseInt(itemZIndex));
-			});
-			var zIndex = Math.max.apply(Math, parentsZindex) + this.o.zIndexOffset;
-			var offset = this.component ? this.component.parent().offset() : this.element.offset();
-			var height = this.component ? this.component.outerHeight(true) : this.element.outerHeight(false);
-			var width = this.component ? this.component.outerWidth(true) : this.element.outerWidth(false);
-			var left = offset.left - appendOffset.left,
-				top = offset.top - appendOffset.top;
-
-			if (this.o.container !== 'body') {
-				top += scrollTop;
-			}
-
-			this.picker.removeClass(
-				'datepicker-orient-top datepicker-orient-bottom '+
-				'datepicker-orient-right datepicker-orient-left'
-			);
-
-			if (this.o.orientation.x !== 'auto'){
-				this.picker.addClass('datepicker-orient-' + this.o.orientation.x);
-				if (this.o.orientation.x === 'right')
-					left -= calendarWidth - width;
-			}
-			// auto x orientation is best-placement: if it crosses a window
-			// edge, fudge it sideways
-			else {
-				if (offset.left < 0) {
-					// component is outside the window on the left side. Move it into visible range
-					this.picker.addClass('datepicker-orient-left');
-					left -= offset.left - visualPadding;
-				} else if (left + calendarWidth > windowWidth) {
-					// the calendar passes the widow right edge. Align it to component right side
-					this.picker.addClass('datepicker-orient-right');
-					left += width - calendarWidth;
-				} else {
-					// Default to left
-					this.picker.addClass('datepicker-orient-left');
-				}
-			}
-
-			// auto y orientation is best-situation: top or bottom, no fudging,
-			// decision based on which shows more of the calendar
-			var yorient = this.o.orientation.y,
-				top_overflow;
-			if (yorient === 'auto'){
-				top_overflow = -scrollTop + top - calendarHeight;
-				yorient = top_overflow < 0 ? 'bottom' : 'top';
-			}
-
-			this.picker.addClass('datepicker-orient-' + yorient);
-			if (yorient === 'top')
-				top -= calendarHeight + parseInt(this.picker.css('padding-top'));
-			else
-				top += height;
-
-			if (this.o.rtl) {
-				var right = windowWidth - (left + width);
-				this.picker.css({
-					top: top,
-					right: right,
-					zIndex: zIndex
-				});
-			} else {
-				this.picker.css({
-					top: top,
-					left: left,
-					zIndex: zIndex
-				});
-			}
-			return this;
-		},
-
-		_allow_update: true,
-		update: function(){
-			if (!this._allow_update)
-				return this;
-
-			var oldDates = this.dates.copy(),
-				dates = [],
-				fromArgs = false;
-			if (arguments.length){
-				$.each(arguments, $.proxy(function(i, date){
-					if (date instanceof Date)
-						date = this._local_to_utc(date);
-					dates.push(date);
-				}, this));
-				fromArgs = true;
-			}
-			else {
-				dates = this.isInput
-						? this.element.val()
-						: this.element.data('date') || this.inputField.val();
-				if (dates && this.o.multidate)
-					dates = dates.split(this.o.multidateSeparator);
-				else
-					dates = [dates];
-				delete this.element.data().date;
-			}
-
-			dates = $.map(dates, $.proxy(function(date){
-				return DPGlobal.parseDate(date, this.o.format, this.o.language, this.o.assumeNearbyYear);
-			}, this));
-			dates = $.grep(dates, $.proxy(function(date){
-				return (
-					!this.dateWithinRange(date) ||
-					!date
-				);
-			}, this), true);
-			this.dates.replace(dates);
-
-			if (this.dates.length)
-				this.viewDate = new Date(this.dates.get(-1));
-			else if (this.viewDate < this.o.startDate)
-				this.viewDate = new Date(this.o.startDate);
-			else if (this.viewDate > this.o.endDate)
-				this.viewDate = new Date(this.o.endDate);
-			else
-				this.viewDate = this.o.defaultViewDate;
-
-			if (fromArgs){
-				// setting date by clicking
-				this.setValue();
-			}
-			else if (dates.length){
-				// setting date by typing
-				if (String(oldDates) !== String(this.dates))
-					this._trigger('changeDate');
-			}
-			if (!this.dates.length && oldDates.length)
-				this._trigger('clearDate');
-
-			this.fill();
-			this.element.change();
-			return this;
-		},
-
-		fillDow: function(){
-			var dowCnt = this.o.weekStart,
-				html = '<tr>';
-			if (this.o.calendarWeeks){
-				this.picker.find('.datepicker-days .datepicker-switch')
-					.attr('colspan', function(i, val){
-						return parseInt(val) + 1;
-					});
-				html += '<th class="cw">&#160;</th>';
-			}
-			while (dowCnt < this.o.weekStart + 7){
-				html += '<th class="dow';
-        if ($.inArray(dowCnt, this.o.daysOfWeekDisabled) > -1)
-          html += ' disabled';
-        html += '">'+dates[this.o.language].daysMin[(dowCnt++)%7]+'</th>';
-			}
-			html += '</tr>';
-			this.picker.find('.datepicker-days thead').append(html);
-		},
-
-		fillMonths: function(){
-      var localDate = this._utc_to_local(this.viewDate);
-			var html = '',
-			i = 0;
-			while (i < 12){
-        var focused = localDate && localDate.getMonth() === i ? ' focused' : '';
-				html += '<span class="month' + focused + '">' + dates[this.o.language].monthsShort[i++]+'</span>';
-			}
-			this.picker.find('.datepicker-months td').html(html);
-		},
-
-		setRange: function(range){
-			if (!range || !range.length)
-				delete this.range;
-			else
-				this.range = $.map(range, function(d){
-					return d.valueOf();
-				});
-			this.fill();
-		},
-
-		getClassNames: function(date){
-			var cls = [],
-				year = this.viewDate.getUTCFullYear(),
-				month = this.viewDate.getUTCMonth(),
-				today = new Date();
-			if (date.getUTCFullYear() < year || (date.getUTCFullYear() === year && date.getUTCMonth() < month)){
-				cls.push('old');
-			}
-			else if (date.getUTCFullYear() > year || (date.getUTCFullYear() === year && date.getUTCMonth() > month)){
-				cls.push('new');
-			}
-			if (this.focusDate && date.valueOf() === this.focusDate.valueOf())
-				cls.push('focused');
-			// Compare internal UTC date with local today, not UTC today
-			if (this.o.todayHighlight &&
-				date.getUTCFullYear() === today.getFullYear() &&
-				date.getUTCMonth() === today.getMonth() &&
-				date.getUTCDate() === today.getDate()){
-				cls.push('today');
-			}
-			if (this.dates.contains(date) !== -1)
-				cls.push('active');
-			if (!this.dateWithinRange(date)){
-				cls.push('disabled');
-			}
-			if (this.dateIsDisabled(date)){
-				cls.push('disabled', 'disabled-date');	
-			} 
-			if ($.inArray(date.getUTCDay(), this.o.daysOfWeekHighlighted) !== -1){
-				cls.push('highlighted');
-			}
-
-			if (this.range){
-				if (date > this.range[0] && date < this.range[this.range.length-1]){
-					cls.push('range');
-				}
-				if ($.inArray(date.valueOf(), this.range) !== -1){
-					cls.push('selected');
-				}
-				if (date.valueOf() === this.range[0]){
-          cls.push('range-start');
-        }
-        if (date.valueOf() === this.range[this.range.length-1]){
-          cls.push('range-end');
-        }
-			}
-			return cls;
-		},
-
-		_fill_yearsView: function(selector, cssClass, factor, step, currentYear, startYear, endYear, callback){
-			var html, view, year, steps, startStep, endStep, thisYear, i, classes, tooltip, before;
-
-			html      = '';
-			view      = this.picker.find(selector);
-			year      = parseInt(currentYear / factor, 10) * factor;
-			startStep = parseInt(startYear / step, 10) * step;
-			endStep   = parseInt(endYear / step, 10) * step;
-			steps     = $.map(this.dates, function(d){
-				return parseInt(d.getUTCFullYear() / step, 10) * step;
-			});
-
-			view.find('.datepicker-switch').text(year + '-' + (year + step * 9));
-
-			thisYear = year - step;
-			for (i = -1; i < 11; i += 1) {
-				classes = [cssClass];
-				tooltip = null;
-
-				if (i === -1) {
-					classes.push('old');
-				} else if (i === 10) {
-					classes.push('new');
-				}
-				if ($.inArray(thisYear, steps) !== -1) {
-					classes.push('active');
-				}
-				if (thisYear < startStep || thisYear > endStep) {
-					classes.push('disabled');
-				}
-        if (thisYear === this.viewDate.getFullYear()) {
-				  classes.push('focused');
-        }
-
-				if (callback !== $.noop) {
-					before = callback(new Date(thisYear, 0, 1));
-					if (before === undefined) {
-						before = {};
-					} else if (typeof(before) === 'boolean') {
-						before = {enabled: before};
-					} else if (typeof(before) === 'string') {
-						before = {classes: before};
-					}
-					if (before.enabled === false) {
-						classes.push('disabled');
-					}
-					if (before.classes) {
-						classes = classes.concat(before.classes.split(/\s+/));
-					}
-					if (before.tooltip) {
-						tooltip = before.tooltip;
-					}
-				}
-
-				html += '<span class="' + classes.join(' ') + '"' + (tooltip ? ' title="' + tooltip + '"' : '') + '>' + thisYear + '</span>';
-				thisYear += step;
-			}
-			view.find('td').html(html);
-		},
-
-		fill: function(){
-			var d = new Date(this.viewDate),
-				year = d.getUTCFullYear(),
-				month = d.getUTCMonth(),
-				startYear = this.o.startDate !== -Infinity ? this.o.startDate.getUTCFullYear() : -Infinity,
-				startMonth = this.o.startDate !== -Infinity ? this.o.startDate.getUTCMonth() : -Infinity,
-				endYear = this.o.endDate !== Infinity ? this.o.endDate.getUTCFullYear() : Infinity,
-				endMonth = this.o.endDate !== Infinity ? this.o.endDate.getUTCMonth() : Infinity,
-				todaytxt = dates[this.o.language].today || dates['en'].today || '',
-				cleartxt = dates[this.o.language].clear || dates['en'].clear || '',
-				titleFormat = dates[this.o.language].titleFormat || dates['en'].titleFormat,
-				tooltip,
-				before;
-			if (isNaN(year) || isNaN(month))
-				return;
-			this.picker.find('.datepicker-days .datepicker-switch')
-						.text(DPGlobal.formatDate(d, titleFormat, this.o.language));
-			this.picker.find('tfoot .today')
-						.text(todaytxt)
-						.toggle(this.o.todayBtn !== false);
-			this.picker.find('tfoot .clear')
-						.text(cleartxt)
-						.toggle(this.o.clearBtn !== false);
-			this.picker.find('thead .datepicker-title')
-						.text(this.o.title)
-						.toggle(this.o.title !== '');
-			this.updateNavArrows();
-			this.fillMonths();
-			var prevMonth = UTCDate(year, month-1, 28),
-				day = DPGlobal.getDaysInMonth(prevMonth.getUTCFullYear(), prevMonth.getUTCMonth());
-			prevMonth.setUTCDate(day);
-			prevMonth.setUTCDate(day - (prevMonth.getUTCDay() - this.o.weekStart + 7)%7);
-			var nextMonth = new Date(prevMonth);
-			if (prevMonth.getUTCFullYear() < 100){
-        nextMonth.setUTCFullYear(prevMonth.getUTCFullYear());
-      }
-			nextMonth.setUTCDate(nextMonth.getUTCDate() + 42);
-			nextMonth = nextMonth.valueOf();
-			var html = [];
-			var clsName;
-			while (prevMonth.valueOf() < nextMonth){
-				if (prevMonth.getUTCDay() === this.o.weekStart){
-					html.push('<tr>');
-					if (this.o.calendarWeeks){
-						// ISO 8601: First week contains first thursday.
-						// ISO also states week starts on Monday, but we can be more abstract here.
-						var
-							// Start of current week: based on weekstart/current date
-							ws = new Date(+prevMonth + (this.o.weekStart - prevMonth.getUTCDay() - 7) % 7 * 864e5),
-							// Thursday of this week
-							th = new Date(Number(ws) + (7 + 4 - ws.getUTCDay()) % 7 * 864e5),
-							// First Thursday of year, year from thursday
-							yth = new Date(Number(yth = UTCDate(th.getUTCFullYear(), 0, 1)) + (7 + 4 - yth.getUTCDay())%7*864e5),
-							// Calendar week: ms between thursdays, div ms per day, div 7 days
-							calWeek =  (th - yth) / 864e5 / 7 + 1;
-						html.push('<td class="cw">'+ calWeek +'</td>');
-					}
-				}
-				clsName = this.getClassNames(prevMonth);
-				clsName.push('day');
-
-				if (this.o.beforeShowDay !== $.noop){
-					before = this.o.beforeShowDay(this._utc_to_local(prevMonth));
-					if (before === undefined)
-						before = {};
-					else if (typeof(before) === 'boolean')
-						before = {enabled: before};
-					else if (typeof(before) === 'string')
-						before = {classes: before};
-					if (before.enabled === false)
-						clsName.push('disabled');
-					if (before.classes)
-						clsName = clsName.concat(before.classes.split(/\s+/));
-					if (before.tooltip)
-						tooltip = before.tooltip;
-				}
-
-				//Check if uniqueSort exists (supported by jquery >=1.12 and >=2.2)
-				//Fallback to unique function for older jquery versions
-				if ($.isFunction($.uniqueSort)) {
-					clsName = $.uniqueSort(clsName);
-				} else {
-					clsName = $.unique(clsName);
-				}
-
-				html.push('<td class="'+clsName.join(' ')+'"' + (tooltip ? ' title="'+tooltip+'"' : '') + '>'+prevMonth.getUTCDate() + '</td>');
-				tooltip = null;
-				if (prevMonth.getUTCDay() === this.o.weekEnd){
-					html.push('</tr>');
-				}
-				prevMonth.setUTCDate(prevMonth.getUTCDate()+1);
-			}
-			this.picker.find('.datepicker-days tbody').empty().append(html.join(''));
-
-			var monthsTitle = dates[this.o.language].monthsTitle || dates['en'].monthsTitle || 'Months';
-			var months = this.picker.find('.datepicker-months')
-						.find('.datepicker-switch')
-							.text(this.o.maxViewMode < 2 ? monthsTitle : year)
-							.end()
-						.find('span').removeClass('active');
-
-			$.each(this.dates, function(i, d){
-				if (d.getUTCFullYear() === year)
-					months.eq(d.getUTCMonth()).addClass('active');
-			});
-
-			if (year < startYear || year > endYear){
-				months.addClass('disabled');
-			}
-			if (year === startYear){
-				months.slice(0, startMonth).addClass('disabled');
-			}
-			if (year === endYear){
-				months.slice(endMonth+1).addClass('disabled');
-			}
-
-			if (this.o.beforeShowMonth !== $.noop){
-				var that = this;
-				$.each(months, function(i, month){
-          var moDate = new Date(year, i, 1);
-          var before = that.o.beforeShowMonth(moDate);
-					if (before === undefined)
-						before = {};
-					else if (typeof(before) === 'boolean')
-						before = {enabled: before};
-					else if (typeof(before) === 'string')
-						before = {classes: before};
-					if (before.enabled === false && !$(month).hasClass('disabled'))
-					    $(month).addClass('disabled');
-					if (before.classes)
-					    $(month).addClass(before.classes);
-					if (before.tooltip)
-					    $(month).prop('title', before.tooltip);
-				});
-			}
-
-			// Generating decade/years picker
-			this._fill_yearsView(
-				'.datepicker-years',
-				'year',
-				10,
-				1,
-				year,
-				startYear,
-				endYear,
-				this.o.beforeShowYear
-			);
-
-			// Generating century/decades picker
-			this._fill_yearsView(
-				'.datepicker-decades',
-				'decade',
-				100,
-				10,
-				year,
-				startYear,
-				endYear,
-				this.o.beforeShowDecade
-			);
-
-			// Generating millennium/centuries picker
-			this._fill_yearsView(
-				'.datepicker-centuries',
-				'century',
-				1000,
-				100,
-				year,
-				startYear,
-				endYear,
-				this.o.beforeShowCentury
-			);
-		},
-
-		updateNavArrows: function(){
-			if (!this._allow_update)
-				return;
-
-			var d = new Date(this.viewDate),
-				year = d.getUTCFullYear(),
-				month = d.getUTCMonth();
-			switch (this.viewMode){
-				case 0:
-					if (this.o.startDate !== -Infinity && year <= this.o.startDate.getUTCFullYear() && month <= this.o.startDate.getUTCMonth()){
-						this.picker.find('.prev').css({visibility: 'hidden'});
-					}
-					else {
-						this.picker.find('.prev').css({visibility: 'visible'});
-					}
-					if (this.o.endDate !== Infinity && year >= this.o.endDate.getUTCFullYear() && month >= this.o.endDate.getUTCMonth()){
-						this.picker.find('.next').css({visibility: 'hidden'});
-					}
-					else {
-						this.picker.find('.next').css({visibility: 'visible'});
-					}
-					break;
-				case 1:
-				case 2:
-				case 3:
-				case 4:
-					if (this.o.startDate !== -Infinity && year <= this.o.startDate.getUTCFullYear() || this.o.maxViewMode < 2){
-						this.picker.find('.prev').css({visibility: 'hidden'});
-					}
-					else {
-						this.picker.find('.prev').css({visibility: 'visible'});
-					}
-					if (this.o.endDate !== Infinity && year >= this.o.endDate.getUTCFullYear() || this.o.maxViewMode < 2){
-						this.picker.find('.next').css({visibility: 'hidden'});
-					}
-					else {
-						this.picker.find('.next').css({visibility: 'visible'});
-					}
-					break;
-			}
-		},
-
-		click: function(e){
-			e.preventDefault();
-			e.stopPropagation();
-
-			var target, dir, day, year, month, monthChanged, yearChanged;
-			target = $(e.target);
-
-			// Clicked on the switch
-			if (target.hasClass('datepicker-switch')){
-				this.showMode(1);
-			}
-
-			// Clicked on prev or next
-			var navArrow = target.closest('.prev, .next');
-			if (navArrow.length > 0) {
-				dir = DPGlobal.modes[this.viewMode].navStep * (navArrow.hasClass('prev') ? -1 : 1);
-				if (this.viewMode === 0){
-					this.viewDate = this.moveMonth(this.viewDate, dir);
-					this._trigger('changeMonth', this.viewDate);
-				} else {
-					this.viewDate = this.moveYear(this.viewDate, dir);
-					if (this.viewMode === 1){
-						this._trigger('changeYear', this.viewDate);
-					}
-				}
-				this.fill();
-			}
-
-			// Clicked on today button
-			if (target.hasClass('today') && !target.hasClass('day')){
-				this.showMode(-2);
-				this._setDate(UTCToday(), this.o.todayBtn === 'linked' ? null : 'view');
-			}
-
-			// Clicked on clear button
-			if (target.hasClass('clear')){
-				this.clearDates();
-			}
-
-			if (!target.hasClass('disabled')){
-				// Clicked on a day
-				if (target.hasClass('day')){
-					day = parseInt(target.text(), 10) || 1;
-					year = this.viewDate.getUTCFullYear();
-					month = this.viewDate.getUTCMonth();
-
-					// From last month
-					if (target.hasClass('old')){
-						if (month === 0) {
-							month = 11;
-							year = year - 1;
-							monthChanged = true;
-							yearChanged = true;
-						} else {
-							month = month - 1;
-							monthChanged = true;
- 						}
- 					}
-
-					// From next month
-					if (target.hasClass('new')) {
-						if (month === 11){
-							month = 0;
-							year = year + 1;
-							monthChanged = true;
-							yearChanged = true;
- 						} else {
-							month = month + 1;
-							monthChanged = true;
- 						}
-					}
-					this._setDate(UTCDate(year, month, day));
-					if (yearChanged) {
-						this._trigger('changeYear', this.viewDate);
-					}
-					if (monthChanged) {
-						this._trigger('changeMonth', this.viewDate);
-					}
-				}
-
-				// Clicked on a month
-				if (target.hasClass('month')) {
-					this.viewDate.setUTCDate(1);
-					day = 1;
-					month = target.parent().find('span').index(target);
-					year = this.viewDate.getUTCFullYear();
-					this.viewDate.setUTCMonth(month);
-					this._trigger('changeMonth', this.viewDate);
-					if (this.o.minViewMode === 1){
-						this._setDate(UTCDate(year, month, day));
-						this.showMode();
-					} else {
-						this.showMode(-1);
-					}
-					this.fill();
-				}
-
-				// Clicked on a year
-				if (target.hasClass('year')
-						|| target.hasClass('decade')
-						|| target.hasClass('century')) {
-					this.viewDate.setUTCDate(1);
-
-					day = 1;
-					month = 0;
-					year = parseInt(target.text(), 10)||0;
-					this.viewDate.setUTCFullYear(year);
-
-					if (target.hasClass('year')){
-						this._trigger('changeYear', this.viewDate);
-						if (this.o.minViewMode === 2){
-							this._setDate(UTCDate(year, month, day));
-						}
-					}
-					if (target.hasClass('decade')){
-						this._trigger('changeDecade', this.viewDate);
-						if (this.o.minViewMode === 3){
-							this._setDate(UTCDate(year, month, day));
-						}
-					}
-					if (target.hasClass('century')){
-						this._trigger('changeCentury', this.viewDate);
-						if (this.o.minViewMode === 4){
-							this._setDate(UTCDate(year, month, day));
-						}
-					}
-
-					this.showMode(-1);
-					this.fill();
-				}
-			}
-
-			if (this.picker.is(':visible') && this._focused_from){
-				$(this._focused_from).focus();
-			}
-			delete this._focused_from;
-		},
-
-		_toggle_multidate: function(date){
-			var ix = this.dates.contains(date);
-			if (!date){
-				this.dates.clear();
-			}
-
-			if (ix !== -1){
-				if (this.o.multidate === true || this.o.multidate > 1 || this.o.toggleActive){
-					this.dates.remove(ix);
-				}
-			} else if (this.o.multidate === false) {
-				this.dates.clear();
-				this.dates.push(date);
-			}
-			else {
-				this.dates.push(date);
-			}
-
-			if (typeof this.o.multidate === 'number')
-				while (this.dates.length > this.o.multidate)
-					this.dates.remove(0);
-		},
-
-		_setDate: function(date, which){
-			if (!which || which === 'date')
-				this._toggle_multidate(date && new Date(date));
-			if (!which || which === 'view')
-				this.viewDate = date && new Date(date);
-
-			this.fill();
-			this.setValue();
-			if (!which || which !== 'view') {
-				this._trigger('changeDate');
-			}
-			if (this.inputField){
-				this.inputField.change();
-			}
-			if (this.o.autoclose && (!which || which === 'date')){
-				this.hide();
-			}
-		},
-
-		moveDay: function(date, dir){
-			var newDate = new Date(date);
-			newDate.setUTCDate(date.getUTCDate() + dir);
-
-			return newDate;
-		},
-
-		moveWeek: function(date, dir){
-			return this.moveDay(date, dir * 7);
-		},
-
-		moveMonth: function(date, dir){
-			if (!isValidDate(date))
-				return this.o.defaultViewDate;
-			if (!dir)
-				return date;
-			var new_date = new Date(date.valueOf()),
-				day = new_date.getUTCDate(),
-				month = new_date.getUTCMonth(),
-				mag = Math.abs(dir),
-				new_month, test;
-			dir = dir > 0 ? 1 : -1;
-			if (mag === 1){
-				test = dir === -1
-					// If going back one month, make sure month is not current month
-					// (eg, Mar 31 -> Feb 31 == Feb 28, not Mar 02)
-					? function(){
-						return new_date.getUTCMonth() === month;
-					}
-					// If going forward one month, make sure month is as expected
-					// (eg, Jan 31 -> Feb 31 == Feb 28, not Mar 02)
-					: function(){
-						return new_date.getUTCMonth() !== new_month;
-					};
-				new_month = month + dir;
-				new_date.setUTCMonth(new_month);
-				// Dec -> Jan (12) or Jan -> Dec (-1) -- limit expected date to 0-11
-				if (new_month < 0 || new_month > 11)
-					new_month = (new_month + 12) % 12;
-			}
-			else {
-				// For magnitudes >1, move one month at a time...
-				for (var i=0; i < mag; i++)
-					// ...which might decrease the day (eg, Jan 31 to Feb 28, etc)...
-					new_date = this.moveMonth(new_date, dir);
-				// ...then reset the day, keeping it in the new month
-				new_month = new_date.getUTCMonth();
-				new_date.setUTCDate(day);
-				test = function(){
-					return new_month !== new_date.getUTCMonth();
-				};
-			}
-			// Common date-resetting loop -- if date is beyond end of month, make it
-			// end of month
-			while (test()){
-				new_date.setUTCDate(--day);
-				new_date.setUTCMonth(new_month);
-			}
-			return new_date;
-		},
-
-		moveYear: function(date, dir){
-			return this.moveMonth(date, dir*12);
-		},
-
-		moveAvailableDate: function(date, dir, fn){
-			do {
-				date = this[fn](date, dir);
-
-				if (!this.dateWithinRange(date))
-					return false;
-
-				fn = 'moveDay';
-			}
-			while (this.dateIsDisabled(date));
-
-			return date;
-		},
-
-		weekOfDateIsDisabled: function(date){
-			return $.inArray(date.getUTCDay(), this.o.daysOfWeekDisabled) !== -1;
-		},
-
-		dateIsDisabled: function(date){
-			return (
-				this.weekOfDateIsDisabled(date) ||
-				$.grep(this.o.datesDisabled, function(d){
-					return isUTCEquals(date, d);
-				}).length > 0
-			);
-		},
-
-		dateWithinRange: function(date){
-			return date >= this.o.startDate && date <= this.o.endDate;
-		},
-
-		keydown: function(e){
-			if (!this.picker.is(':visible')){
-				if (e.keyCode === 40 || e.keyCode === 27) { // allow down to re-show picker
-					this.show();
-					e.stopPropagation();
-        }
-				return;
-			}
-			var dateChanged = false,
-				dir, newViewDate,
-				focusDate = this.focusDate || this.viewDate;
-			switch (e.keyCode){
-				case 27: // escape
-					if (this.focusDate){
-						this.focusDate = null;
-						this.viewDate = this.dates.get(-1) || this.viewDate;
-						this.fill();
-					}
-					else
-						this.hide();
-					e.preventDefault();
-					e.stopPropagation();
-					break;
-				case 37: // left
-				case 38: // up
-				case 39: // right
-				case 40: // down
-					if (!this.o.keyboardNavigation || this.o.daysOfWeekDisabled.length === 7)
-						break;
-					dir = e.keyCode === 37 || e.keyCode === 38 ? -1 : 1;
-          if (this.viewMode === 0) {
-  					if (e.ctrlKey){
-  						newViewDate = this.moveAvailableDate(focusDate, dir, 'moveYear');
-
-  						if (newViewDate)
-  							this._trigger('changeYear', this.viewDate);
-  					}
-  					else if (e.shiftKey){
-  						newViewDate = this.moveAvailableDate(focusDate, dir, 'moveMonth');
-
-  						if (newViewDate)
-  							this._trigger('changeMonth', this.viewDate);
-  					}
-  					else if (e.keyCode === 37 || e.keyCode === 39){
-  						newViewDate = this.moveAvailableDate(focusDate, dir, 'moveDay');
-  					}
-  					else if (!this.weekOfDateIsDisabled(focusDate)){
-  						newViewDate = this.moveAvailableDate(focusDate, dir, 'moveWeek');
-  					}
-          } else if (this.viewMode === 1) {
-            if (e.keyCode === 38 || e.keyCode === 40) {
-              dir = dir * 4;
-            }
-            newViewDate = this.moveAvailableDate(focusDate, dir, 'moveMonth');
-          } else if (this.viewMode === 2) {
-            if (e.keyCode === 38 || e.keyCode === 40) {
-              dir = dir * 4;
-            }
-            newViewDate = this.moveAvailableDate(focusDate, dir, 'moveYear');
-          }
-					if (newViewDate){
-						this.focusDate = this.viewDate = newViewDate;
-						this.setValue();
-						this.fill();
-						e.preventDefault();
-					}
-					break;
-				case 13: // enter
-					if (!this.o.forceParse)
-						break;
-					focusDate = this.focusDate || this.dates.get(-1) || this.viewDate;
-					if (this.o.keyboardNavigation) {
-						this._toggle_multidate(focusDate);
-						dateChanged = true;
-					}
-					this.focusDate = null;
-					this.viewDate = this.dates.get(-1) || this.viewDate;
-					this.setValue();
-					this.fill();
-					if (this.picker.is(':visible')){
-						e.preventDefault();
-						e.stopPropagation();
-						if (this.o.autoclose)
-							this.hide();
-					}
-					break;
-				case 9: // tab
-					this.focusDate = null;
-					this.viewDate = this.dates.get(-1) || this.viewDate;
-					this.fill();
-					this.hide();
-					break;
-			}
-			if (dateChanged){
-				if (this.dates.length)
-					this._trigger('changeDate');
-				else
-					this._trigger('clearDate');
-				if (this.inputField){
-					this.inputField.change();
-				}
-			}
-		},
-
-		showMode: function(dir){
-			if (dir){
-				this.viewMode = Math.max(this.o.minViewMode, Math.min(this.o.maxViewMode, this.viewMode + dir));
-			}
-			this.picker
-				.children('div')
-				.hide()
-				.filter('.datepicker-' + DPGlobal.modes[this.viewMode].clsName)
-					.show();
-			this.updateNavArrows();
-		}
-	};
-
-	var DateRangePicker = function(element, options){
-		$(element).data('datepicker', this);
-		this.element = $(element);
-		this.inputs = $.map(options.inputs, function(i){
-			return i.jquery ? i[0] : i;
-		});
-		delete options.inputs;
-
-		datepickerPlugin.call($(this.inputs), options)
-			.on('changeDate', $.proxy(this.dateUpdated, this));
-
-		this.pickers = $.map(this.inputs, function(i){
-			return $(i).data('datepicker');
-		});
-		this.updateDates();
-	};
-	DateRangePicker.prototype = {
-		updateDates: function(){
-			this.dates = $.map(this.pickers, function(i){
-				return i.getUTCDate();
-			});
-			this.updateRanges();
-		},
-		updateRanges: function(){
-			var range = $.map(this.dates, function(d){
-				return d.valueOf();
-			});
-			$.each(this.pickers, function(i, p){
-				p.setRange(range);
-			});
-		},
-		dateUpdated: function(e){
-			// `this.updating` is a workaround for preventing infinite recursion
-			// between `changeDate` triggering and `setUTCDate` calling.  Until
-			// there is a better mechanism.
-			if (this.updating)
-				return;
-			this.updating = true;
-
-			var dp = $(e.target).data('datepicker');
-
-			if (typeof(dp) === "undefined") {
-				return;
-			}
-
-			var new_date = dp.getUTCDate(),
-				i = $.inArray(e.target, this.inputs),
-				j = i - 1,
-				k = i + 1,
-				l = this.inputs.length;
-			if (i === -1)
-				return;
-
-			$.each(this.pickers, function(i, p){
-				if (!p.getUTCDate())
-					p.setUTCDate(new_date);
-			});
-
-			if (new_date < this.dates[j]){
-				// Date being moved earlier/left
-				while (j >= 0 && new_date < this.dates[j]){
-					this.pickers[j--].setUTCDate(new_date);
-				}
-			}
-			else if (new_date > this.dates[k]){
-				// Date being moved later/right
-				while (k < l && new_date > this.dates[k]){
-					this.pickers[k++].setUTCDate(new_date);
-				}
-			}
-			this.updateDates();
-
-			delete this.updating;
-		},
-		remove: function(){
-			$.map(this.pickers, function(p){ p.remove(); });
-			delete this.element.data().datepicker;
-		}
-	};
-
-	function opts_from_el(el, prefix){
-		// Derive options from element data-attrs
-		var data = $(el).data(),
-			out = {}, inkey,
-			replace = new RegExp('^' + prefix.toLowerCase() + '([A-Z])');
-		prefix = new RegExp('^' + prefix.toLowerCase());
-		function re_lower(_,a){
-			return a.toLowerCase();
-		}
-		for (var key in data)
-			if (prefix.test(key)){
-				inkey = key.replace(replace, re_lower);
-				out[inkey] = data[key];
-			}
-		return out;
-	}
-
-	function opts_from_locale(lang){
-		// Derive options from locale plugins
-		var out = {};
-		// Check if "de-DE" style date is available, if not language should
-		// fallback to 2 letter code eg "de"
-		if (!dates[lang]){
-			lang = lang.split('-')[0];
-			if (!dates[lang])
-				return;
-		}
-		var d = dates[lang];
-		$.each(locale_opts, function(i,k){
-			if (k in d)
-				out[k] = d[k];
-		});
-		return out;
-	}
-
-	var old = $.fn.datepicker;
-	var datepickerPlugin = function(option){
-		var args = Array.apply(null, arguments);
-		args.shift();
-		var internal_return;
-		this.each(function(){
-			var $this = $(this),
-				data = $this.data('datepicker'),
-				options = typeof option === 'object' && option;
-			if (!data){
-				var elopts = opts_from_el(this, 'date'),
-					// Preliminary otions
-					xopts = $.extend({}, defaults, elopts, options),
-					locopts = opts_from_locale(xopts.language),
-					// Options priority: js args, data-attrs, locales, defaults
-					opts = $.extend({}, defaults, locopts, elopts, options);
-				if ($this.hasClass('input-daterange') || opts.inputs){
-					$.extend(opts, {
-						inputs: opts.inputs || $this.find('input').toArray()
-					});
-					data = new DateRangePicker(this, opts);
-				}
-				else {
-					data = new Datepicker(this, opts);
-				}
-				$this.data('datepicker', data);
-			}
-			if (typeof option === 'string' && typeof data[option] === 'function'){
-				internal_return = data[option].apply(data, args);
-			}
-		});
-
-		if (
-			internal_return === undefined ||
-			internal_return instanceof Datepicker ||
-			internal_return instanceof DateRangePicker
-		)
-			return this;
-
-		if (this.length > 1)
-			throw new Error('Using only allowed for the collection of a single element (' + option + ' function)');
-		else
-			return internal_return;
-	};
-	$.fn.datepicker = datepickerPlugin;
-
-	var defaults = $.fn.datepicker.defaults = {
-		assumeNearbyYear: false,
-		autoclose: false,
-		beforeShowDay: $.noop,
-		beforeShowMonth: $.noop,
-		beforeShowYear: $.noop,
-		beforeShowDecade: $.noop,
-		beforeShowCentury: $.noop,
-		calendarWeeks: false,
-		clearBtn: false,
-		toggleActive: false,
-		daysOfWeekDisabled: [],
-		daysOfWeekHighlighted: [],
-		datesDisabled: [],
-		endDate: Infinity,
-		forceParse: true,
-		format: 'mm/dd/yyyy',
-		keyboardNavigation: true,
-		language: 'en',
-		minViewMode: 0,
-		maxViewMode: 4,
-		multidate: false,
-		multidateSeparator: ',',
-		orientation: "auto",
-		rtl: false,
-		startDate: -Infinity,
-		startView: 0,
-		todayBtn: false,
-		todayHighlight: false,
-		weekStart: 0,
-		disableTouchKeyboard: false,
-		enableOnReadonly: true,
-		showOnFocus: true,
-		zIndexOffset: 10,
-		container: 'body',
-		immediateUpdates: false,
-		title: '',
-		templates: {
-			leftArrow: '&laquo;',
-			rightArrow: '&raquo;'
-		}
-	};
-	var locale_opts = $.fn.datepicker.locale_opts = [
-		'format',
-		'rtl',
-		'weekStart'
-	];
-	$.fn.datepicker.Constructor = Datepicker;
-	var dates = $.fn.datepicker.dates = {
-		en: {
-			days: ["일요일", "월요일", "화요일", "수요일", "목요일", "금요일", "토요일"],
-			daysShort: ["일", "월", "화", "수", "목", "금", "토"],
-			daysMin: ["일", "월", "화", "수", "목", "금", "토"],
-			months: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-			monthsShort: ["1월", "2월", "3월", "4월", "5월", "6월", "7월", "8월", "9월", "10월", "11월", "12월"],
-			today: "Today",
-			clear: "Clear",
-			titleFormat: "yyyy MM"
-		}
-	};
-
-	var DPGlobal = {
-		modes: [
-			{
-				clsName: 'days',
-				navFnc: 'Month',
-				navStep: 1
-			},
-			{
-				clsName: 'months',
-				navFnc: 'FullYear',
-				navStep: 1
-			},
-			{
-				clsName: 'years',
-				navFnc: 'FullYear',
-				navStep: 10
-			},
-			{
-				clsName: 'decades',
-				navFnc: 'FullDecade',
-				navStep: 100
-			},
-			{
-				clsName: 'centuries',
-				navFnc: 'FullCentury',
-				navStep: 1000
-		}],
-		isLeapYear: function(year){
-			return (((year % 4 === 0) && (year % 100 !== 0)) || (year % 400 === 0));
-		},
-		getDaysInMonth: function(year, month){
-			return [31, (DPGlobal.isLeapYear(year) ? 29 : 28), 31, 30, 31, 30, 31, 31, 30, 31, 30, 31][month];
-		},
-		validParts: /dd?|DD?|mm?|MM?|yy(?:yy)?/g,
-		nonpunctuation: /[^ -\/:-@\u5e74\u6708\u65e5\[-`{-~\t\n\r]+/g,
-		parseFormat: function(format){
-			if (typeof format.toValue === 'function' && typeof format.toDisplay === 'function')
-                return format;
-            // IE treats \0 as a string end in inputs (truncating the value),
-			// so it's a bad format delimiter, anyway
-			var separators = format.replace(this.validParts, '\0').split('\0'),
-				parts = format.match(this.validParts);
-			if (!separators || !separators.length || !parts || parts.length === 0){
-				throw new Error("Invalid date format.");
-			}
-			return {separators: separators, parts: parts};
-		},
-		parseDate: function(date, format, language, assumeNearby){
-			if (!date)
-				return undefined;
-			if (date instanceof Date)
-				return date;
-			if (typeof format === 'string')
-				format = DPGlobal.parseFormat(format);
-			if (format.toValue)
-                return format.toValue(date, format, language);
-            var part_re = /([\-+]\d+)([dmwy])/,
-				parts = date.match(/([\-+]\d+)([dmwy])/g),
-				fn_map = {
-					d: 'moveDay',
-					m: 'moveMonth',
-					w: 'moveWeek',
-					y: 'moveYear'
-				},
-				dateAliases = {
-					yesterday: '-1d',
-					today: '+0d',
-					tomorrow: '+1d'
-				},
-				part, dir, i, fn;
-			if (/^[\-+]\d+[dmwy]([\s,]+[\-+]\d+[dmwy])*$/.test(date)){
-				date = new Date();
-				for (i=0; i < parts.length; i++){
-					part = part_re.exec(parts[i]);
-					dir = parseInt(part[1]);
-					fn = fn_map[part[2]];
-					date = Datepicker.prototype[fn](date, dir);
-				}
-				return UTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-			}
-
-			if (typeof dateAliases[date] !== 'undefined') {
-				date = dateAliases[date];
-				parts = date.match(/([\-+]\d+)([dmwy])/g);
-
-				if (/^[\-+]\d+[dmwy]([\s,]+[\-+]\d+[dmwy])*$/.test(date)){
-					date = new Date();
-				  	for (i=0; i < parts.length; i++){
-						part = part_re.exec(parts[i]);
-						dir = parseInt(part[1]);
-						fn = fn_map[part[2]];
-						date = Datepicker.prototype[fn](date, dir);
-				  	}
-
-			  		return UTCDate(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-				}
-			}
-
-			parts = date && date.match(this.nonpunctuation) || [];
-			date = new Date();
-
-			function applyNearbyYear(year, threshold){
-				if (threshold === true)
-					threshold = 10;
-
-				// if year is 2 digits or less, than the user most likely is trying to get a recent century
-				if (year < 100){
-					year += 2000;
-					// if the new year is more than threshold years in advance, use last century
-					if (year > ((new Date()).getFullYear()+threshold)){
-						year -= 100;
-					}
-				}
-
-				return year;
-			}
-
-			var parsed = {},
-				setters_order = ['yyyy', 'yy', 'M', 'MM', 'm', 'mm', 'd', 'dd'],
-				setters_map = {
-					yyyy: function(d,v){
-						return d.setUTCFullYear(assumeNearby ? applyNearbyYear(v, assumeNearby) : v);
-					},
-					yy: function(d,v){
-						return d.setUTCFullYear(assumeNearby ? applyNearbyYear(v, assumeNearby) : v);
-					},
-					m: function(d,v){
-						if (isNaN(d))
-							return d;
-						v -= 1;
-						while (v < 0) v += 12;
-						v %= 12;
-						d.setUTCMonth(v);
-						while (d.getUTCMonth() !== v)
-							d.setUTCDate(d.getUTCDate()-1);
-						return d;
-					},
-					d: function(d,v){
-						return d.setUTCDate(v);
-					}
-				},
-				val, filtered;
-			setters_map['M'] = setters_map['MM'] = setters_map['mm'] = setters_map['m'];
-			setters_map['dd'] = setters_map['d'];
-			date = UTCToday();
-			var fparts = format.parts.slice();
-			// Remove noop parts
-			if (parts.length !== fparts.length){
-				fparts = $(fparts).filter(function(i,p){
-					return $.inArray(p, setters_order) !== -1;
-				}).toArray();
-			}
-			// Process remainder
-			function match_part(){
-				var m = this.slice(0, parts[i].length),
-					p = parts[i].slice(0, m.length);
-				return m.toLowerCase() === p.toLowerCase();
-			}
-			if (parts.length === fparts.length){
-				var cnt;
-				for (i=0, cnt = fparts.length; i < cnt; i++){
-					val = parseInt(parts[i], 10);
-					part = fparts[i];
-					if (isNaN(val)){
-						switch (part){
-							case 'MM':
-								filtered = $(dates[language].months).filter(match_part);
-								val = $.inArray(filtered[0], dates[language].months) + 1;
-								break;
-							case 'M':
-								filtered = $(dates[language].monthsShort).filter(match_part);
-								val = $.inArray(filtered[0], dates[language].monthsShort) + 1;
-								break;
-						}
-					}
-					parsed[part] = val;
-				}
-				var _date, s;
-				for (i=0; i < setters_order.length; i++){
-					s = setters_order[i];
-					if (s in parsed && !isNaN(parsed[s])){
-						_date = new Date(date);
-						setters_map[s](_date, parsed[s]);
-						if (!isNaN(_date))
-							date = _date;
-					}
-				}
-			}
-			return date;
-		},
-		formatDate: function(date, format, language){
-			if (!date)
-				return '';
-			if (typeof format === 'string')
-				format = DPGlobal.parseFormat(format);
-			if (format.toDisplay)
-                return format.toDisplay(date, format, language);
-            var val = {
-				d: date.getUTCDate(),
-				D: dates[language].daysShort[date.getUTCDay()],
-				DD: dates[language].days[date.getUTCDay()],
-				m: date.getUTCMonth() + 1,
-				M: dates[language].monthsShort[date.getUTCMonth()],
-				MM: dates[language].months[date.getUTCMonth()],
-				yy: date.getUTCFullYear().toString().substring(2),
-				yyyy: date.getUTCFullYear()
-			};
-			val.dd = (val.d < 10 ? '0' : '') + val.d;
-			val.mm = (val.m < 10 ? '0' : '') + val.m;
-			date = [];
-			var seps = $.extend([], format.separators);
-			for (var i=0, cnt = format.parts.length; i <= cnt; i++){
-				if (seps.length)
-					date.push(seps.shift());
-				date.push(val[format.parts[i]]);
-			}
-			return date.join('');
-		},
-		headTemplate: '<thead>'+
-			              '<tr>'+
-			                '<th colspan="7" class="datepicker-title"></th>'+
-			              '</tr>'+
-							'<tr>'+
-								'<th class="prev">&laquo;</th>'+
-								'<th colspan="5" class="datepicker-switch"></th>'+
-								'<th class="next">&raquo;</th>'+
-							'</tr>'+
-						'</thead>',
-		contTemplate: '<tbody><tr><td colspan="7"></td></tr></tbody>',
-		footTemplate: '<tfoot>'+
-							'<tr>'+
-								'<th colspan="7" class="today"></th>'+
-							'</tr>'+
-							'<tr>'+
-								'<th colspan="7" class="clear"></th>'+
-							'</tr>'+
-						'</tfoot>'
-	};
-	DPGlobal.template = '<div class="datepicker">'+
-							'<div class="datepicker-days">'+
-								'<table class="table-condensed">'+
-									DPGlobal.headTemplate+
-									'<tbody></tbody>'+
-									DPGlobal.footTemplate+
-								'</table>'+
-							'</div>'+
-							'<div class="datepicker-months">'+
-								'<table class="table-condensed">'+
-									DPGlobal.headTemplate+
-									DPGlobal.contTemplate+
-									DPGlobal.footTemplate+
-								'</table>'+
-							'</div>'+
-							'<div class="datepicker-years">'+
-								'<table class="table-condensed">'+
-									DPGlobal.headTemplate+
-									DPGlobal.contTemplate+
-									DPGlobal.footTemplate+
-								'</table>'+
-							'</div>'+
-							'<div class="datepicker-decades">'+
-								'<table class="table-condensed">'+
-									DPGlobal.headTemplate+
-									DPGlobal.contTemplate+
-									DPGlobal.footTemplate+
-								'</table>'+
-							'</div>'+
-							'<div class="datepicker-centuries">'+
-								'<table class="table-condensed">'+
-									DPGlobal.headTemplate+
-									DPGlobal.contTemplate+
-									DPGlobal.footTemplate+
-								'</table>'+
-							'</div>'+
-						'</div>';
-
-	$.fn.datepicker.DPGlobal = DPGlobal;
-
-
-	/* DATEPICKER NO CONFLICT
-	* =================== */
-
-	$.fn.datepicker.noConflict = function(){
-		$.fn.datepicker = old;
-		return this;
-	};
-
-	/* DATEPICKER VERSION
-	 * =================== */
-	$.fn.datepicker.version = '1.6.4';
-
-	/* DATEPICKER DATA-API
-	* ================== */
-
-	$(document).on(
-		'focus.datepicker.data-api click.datepicker.data-api',
-		'[data-provide="datepicker"]',
-		function(e){
-			var $this = $(this);
-			if ($this.data('datepicker'))
-				return;
-			e.preventDefault();
-			// component click requires us to explicitly show it
-			datepickerPlugin.call($this, 'show');
-		}
-	);
-	$(function(){
-		datepickerPlugin.call($('[data-provide="datepicker-inline"]'));
-	});
-
-}));
-
-
-
-
-
-
-// autoComplete
-
-var placeSearch, autocomplete;
-var componentForm = {
-  street_number: 'short_name',
-  route: 'long_name',
-  locality: 'long_name',
-  administrative_area_level_1: 'short_name',
-  country: 'long_name',
-  postal_code: 'short_name'
-};
-
-function initAutocomplete() {
-  // Create the autocomplete object, restricting the search to geographical
-  // location types.
-  autocomplete = new google.maps.places.Autocomplete(
-      /** @type {!HTMLInputElement} */(document.getElementById('autocomplete')),
-      {types: ['geocode'],componentRestrictions: {country: 'kr'}});
-
-  // When the user selects an address from the dropdown, populate the address
-  // fields in the form.
-  autocomplete.addListener('place_changed', fillInAddress);
-}
-
-// [START region_fillform]
-function fillInAddress() {
-  // Get the place details from the autocomplete object.
-  var place = autocomplete.getPlace();
-  $('#lat').prop('value',place.geometry.location.lat());
-  $('#lng').prop('value',place.geometry.location.lng());
-  console.log(place.formatted_address);
- 
-  // Get each component of the address from the place details
-  // and fill the corresponding field on the form.
- 
-}
-// [END region_fillform]
-
-// [START region_geolocation]
-// Bias the autocomplete object to the user's geographical location,
-// as supplied by the browser's 'navigator.geolocation' object.
-function geolocate() {
-  if (navigator.geolocation) {
-    navigator.geolocation.getCurrentPosition(function(position) {
-      var geolocation = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-      
-      var circle = new google.maps.Circle({
-        center: geolocation,
-        radius: position.coords.accuracy
-      });
-      autocomplete.setBounds(circle.getBounds());
-    });
-  }
-}	
+})();

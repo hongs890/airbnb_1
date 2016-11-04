@@ -63,7 +63,7 @@ public class MemberController {
 			member.setPw(pw);
 			 MemberDTO user = service.signin(member);
 			logger.info("getEmail value: {}", member.getEmail());
-			  if(email.equals("admin")&&pw.equals("1")){
+			 if(email.equals("admin")&&pw.equals("1")){
 			         logger.info("Controller LOGIN {}","ADMIN");
 			         logger.info("Controller LOGIN {}",email);
 			         logger.info("Controller LOGIN {}",pw);
@@ -127,7 +127,7 @@ public class MemberController {
 	         return user;
 	      }
 	   } */
-	   @RequestMapping(value="/check_dup/{email}")
+	   @RequestMapping(value="/check_dup/{email}",method=RequestMethod.POST,consumes="application/json")
 	   public @ResponseBody Retval checkDup(@PathVariable String email) {
 	      logger.info("checkDup {}","email");
 	      logger.info("checkDup {}",email);

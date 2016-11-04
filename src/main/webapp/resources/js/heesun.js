@@ -4,14 +4,11 @@
 				onCreate();
 			};
 			var setContentView = function() {
-				$('#h_logo').addClass('cursor');
 				$('#h_admin').addClass('cursor');
 				$('#p_con_footer').addClass('text_center').css('margin-left','16%').css('margin-right','0 auto').css('width','100%');
 			};
 			var onCreate = function() {
 				setContentView();
-				$('#h_logo').click(function(){
-					location.href=app.context()+'/';});
 				$('#pub_article').on('click','#m_rlogin',function(){
 					$('#pub_article').html(SIGNIN);});
 			};
@@ -64,8 +61,9 @@ var member = (function() {
 	var onCreate = function() {
 		setContentView();
 		$('#pub_header').on('click','#h_logo_u',function(){
-			$('#pub_header').empty().load(app.context()+ '/member/logined/header');
-			$('#pub_article').empty().load(app.context()+ '/member/logined/main');
+			$('#pub_header').load(app.context()+ '/member/logined/header');
+			$('#pub_article').load(app.context()+ '/member/logined/main');
+			
 		});
 		$('#pub_article').on('click','#m_signup_e',function(){
 		$.ajax({
@@ -92,23 +90,8 @@ var member = (function() {
 								$('font[name=phone_check]').html("올바르지않은전화번호입니다.").css('color', 'red');
 							}
 					}); 
-		$('#pub_article').on('click','#check_dup',function(e) {
-			e.preventDefault();
-					if (util.emailChecker($('#signup_email').val()) === 'yes') {
-						$.ajax({
-							url : app.context()+ '/member/check_dup/'+ $('#signup_email').val()+'.com',
-							success : function(data) {
-								alert(data.flag);
-								alert(data.Message);
-								alert(data.temp);
-							if (data.Flag === 'TRUE') {
-								alert('true');
-							$('#check_dup').html('<input type="button" id="signup_email" placeholder="'+ data.message+ '"><input type="button" id="signup_email" value="다시 조회"/>');
-							} else {
-								alert('false');
-							$('#check_dup').html('<input style= "color:green"; type="text" id="signup_email" value="'+ data.temp
-											+ '"><input type="button" id="signup_email" value="그대로 사용"/>');
-							$('#m_bt_signup').click(function(e) {
+			$('#pub_article').on('click','#m_bt_signup',function(e){
+								alert('ㅋㅋ');
 										e.preventDefault();
 										var sign_info = {'email' : $('#signup_email').val(),
 												'pw' : $('#signup_pw').val(),
@@ -136,20 +119,6 @@ var member = (function() {
 											}
 								});
 						});
-							
-							
-					}
-			},
-							error : function(x, s, m) {
-										alert('중복가입 에러' + m);
-							}
-								});
-						alert('정규식에 합당함');
-					} else {
-						alert('정규식에 맞지 않음');
-						$('#signup_email').val('').focus();
-					}
-				});
 		
 			$('#pub_header').on('click','#m_logout',function(){
 					location.href=app.context()+'/member/logout'
@@ -166,6 +135,7 @@ var member = (function() {
 					data : {'email' : $('#signin_email').val(),
 							'pw' : $('#signin_password').val()},
 					dataType : 'json',
+					async : false,
 					success : function(data){
 						if (data.email==='admin') {
 							location.href = app.context()+'/admin/main';
@@ -196,11 +166,11 @@ var SINGUPEMAIL=
 	 +'<section style="width:30%;margin-left:35%;padding-top: 5%;padding-bottom:5%">'
 	+'<h3 style="color:red;text-align:center"><strong>이메일로 회원가입</strong></h3>'
 	+'<div class="control-group space-1">'
-	+'<input type="email" name="email" id="signup_email" placeholder="이메일 주소" class="decorative-input inspectletIgnore"/><input  id="check_dup"  class="control-group space-1" style="width:100%;text-align:center" type="button" value="중복체크"/>'
+	+'<input type="email" name="email" id="signup_email" placeholder="이메일 주소" class="decorative-input inspectletIgnore"/>'
 	+'</div>'
 	+'<div class="control-group space-1">'
 	+'<div>'
-	+'<input type="password" id="signup_pw" name="pw" placeholder="비밀번호4~10자" class="decorative-input inspectletIgnore">'
+	+'<input type="password" id="signup_pw" name="pw" placeholder="비밀번호를 입력해주세요" class="decorative-input inspectletIgnore">'
 	+'</div>'
 	+'</div>'
 	+'<div class="control-group space-1">'

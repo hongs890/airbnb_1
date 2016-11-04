@@ -16,7 +16,7 @@ public class MchartDTO implements Serializable {/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@Getter @Setter private String mchart_year,mchart_month;
+	@Getter @Setter private String mchart_month;
 	@Getter @Setter private int mchart_count;
 	
 

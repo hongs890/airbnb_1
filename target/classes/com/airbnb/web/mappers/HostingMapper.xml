@@ -3,11 +3,11 @@
 <mapper namespace="com.airbnb.web.mappers.HostingMapper">
 <insert id="regist_houses" parameterType="com.airbnb.web.domains.HostingDTO">
 	insert into houses (room_type, guest_cnt, bed_cnt, bathroom_cnt, picture, explaination, title, other_rule, checkin_term, checkin_time, min_nights, max_nights, price, reg_date, rules, convenience, safety_fac, space, email, building_seq) 
-values (#{room_type}, #{guest_cnt}, #{bed_cnt}, #{bathroom_cnt}, #{picture}, #{explaination}, #{title}, #{other_rule}, #{checkin_term}, #{checkin_time}, #{min_nights}, #{max_nights}, #{price}, #{reg_date}, #{rules}, #{convenience}, #{safety_fac}, #{space}, #{email}, #{building_seq})
+values (#{roomType}, #{guestCnt}, #{bedCnt}, #{bathroomCnt}, #{picture}, #{explaination}, #{title}, #{otherRule}, #{checkinTerm}, #{checkinTime}, #{minNights}, #{maxNights}, #{price}, #{regDate}, #{rules}, #{convenience}, #{safetyFac}, #{space}, #{email}, #{buildingSeq})
 </insert>
 <insert id="regist_address" parameterType="com.airbnb.web.domains.HostingDTO">
 	insert into address (country, state, city, street, optional, zip_code, latitude, longitude, house_seq)
-values (#{country}, #{state}, #{city}, #{street}, #{optional}, #{zip_code}, #{latitude}, #{longitude}, #{house_seq})
+values (#{country}, #{state}, #{city}, #{street}, #{optional}, #{zipCode}, #{latitude}, #{longitude}, #{houseSeq})
 </insert>
 <insert id="regist_block" parameterType="com.airbnb.web.domains.Command">
 	insert into block (block_date,house_seq) values (#{option},#{keyword})
@@ -16,47 +16,78 @@ values (#{country}, #{state}, #{city}, #{street}, #{optional}, #{zip_code}, #{la
 	delete from block where house_seq = #{keyword}
 </delete>
 <update id="update_price" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set price = #{price} where house_seq = #{house_seq}
+	update houses set price = #{price} where house_seq = #{houseSeq}
 </update>
 <update id="update_rules" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set rules = #{rules}, other_rule = #{other_rule} where house_seq = #{house_seq}
+	update houses set rules = #{rules}, other_rule = #{otherRule} where house_seq = #{houseSeq}
 </update>
 <update id="update_checkin" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set checkin_time = #{checkin_time} where house_seq = #{house_seq}
+	update houses set checkin_time = #{checkinTime} where house_seq = #{houseSeq}
 </update>
 <update id="update_house_option" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set building_seq = #{building_seq}, room_type = #{room_type}, guest_cnt = #{guest_cnt}, 
-	bed_cnt = #{bed_cnt}, bathroom_cnt = #{bathroom_cnt} where house_seq = #{house_seq}
+	update houses set building_seq = #{buildingSeq}, room_type = #{roomType}, guest_cnt = #{guestCnt}, 
+	bed_cnt = #{bedCnt}, bathroom_cnt = #{bathroomCnt} where house_seq = #{houseSeq}
 </update>
 <update id="update_explaination" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set explaination = #{explaination}, title = #{title} where house_seq = #{house_seq}
+	update houses set explaination = #{explaination}, title = #{title} where house_seq = #{houseSeq}
 </update> 
 <update id="update_googleMap" parameterType="com.airbnb.web.domains.HostingDTO">
-	update address set latitude = #{latitude}, longitude = #{longitude} where house_seq = #{house_seq}
+	update address set latitude = #{latitude}, longitude = #{longitude} where house_seq = #{houseSeq}
 </update>
 <update id="update_convenience" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set convenience = #{convenience} where house_seq = #{house_seq}
+	update houses set convenience = #{convenience} where house_seq = #{houseSeq}
 </update>
 <update id="update_picture" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set picture = #{picture} where house_seq = #{house_seq}
+	update houses set picture = #{picture} where house_seq = #{houseSeq}
 </update>
 <update id="update_safety_fac" parameterType="com.airbnb.web.domains.HostingDTO">
-	update houses set safety_fac = #{safety_fac} where house_seq = #{house_seq}
+	update houses set safety_fac = #{safetyFac} where house_seq = #{houseSeq}
 </update>
+
 <select id="building_list" resultType="string">
-	SELECT TYPE FROM BUILDING
+	select type from building
 </select>
-<select id="house_seq_max" parameterType="com.airbnb.web.domains.Command" resultType="int">
-	select max(house_seq) from houses where email = #{keyword}
+<select id="exist_block" parameterType="com.airbnb.web.domains.Command" resultType="int">
+select if (exists(select block_date from block where house_seq = #{keyword}), 1, 0)
+</select>
+<select id="block_list" parameterType="com.airbnb.web.domains.Command" resultType="string">
+	select block_date from block where house_seq = #{keyword}
 </select>
 <select id="house_seq" parameterType="com.airbnb.web.domains.Command" resultType="string">
 	select house_seq from houses where email = #{keyword} order by house_seq asc 
 </select>
 <select id="house_list" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.HostingDTO">
-	select * from houses where house_seq = #{start} and email = #{keyword}
-</select>
-<select id="address_country" parameterType="com.airbnb.web.domains.Command" resultType="string">
-	select country from address where house_seq = #{start}
+	select 
+	house_seq as houseSeq,
+	room_type as roomType,
+	guest_cnt as guestCnt,
+	bed_cnt as bedCnt,
+	bathroom_cnt as bathroomCnt,
+	picture as picture,
+	explaination as explaination,
+	title as title,
+	rules as rules,
+	other_rule as otherRule,
+	checkin_term as checkinTerm,
+	checkin_time as checkinTime,
+	min_nights as minNights,
+	max_nights as maxNights,
+	price as price,
+	reg_date as regDate,
+	convenience as convenience,
+	type as type,
+	safety_fac as safetyFac,
+	space as space,
+	email as email,
+	country as country,
+	state as state,
+	city as city,
+	street as street,
+	optional as optional,
+	zip_code as zipCode,
+	latitude as latitude,
+	longitude as longitude
+	 from houses_view where house_seq = #{start} and email = #{keyword}
 </select>
 <select id="house_count" parameterType="com.airbnb.web.domains.Command" resultType="int">
 	select count(*) from houses where email = #{keyword}

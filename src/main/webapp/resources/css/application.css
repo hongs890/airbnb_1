@@ -12,3 +12,38 @@ a{cursor:pointer;}
 .red{color: red;}
 .formbox2{padding:20px;border:0px solid #999999;margin:0 auto;display:block}
 .sectionLabel_rcr7sj{display:block !important;padding-top:9px !important;padding-bottom:8px !important;}.ucBody_1elyhsq{float:left !important;}.learnMoreLink_jcsji7{float:left !important;padding-left:2px !important;}.container_e6l7gr{display:none !important;bottom:20px !important;left:0px !important;right:0px !important;text-align:center !important;position:fixed !important;z-index:100 !important;}@media (max-width: 743px){.container_e6l7gr{display:block !important;}}.container_nih30w-o_O-container_180u7sb{font-family:Circular !important;font-size:19px !important;line-height:22px !important;letter-spacing:undefined !important;padding-top:12px !important;padding-bottom:12px !important;color:#484848 !important;margin:0px !important;font-weight:700 !important;border:2px solid transparent !important;cursor:pointer !important;padding-right:32px !important;padding-left:32px !important;transition:background 0.3s, border-color 0.3s !important;position:relative !important;border-radius:64px !important;background:#FF5A5F !important;border-color:undefined !important;width:auto !important;-webkit-transition:background 0.3s, border-color 0.3s !important;}.container_nih30w-o_O-container_180u7sb:active{background:#ED595C !important;border-color:undefined !important;}.container_nih30w-o_O-container_180u7sb:disabled{background:rgba(255, 90, 95, 0.3) !important;border-color:undefined !important;cursor:default !important;}.text_1f104np-o_O-text_v1ofku{font-family:Circular !important;font-size:19px !important;line-height:22px !important;letter-spacing:undefined !important;padding-top:0px !important;padding-bottom:0px !important;color:#ffffff !important;margin:0px !important;white-space:nowrap !important;transition:color 0.3s !important;visibility:visible !important;-webkit-transition:color 0.3s !important;}.text_1f104np-o_O-text_v1ofku:active{color:undefined !important;}
+a.tooltips {
+   position: relative;
+   display: inline;
+}
+a.tooltips span {
+   position: absolute;
+   width: 150px;
+   color: #FFFFFF;
+   background: #000000;
+   height: -100px;
+   line-height: 10px;
+   text-align: center;
+   display: none;
+   border-radius: 6px;
+}
+a.tooltips span:after {
+   content: '';
+   position: absolute;
+   top: 100%;
+   left: 50%;
+   margin-left: -8px;
+   width: 0;
+   height: 0;
+   border-top: 8px solid #000000;
+   border-right: 8px solid transparent;
+   border-left: 8px solid transparent;
+}
+a:hover.tooltips span {
+   display: block;
+   opacity: 0.8;
+   bottom: 30px;
+   left: 50%;
+   margin-left: -76px;
+   z-index: 999;
+}

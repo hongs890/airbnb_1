@@ -30,7 +30,7 @@ var admin =(function(){
         	        }
         	    }
         	});
-           $('#admin_main').click(function(){
+           $('#admin_main1').click(function(){
                 $.ajax({
                      url:app.context()+'/admin/admin_main',
                      success:function(data){
@@ -48,7 +48,22 @@ var admin =(function(){
                                        }
                                    }); 
                         	   $('#admin_article').empty().html(ADMIN_ARTICLE);
-                        	   
+                        	   $('#admin_main_mlist #mcount').click(function() {
+                               	
+                                   $.ajax({ 
+                                         url: app.context()+'/admin/list',
+                                           datatype: "json",
+                                       mtype: "get",
+                                       success: function(data) {
+                                                  console.log(data);
+                                                  admin.mlist();
+                                             },
+                                             error: function(x,h,m) {
+                                                  alert('error'+m)
+                                             }
+                                         });
+                                   $('#admin_article').empty().html(TEST_LIST);
+                             });
                                 $('#admin_main_mlist').click(function() {
                                 	
                                       $.ajax({ 
@@ -65,6 +80,21 @@ var admin =(function(){
                                             });
                                       $('#admin_article').empty().html(TEST_LIST);
                                 });
+                                $('#admin_main_hlist #hcount').click(function() {
+                              	  $.ajax({ 
+                                        url: app.context()+'/admin/hlist',
+                                          datatype: "json",
+                                      mtype: "get",
+                                      success: function(data) {
+                                                 console.log(data);
+                                                 admin.hlist();
+                                            },
+                                            error: function(x,h,m) {
+                                                 alert('error'+m)
+                                            }
+                                        });
+                                  $('#admin_article').empty().html(TEST_LIST);
+                              });
                                 $('#admin_main_hlist').click(function() {
                                 	  $.ajax({ 
                                           url: app.context()+'/admin/hlist',
@@ -80,6 +110,21 @@ var admin =(function(){
                                           });
                                     $('#admin_article').empty().html(TEST_LIST);
                                 });
+                                $('#admin_main_rlist #rcount').click(function() {
+                             	   $.ajax({ 
+                                        url: app.context()+'/admin/rlist',
+                                          datatype: "json",
+                                      mtype: "get",
+                                      success: function(data) {
+                                                 console.log(data);
+                                                 admin.rlist();
+                                            },
+                                            error: function(x,h,m) {
+                                                 alert('error'+m)
+                                            }
+                                        });
+                                  $('#admin_article').empty().html(TEST_LIST);
+                                 });
                                $('#admin_main_rlist').click(function() {
                             	   $.ajax({ 
                                        url: app.context()+'/admin/rlist',
@@ -119,12 +164,10 @@ var admin =(function(){
                            }
                       });
                  $('#admin_article').empty().html(TEST_LIST);
-                     alert('click testlist');
-     
            });
            $('#admin_main_mlist').click(function(){
                  $.ajax({ 
-                      url: app.context()+'/admin/list',
+                     /* url: app.context()+'/admin/list',*/
                         datatype: "json",
                      mtype: "get",
                      success: function(data) {
@@ -139,7 +182,6 @@ var admin =(function(){
                       });
            
                  $('#admin_article').empty().html(TEST_LIST);
-           
            });
            
            $('#admin_main_hlist').click(function() {
@@ -203,21 +245,37 @@ var admin =(function(){
              $('#admin_article').empty().html(TEST_LIST);
            });
            $('#admin_nav_chart').click(function(){
-                $.ajax({
-                     url:app.context()+'/admin/chart',
-                     success:function(data){
-                    	 
-                           if (data.message==="success") {
-                                $('#admin_article').empty().html(ADMIN_MCHART);
-                           }else{
-                                ALERT('SUCCESS ERROR chart ')
-                           }
-                     },
-                     error:function(x,e,m){
-                           alert("admin nav chart error : " +m)
-                     }
-                });
-           });
+        	   google.charts.load('current', {
+        		   packages: ['corechart']
+        		 });
+        	   admin.drawChart();
+        	   $('#admin_article').empty().html(ADMIN_CHART);
+                   });
+         
+           $('#admin_nav_mchart').click(function(){
+        	   google.charts.load('current', {
+        		   packages: ['corechart']
+        		 });
+        	   admin.drawChart();
+        	      $('#admin_article').empty().html(ADMIN_CHART);
+                   });
+     
+           $('#admin_nav_rchart').click(function(){
+        	   google.charts.load('current', {
+        		   packages: ['corechart']
+        		 });
+        	   admin.drawRChart();
+        	   $('#admin_article').empty().html(ADMIN_CHART);
+                   });
+         
+           $('#admin_nav_hchart').click(function(){
+        	   google.charts.load('current', {
+        		   packages: ['corechart']
+        		 });
+        	   admin.drawMHChart();
+        	   $('#admin_article').empty().html(ADMIN_CHART);
+                   });
+        
            $('#admin_nav_search').click(function(){
                 $.ajax({
                      url:app.context()+'/admin/search',
@@ -233,18 +291,6 @@ var admin =(function(){
                      }
                 });  
            });
-           $('#admin_nav_testchart').click(function(){
-        	   alert('test chart');
-        	   google.charts.load('current', {
-        		   packages: ['corechart']
-        		 });
-        	   alert('test chart1');
-        	   admin.drawChart();
-        	 
-                   });
-             $('#admin_article').empty().html(TEST_CHART);
-       /*    });*/
-           
      };
        return{
           init : init,
@@ -390,36 +436,143 @@ var admin =(function(){
                   	});
               },
               drawChart: function(){
-            	  alert('function drawChart');
                   $.ajax({
-                          url: app.context()+'/admin/testchart',
+                          url: app.context()+'/admin/mchart',
                           dataType: "json",
                           data:{},
-                         /* async: false,*/
+                       /*   async: false,*/
                           success: function(data) {
-                        	  alert('test chart ajax');
-                        	  data = new google.visualization.DataTable(jsonData);
-                        	  alert('test chart visualization');
-                        	  if (data) {
+                        	  $('#admin_article').empty().html(ADMIN_CHART);
+                        var  admin_data = new google.visualization.DataTable(data);
+                        	  if (admin_data) {
+                        		  var options = {
+                        					  title : 'AIRBNB 월간회원 가입현황 ',
+                        					  width:'80%',
+                        	                   height:500,
+                        	                   colors: ['green'],
+                        	                   color: '#c784de',
+                        				      vAxis: {title: 'MUMBERS'},
+                        				      hAxis: {title: 'Month'},
+                        				      seriesType: 'bars',
+                        				      series: {5: {type: 'line'}}
+                        				   };
+                        		  var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                        		  chart.draw(admin_data,options);
                         		  
-                        		  google.charts.setOnLoadCallback(data);
+                        		
+                        	/*  google.charts.setOnLoadCallback(test);*/
                         		  
 							} else {
 								alert('test chart error');
-							}
-                        	 
+							}                          
+                              // Instantiate and draw our chart, passing in some options.
+                         /*     var chart = new google.visualization.PieChart(document.getElementById$('chart_div'));
+                              chart.draw(jsonData, {width: 400, height: 240});
+                        */	 
 						},
 						error:function(x,e,m){
 	                           alert("admin test chart error : " +m)
 						}
                           });
-                          
-                                          
-                      // Instantiate and draw our chart, passing in some options.
-                      var chart = new google.visualization.PieChart(document.getElementById$('#chart_div'));
-                      chart.draw(jsonData, {width: 400, height: 240});
-                    }
-
+                    },
+                    drawMHChart: function(){
+                        $.ajax({
+                                url: app.context()+'/admin/hchart',
+                                dataType: "json",
+                                data:{},
+                             /*   async: false,*/
+                                success: function(data) {
+                              	  $('#admin_article').empty().html(ADMIN_CHART);
+                              var  admin_data = new google.visualization.DataTable(data);
+                              	  if (admin_data) {
+                              		  var options = {
+                              					  title : 'AIRBNB 월간 회원 및 호스팅 가입현황 ',
+                              					  width:'80%',
+                              	                   height:500,
+                              	                 colors: ['red','#43459d'],
+                              	              
+                              				      vAxis: {title: 'MUMBERS'},
+                              				      hAxis: {title: 'Month'},
+                              				      seriesType: 'bars',
+                              				      series: {5: {type: 'line'}}
+                              				   };
+                              		  var chart = new google.visualization.ComboChart(document.getElementById('chart_div'));
+                              		  chart.draw(admin_data,options);
+                              		  
+                              		
+                              	/*  google.charts.setOnLoadCallback(test);*/
+                              		  
+      							} else {
+      								alert('test chart error');
+      							}                          
+                                    // Instantiate and draw our chart, passing in some options.
+                               /*     var chart = new google.visualization.PieChart(document.getElementById$('chart_div'));
+                                    chart.draw(jsonData, {width: 400, height: 240});
+                              */	 
+      						},
+      						error:function(x,e,m){
+      	                           alert("admin test chart error : " +m)
+      						}
+                                });
+                          },
+                          drawRChart: function(){
+                              $.ajax({
+                                      url: app.context()+'/admin/rchart',
+                                      dataType: "json",
+                                      data:{},
+                                   /*   async: false,*/
+                                      success: function(data) {
+                                    	  $('#admin_article').empty().html(ADMIN_CHART);
+                                    var  admin_data = new google.visualization.DataTable(data);
+                                    	  if (admin_data) {
+                                    		  var options = {
+                                    					  title : 'AIRBNB 월간회원 및 호스팅 예약 가입현황 ',
+                                    					  width:'80%',
+                                    	                   height:500,
+                                    	                   colors: ['green','#43459d'],
+                                    				      vAxis: {title: 'MUMBERS'},
+                                    				      hAxis: {title: 'Month'},
+                                    				      curveType: 'function',
+                                    				     /* seriesType: 'bars',
+                                    				      series: {5: {type: 'line'}}*/
+                                    				   };
+                                    		  var chart = new google.visualization.LineChart(document.getElementById('chart_div'));
+                                    		  chart.draw(admin_data,options);
+                                    		  
+                                    		
+                                    	/*  google.charts.setOnLoadCallback(test);*/
+                                    		  
+            							} else {
+            								alert('test chart error');
+            							}                          
+                                          // Instantiate and draw our chart, passing in some options.
+                                     /*     var chart = new google.visualization.PieChart(document.getElementById$('chart_div'));
+                                          chart.draw(jsonData, {width: 400, height: 240});
+                                    */	 
+            						},
+            						error:function(x,e,m){
+            	                           alert("admin test chart error : " +m)
+            						}
+                                      });
+                                },
+                                mcount : function(){
+                        			$.getJSON(app.context()+'/admin/mcount/',function(data){
+                        				$('#mcount').text(data.count);
+                        				console.log('멥버회원수'+data.count);	
+                        			});
+                        			},
+                        	   hcount : function(){
+                              			$.getJSON(app.context()+'/admin/hcount/',function(data){
+                              				$('#hcount').text(data.count);
+                              				console.log('호스팅수'+data.count);	
+                              			});
+                              			},	   
+                              	rcount : function(){
+                                   			$.getJSON(app.context()+'/admin/rcount/',function(data){
+                                   				$('#rcount').text(data.count);
+                                   				console.log('예약수'+data.count);	
+                                   			});
+                                   			},
              }
          
 })();
@@ -514,7 +667,7 @@ var ADMIN_NAV =
      var ADMIN_ARTICLE =
          '<section>'
          +'<article id="admin_article">'
-         +''
+         +'<script type="text/javascript"> $(function(){admin.mlist();});$(function(){admin.mcount();});$(function(){admin.hcount();});$(function(){admin.rcount();});</script>'
          +'<body>'
          +'<div id="page-wrapper">'
          +'<div id="page-inner">'
@@ -532,7 +685,7 @@ var ADMIN_NAV =
          +'<div class="panel-body">'
          +'<a id="admin_main_mlist">'
          +'<i class="fa fa-user fa-5x"></i>'
-         +'<h3>8,457 </h3>'
+         +'<h3><a  id="admin_main_mlist"><div id="mcount"></div> </a> </h3>'
          +'</div>'
          +'<div class="panel-footer back-footer-green" >'
          +'가입회원자수</a>'
@@ -544,7 +697,7 @@ var ADMIN_NAV =
          +'<div class="panel-body">'
          +'<a id="admin_main_hlist">'
          +'<i class="fa fa-home fa-5x"></i>'
-         +'<h3>52,160 </h3>'
+         +'<h3><a  id="admin_main_hlist"><div id="hcount"></div> </a> </h3>'
          +'</div>'
          +'<div class="panel-footer back-footer-blue">'
          +'호스팅 회원수</a>'
@@ -556,7 +709,7 @@ var ADMIN_NAV =
          +'<div class="panel-body">'
          +'<a id="admin_main_rlist">'
          +'<i class="fa fa-book fa-5x"></i>'
-         +'<h3>15,823 </h3>'
+         +'<h3><a  id="admin_main_rlist"><div id="rcount"></div> </a> </h3>'
          +'</div>'
          +'<div class="panel-footer back-footer-red">'
          +'예약 현황</a>'
@@ -576,84 +729,10 @@ var ADMIN_NAV =
          +'</div>'
          +'</div>'
          +'<div class="row">'
-        /* +'<div class="col-md-12 col-sm-12 col-xs-12">'
-         +'<div class="panel panel-default">'
-         +'<div class="panel-heading">'
-         +'Latest booking status list'
-         +'</div>'*/
          +'<div class="panel-body">'
          +'<div class="table-responsive">'
          +'<table  id="grid"> </table>'
          +'<div id="jqGridPager"></div>'
-        /* +'<table class="table table-striped table-bordered table-hover">'
-         +'<thead>'
-         +'<tr>'
-         +'<th>예약번호</th>'
-         +'<th>결재일</th>'
-         +'<th>예약자 ID </th>'
-         +'<th>Hoisting ID</th>'
-         +'<th>Check in date</th>'
-         +'<th>Check out date</th>'
-         +'<th>Address</th>'
-         +'</tr>'
-         +'</thead>'
-         +'<tbody>'
-         +'<tr>'
-         +'<td>1000</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>seoul</td>'
-         +'</tr>'
-         +'<tr>'
-         +'<td>1001</td>'
-         +'<td>2016-10-10</td>'
-         +'<td>choi Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>LA</td>'
-         +'</tr>'
-         +'<tr>'
-         +'<td>1002</td>'
-         +'<td>2016-10-10</td>'
-         +'<td>choi Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>LA</td>'
-         +'</tr>'
-         +'<tr>'
-         +'<td>1003</td>'
-         +'<td>2016-10-10</td>'
-         +'<td>choi Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>LA</td>'
-         +'</tr>'
-         +'<tr>'
-         +'<td>1004</td>'
-         +'<td>2016-10-10</td>'
-         +'<td>choi Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>busan</td>'
-         +'</tr>'
-         +'<tr>'
-         +'<td>1006</td>'
-         +'<td>2016-10-10</td>'
-         +'<td>choi Doe</td>'
-         +'<td>John15482</td>'
-         +'<td>2016-10-09</td>'
-         +'<td>2016-10-19</td>'
-         +'<td>LA</td>'
-         +'</tr>'
-         +'</tbody>'
-         +'</table>'*/
          +'</div>'
          +'</div>'
          +'</div>'
@@ -968,57 +1047,6 @@ var ADMIN_RLIST =
      +'</div>'
      +'<!-- /. ROW  -->'
      +'</div>'
-     +'</article>'
-var ADMIN_CHART=
-     '<article id="admin_article">'
-     +'<div id="page-wrapper">'
-     +'<div id="page-inner">'
-     +'<div class="row">'
-     +'<div class="col-md-12">'
-     +'<h1 class="page-header">'
-     +'통계<small>회원 호스팅 예약 관련 통계 자료 </small>'
-     +'</h1>'
-     +'</div>'
-     +'</div>'
-     +'<!-- /. ROW  -->'
-     +'<div class="row">'
-     +'<div class="col-md-6 col-sm-12 col-xs-12">'
-     +'<div class="panel panel-default">'
-     +'<div class="panel-heading">2016년 월별 회원 가입 현황</div>'
-     +'<div class="panel-body">'
-     +'<div id="morris-bar-chart"></div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'<div class="col-md-6 col-sm-12 col-xs-12">'
-     +'<div class="panel panel-default">'
-     +'<div class="panel-heading">2016년 월별 회원 및 호스팅 가입,예약 통계</div>'
-     +'<div class="panel-body">'
-     +'<div id="morris-area-chart"></div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'<!-- /. ROW  -->'
-     +'<div class="row">'
-     +'<div class="col-md-6 col-sm-12 col-xs-12">'
-     +'<div class="panel panel-default">'
-     +'<div class="panel-heading">연도별 회원 및 호스팅 가입 통계</div>'
-     +'<div class="panel-body">'
-     +'<div id="morris-line-chart"></div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'<div class="col-md-6 col-sm-12 col-xs-12">'
-     +'<div class="panel panel-default">'
-     +'<div class="panel-heading">순수 회원 및 호스팅 회원 통계</div>'
-     +'<div class="panel-body">'
-     +'<div id="morris-donut-chart"></div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'</div>'
-     +'<!-- /. ROW  -->'
      +'</article>'
 var ADMIN_SEARCH=
      '<article id="admin_article">'
@@ -1343,14 +1371,14 @@ var TEST_LIST=
                 +'<!-- /. ROW  -->'
                 +'</div>'*/
                 +'</article>';
-var TEST_CHART=
+var ADMIN_CHART=
     '<article id="admin_article">'
     +'<div id="page-wrapper" >'
     +'<div id="page-inner">'
     +'<div class="row">'
     +'<div class="col-md-12">'
     +'<h1 class="page-header">'
-    +'AIRBNB  <small>List</small>'
+    +'AIRBNB  <small>CHART</small>'
     +'</h1>'
     +'</div>'
     +'</div>'
@@ -1365,7 +1393,7 @@ var TEST_CHART=
 /*   +'<div class="panel-body">'
     +'<div class="table-responsive">'*/
 /*   +'<table class="table table-striped table-bordered table-hover" id="grid">'*/
-    +' <div id="chart_div" style="width: 400, height: 240"></div>'
+    +' <div id="chart_div" style="width: 600, height: 540"></div>'
 /*    +'</div>'
     +'</div>'
     +'</div>'

@@ -68,36 +68,29 @@ public class HostingServiceImpl implements HostingService{
 	public Integer update_safety_fac(HostingDTO param) {
 		return sqlSession.getMapper(HostingMapper.class).update_safety_fac(param);
 	}
-	
-
+	@Override
+	public Integer house_count(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).house_count(command);
+	}
+	@Override
+	public Integer exist_block(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).exist_block(command);
+	}
 	@Override
 	public List<HostingDTO> house_list(Command command) {
 		return sqlSession.getMapper(HostingMapper.class).house_list(command);
 	}
 	@Override
-	public List<String> address_country(Command command) {
-		return sqlSession.getMapper(HostingMapper.class).address_country(command);
+	public List<String> block_list(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).block_list(command);
 	}
 	@Override
 	public List<String> house_seq(Command command) {
 		return sqlSession.getMapper(HostingMapper.class).house_seq(command);
 	}
 	@Override
-	public Integer house_seq_max(Command command) {
-		return sqlSession.getMapper(HostingMapper.class).house_seq_max(command);
-	}
-	@Override
 	public List<String> building_list() {
 		return sqlSession.getMapper(HostingMapper.class).building_list();
 	}
-	@Override
-	public Integer house_count(Command command) {
-		return sqlSession.getMapper(HostingMapper.class).house_count(command);
-	}
-
-
-
-
-
 
 }

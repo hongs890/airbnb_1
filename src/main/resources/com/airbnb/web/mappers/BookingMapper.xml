@@ -289,17 +289,30 @@
 	
 	
 	<!-- Sangho  -->
-	<select id="resvList" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.BookingDTO">
-   SELECT * FROM resv_view WHERE ${keyField} = #{keyword}
+	<select id="resvCancel" parameterType="com.airbnb.web.domains.Command" statementType="CALLABLE">
+   {CALL sp_delete_resv(#{keyword})}
+   </select>	
+   <select id="payment" parameterType="com.airbnb.web.domains.BookingDTO" statementType="CALLABLE">
+   {CALL sp_insert_resv(#{checkinDate},#{checkoutDate},#{guestCnt},#{houseSeq},#{email},#{cardNum},#{price})}
+   </select>		
+   <select id="getHost" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.MemberDTO" statementType="CALLABLE">
+   {CALL sp_find_host(#{keyword})}
+   </select>
+   <select id="resvList" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.BookingDTO">
+   SELECT @RNUM := @RNUM +1 AS ROWNUM,v.* FROM (
+   	SELECT * FROM resv_view WHERE ${keyField} = #{keyword} AND DATE_FORMAT(checkinDate,'%Y/%m/%d %h:%i:%s') > CURDATE() ORDER BY resvSeq ) v, (SELECT @RNUM :=0 ) R LIMIT #{start},#{end}
    </select>
    <select id="findOne" parameterType="com.airbnb.web.domains.Command" resultMap="houseMap">
    SELECT * FROM houses_view WHERE ${keyField} = #{keyword}
    </select>
-   <insert id="payInsert" parameterType="com.airbnb.web.domains.BookingDTO">
-   INSERT INTO payment(card_num,price,payment_date,resv_seq) VALUES(#{cardNum},#{price},CURDATE(),#{resvSeq})
-    </insert>
-    <select id="resvCount" resultType="com.airbnb.web.domains.Command">
+   <select id="resvCount" resultType="com.airbnb.web.domains.Command">
    SELECT count(*) as count FROM resv_view WHERE ${keyField} = #{keyword}
-    </select>
+   </select>
+   <select id="getBlockList" parameterType="com.airbnb.web.domains.Command" resultType="String">
+   SELECT block_date FROM block WHERE DATE_FORMAT(block_date, '%Y/%m/%d') >= DATE_FORMAT(CURDATE(), '%Y/%m/%d') AND ${keyField} = #{keyword}
+   </select>
+   <select id="findResv" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.BookingDTO" statementType="CALLABLE">
+   {CALL sp_find_resv(#{keyword})}
+   </select>
 	
 </mapper>

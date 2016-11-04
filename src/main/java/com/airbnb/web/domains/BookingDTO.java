@@ -11,6 +11,6 @@ import lombok.Setter;
 @Data
 @Lazy
 public class BookingDTO {
-    @Getter @Setter private String checkinDate, checkoutDate, email, paymentDate, cardNum;
+    @Getter @Setter private String checkinDate, checkoutDate, email, paymentDate, cardNum, state;
     @Getter @Setter private int resvSeq, guestCnt, houseSeq, paymentSeq, price; 
 }

@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.airbnb.web.controllers.AdminController;
 import com.airbnb.web.domains.AdminDTO;
 import com.airbnb.web.domains.BookingDTO;
+import com.airbnb.web.domains.GoogleChartDTO;
 import com.airbnb.web.domains.HchartDTO;
 import com.airbnb.web.domains.HostingDTO;
 import com.airbnb.web.domains.MchartDTO;
@@ -102,7 +103,7 @@ public class AdminServiceImpl implements AdminService {
 	@Override
 	public List<MchartDTO> mchart() {
 		AdminMapper mapper =sqlSession.getMapper(AdminMapper.class);
-		logger.info("----- ADMIN_CONTOLLER mcount -----{}",mapper.mchart());	
+		/*logger.info("----- ADMIN_CONTOLLER mchart -----{}",mapper.mchart());	*/
 		return mapper.mchart();
 	}
 	@Override
@@ -114,6 +115,11 @@ public class AdminServiceImpl implements AdminService {
 	public List<RchartDTO> rchart() {
 		AdminMapper mapper =sqlSession.getMapper(AdminMapper.class);
 		return mapper.rchart();
+	}
+	@Override
+	public List<GoogleChartDTO> chart() {
+		AdminMapper mapper =sqlSession.getMapper(AdminMapper.class);
+		return mapper.chart();
 	}
 
 }

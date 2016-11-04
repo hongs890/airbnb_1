@@ -7,9 +7,11 @@ import java.util.List;
 
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Repository;
 
 import com.airbnb.web.domains.AdminDTO;
 import com.airbnb.web.domains.BookingDTO;
+import com.airbnb.web.domains.GoogleChartDTO;
 import com.airbnb.web.domains.HchartDTO;
 import com.airbnb.web.domains.HostingDTO;
 import com.airbnb.web.domains.MchartDTO;
@@ -17,7 +19,7 @@ import com.airbnb.web.domains.RchartDTO;
 import com.airbnb.web.domains.Retval;
 
 
-@Component @Lazy
+@Repository @Lazy
 public interface AdminService{
 	public Retval count();
 	public Retval mcount();
@@ -30,6 +32,7 @@ public interface AdminService{
 	public List<MchartDTO> mchart();
 	public List<HchartDTO> hchart();
 	public List<RchartDTO> rchart();
+	public List<GoogleChartDTO> chart();
 	
 	public Retval regist(AdminDTO param);
 	public Retval update(AdminDTO param);

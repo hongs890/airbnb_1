@@ -16,7 +16,7 @@ public class RchartDTO implements Serializable {/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
-	@Getter @Setter private String rchart_year,rchart_month;
+	@Getter @Setter private String rchart_month;
 	@Getter @Setter private int rchart_count;
 
 	

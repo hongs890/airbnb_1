@@ -27,7 +27,7 @@
                 <ul class="nav" id="main-menu">
 
                     <li>
-                        <a class="active-menu" id="admin_main"><i class="fa fa-dashboard"></i> Dashboard</a>
+                        <a class="active-menu" id="admin_main1"><i class="fa fa-dashboard"></i> Dashboard</a>
                     </li>
                     <li>
                         <a class="active-menu" href="${context}/admin/list"><i class="fa fa-desktop"></i> List</a>
@@ -47,10 +47,20 @@
                     </li>
 					<li>
                         <a class="active-menu" id="admin_nav_chart"><i class="fa fa-bar-chart-o"></i> Charts</a>
+                        <ul class="nav nav-second-level">
+                            <li>
+                                <a id="admin_nav_mchart">월간 회원가입 차트</a>
+                            </li>
+                            <li>
+                                <a id="admin_nav_hchart">월간 회원 및 호스팅 가입 챠트</a>
+                            </li>
+                            <li>
+                                <a id="admin_nav_rchart">회원 중 호스팅 회원수 챠트</a>
+                                
+                            </li>
+                        </ul>
                     </li>
-                    <li>
-                        <a class="active-menu" id="admin_nav_search"><i class="fa fa-qrcode"></i> Search</a>
-                    </li>
+                   
                 </ul>
             </div>
 

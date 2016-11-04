@@ -142,7 +142,7 @@
 
 <script src="${js}/application.js"></script>
 <script src="${js}/hyunwoo.js"></script>
-<script src="${js}/sangho.js"></script>
+
 <script src="${js}/heesun.js"></script>
 <script src="${js}/inchul.js"></script>
 <script src="${js}/geunhong.js"></script>
@@ -150,6 +150,6 @@
 <script src="${js}/seungjun.js"></script>
 
 <script>
-	app.init('${pageContext.request.contextPath}');
+
 </script>
 </html>

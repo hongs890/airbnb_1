@@ -457,7 +457,15 @@ END;
 
 CALL sp_find_host(12);
 
+DROP PROCEDURE IF EXISTS sp_find_resv;
+CREATE PROCEDURE sp_find_resv(
+  IN in_resv_seq INT
+)
+BEGIN
+  SELECT * FROM resv_view WHERE resvSeq = in_resv_seq;
+END;
 
+call sp_find_resv(14);
 
 
    

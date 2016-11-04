@@ -19,9 +19,6 @@
     <definition name="public:*/*.tiles" extends="public">
     	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
     </definition>
-   <!--    <definition name="public:*/*.tiles" extends="member">
-    	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
-    </definition> -->
     <definition name="admin:*/*.tiles" extends="admin">
     	<put-attribute name="body" value="/WEB-INF/views/{1}/{2}.jsp" />
     </definition>

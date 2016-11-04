@@ -60,21 +60,16 @@ public class MemberServiceImpl implements MemberService{
 	@Override
 	public MemberDTO signin(MemberDTO member) {
 		logger.info("Login Email: {}",member.getEmail());
+		logger.info("Login PW: {}",member.getPw());
 		MemberMapper mapper = sqlSession.getMapper(MemberMapper.class); //??
-		List<MemberDTO> list = new ArrayList<MemberDTO>(); //?
 		command.setKeyword(member.getEmail());
 		command.setKeyField("email");
-		list = (List<MemberDTO>) mapper.find(command);
-		String pw = list.get(0).getPw(); //?
-		logger.info("Login PW: {}",member.getPw());
-		logger.info("Database PW: {}",pw);
-		if (pw.equals(member.getPw())) {
-			logger.info("MemberService Login: {}"+ "success");
-			return list.get(0);
+		List<MemberDTO> pw = mapper.find(command);
+		if (pw.get(0).getPw().equals(member.getPw())) {
+			return pw.get(0);
 		} else {
-			logger.info("MemberService Login: {}"+ "fail");
-			((MemberDTO) list).setEmail("NONE");
-			return list.get(0);
+			((MemberDTO) pw).setEmail("NONE");
+			return pw.get(0);
 		}
 	}
 

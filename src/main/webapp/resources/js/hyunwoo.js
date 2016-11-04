@@ -562,8 +562,21 @@ var booking = (function() {
 		var check_in = page_num==0? $('#header-search-checkin').val() : $('#checkin').val();
 		var check_out = page_num==0? $('#header-search-checkout').val() : $('#checkout').val();
 		
+		if(page_num==-1){
+			var day = new Date();
+			var endDay = day;
+			endDay.setDate(endDay.getDate()+3);
+			location='대한민국 서울특별시';
+			page_num = 0;
+			check_in = day.getFullYear()+'/'+(day.getMonth()+1)+'/'+ (day.getDate() < 10 ? '0'+day.getDate(): day.getDate());
+			check_out = endDay.getFullYear()+'/'+(endDay.getMonth()+1)+'/'+(endDay.getDate() <10? '0'+endDay.getDate():endDay.getDate());
+			$('#lng').val(127.04932480000007);
+			$('#lat').val(37.51523630000001);
+		}
+		
 		check_in = check_in.includes(':') ? check_in : check_in + ' 15:00:00';
 		check_out = check_out.includes(':') ? check_out : check_out + ' 10:00:00';
+		
 		// 첫 페이지에서 검색한 주소를 분할(ex: 서울특별시 강남구)
 		if($('#autocomplete').val() !== undefined){
 			location = page_num==0? $('#location').val().split(' ') : $('#autocomplete').val().split(' ');
@@ -2089,3 +2102,4 @@ var card_util = (function(){
 		}
 	};
 })();
+

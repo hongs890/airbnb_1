@@ -15,12 +15,12 @@
       <div class="header--sm show-sm" aria-hidden="true">
       <!-- 에어비앤비 로고 -->
          <i class="icon icon-reorder icon-rausch"></i> <span class="screen-reader-only"> 에어비앤비 </span>
-         <div class="title--sm text-center">
+       <!--   <div class="title--sm text-center">
             <button class="btn btn-block search-btn--sm search-modal-trigger "
                style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
                <i class="icon icon-search icon-gray"></i> <span class="search-placeholder--sm"> 어디로 가세요? </span>
             </button>
-         </div>
+         </div> -->
          <div class="action--sm"></div>
          <nav class="nav--sm" role="navigation"></nav>
          <div class="search-modal-container"></div>
@@ -46,18 +46,18 @@
             </div>
          </div>
          </div>
-         <div class="comp pull-left back-to-search-results-wrapper"></div>
- 	<div class="comp search-bar-wrapper" role="search">
+  	<div class="comp pull-left back-to-search-results-wrapper"></div>
+	<div class="comp search-bar-wrapper" role="search">
          
-               <div class="search-bar" id="locationField">
-                  <i class="header-icon icon-search-alt-gray search-icon"></i>
-                   <input   type="search" placeholder="어디로 가세요?" id="location" name="location" data-date-placeholder="년/월/일" class="location" />
-                  <input type="hidden" name="source" value="hdr" />
+                <div class="search-bar" id="locationField">
+            	<i class="header-icon icon-search-alt-gray search-icon"></i>
+                  <input   type="search" placeholder="어디로 가세요?" id="location" name="location" data-date-placeholder="년/월/일" class="location" />
+                   <input type="hidden" name="source" value="hdr" />
 
-              <div id="header-search-settings" class="panel search-settings header-menu">
+             <div id="header-search-settings" class="panel search-settings header-menu">
                   <div><div class="panel-body clearfix">
-                     <div class="row row-condensed">
-                        <div class="col-sm-12">
+                    <div class="row row-condensed">
+                      <div class="col-sm-12">
                            <div class="row row-condensed input-daterange">
                               <div class="col-sm-6">
                                  <label for="header-search-checkin" class="field-label">
@@ -73,7 +73,7 @@
                               </div>
                            </div>
                         </div>
-                        <div class="col-sm-12 space-top-2">
+                       <div class="col-sm-12 space-top-2">
                            <label for="header-search-guests" class="field-label">
                               <strong>숙박 인원</strong>
                            </label>
@@ -165,7 +165,7 @@
                         <input type="hidden" name="guests" value="1">
                      </div>
                   </div>
-               </div>
+                </div>
                <fieldset>
                <div class="panel-header menu-header normal-line-height">
                   <strong><small>
@@ -196,8 +196,8 @@
                <span>숙소 찾기</span>
             </span>
          </div>
-      </div>
-   </div>
+     </div>
+   		</div>
                            </div>
          </div>
       </header>

@@ -97,7 +97,7 @@
          </div>
          </div>
          <div class="pull-left back-to-search-results-wrapper"></div>
-            <div class="search-bar-wrapper" role="search">
+            <div class="comp search-bar-wrapper" role="search">
                <div class="search-bar" id="locationField">
                <i class="header-icon icon-search-alt-gray search-icon"></i> <input
                   type="search" placeholder="어디로 가세요?" id="location" name="location"

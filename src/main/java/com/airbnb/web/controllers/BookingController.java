@@ -52,6 +52,7 @@ public class BookingController {
 	public @ResponseBody Map<String, Object> search(@RequestBody SearchVal sVal) {
 
 		logger.info("예약 컨트롤러 {}.", sVal);
+		logger.info("예약 컨트롤러  PageNum {}.", sVal.getPageNum());
 		// ====================DATE(날짜 차이)=====================
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
 		sVal.setNights(LocalDate.parse(sVal.getCheckin(), formatter)
@@ -66,6 +67,7 @@ public class BookingController {
 		sVal.setStart(rows[0]);
 		sVal.setEnd(rows[1]);
 		logger.info("예약 컨트롤러  totCount {}.", totCount);
+		logger.info("예약 컨트롤러  pgNum {}.", pgNum);
 		logger.info("예약 컨트롤러  totPg {}.", totPg);
 		logger.info("예약 컨트롤러  startPg {}.", startPg);
 		logger.info("예약 컨트롤러  lasgPg {}.", lasgPg);

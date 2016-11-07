@@ -9,7 +9,7 @@ import lombok.Data;
 @Component
 @Lazy
 @Data
-public class Pagination {
+public class Pagination {  
 	public static int[] getStartEndRow(int totCount,int pgNum,int pgSize){
 		int[] rows = {totCount <= pgSize ? 0 : (pgNum-1)*pgSize,pgSize};
 		return rows;
@@ -17,7 +17,7 @@ public class Pagination {
 	public static int getLastPg(int totPg, int startPg) {
 		return startPg+Values.GROUP_SIZE-1 <= totPg ? startPg+Values.GROUP_SIZE-1 : totPg;
 	}
-	public static int getStartPg(int pgNum) {
+	public static int getStartPg(int pgNum) { 
 		return  pgNum-((pgNum-1)%Values.GROUP_SIZE);
 	}
 	public static int getTotPg(int totCount) {

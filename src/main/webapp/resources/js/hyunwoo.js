@@ -563,27 +563,37 @@ var booking = (function() {
 		var check_out = page_num==0? $('#header-search-checkout').val() : $('#checkout').val();
 		
 		if(page_num==-1){
+			// MAIN TEST 용 (메인에서 도시들 사진 눌렀을 떄 임시 링크위한 TEMP 값들)
 			var day = new Date();
-			var endDay = day;
-			endDay.setDate(endDay.getDate()+3);
+			var endDay = new Date();
+			day.setDate(day.getDate()+6);
+			endDay.setDate(endDay.getDate()+9);
 			location='대한민국 서울특별시';
-			page_num = 0;
 			check_in = day.getFullYear()+'/'+(day.getMonth()+1)+'/'+ (day.getDate() < 10 ? '0'+day.getDate(): day.getDate());
 			check_out = endDay.getFullYear()+'/'+(endDay.getMonth()+1)+'/'+(endDay.getDate() <10? '0'+endDay.getDate():endDay.getDate());
 			$('#lng').val(127.04932480000007);
 			$('#lat').val(37.51523630000001);
-		}
 		
+		}
+	
 		check_in = check_in.includes(':') ? check_in : check_in + ' 15:00:00';
 		check_out = check_out.includes(':') ? check_out : check_out + ' 10:00:00';
-		
+	
 		// 첫 페이지에서 검색한 주소를 분할(ex: 서울특별시 강남구)
 		if($('#autocomplete').val() !== undefined){
-			location = page_num==0? $('#location').val().split(' ') : $('#autocomplete').val().split(' ');
+			if(page_num==-1){
+				location = location.split(' ');
+			}else{
+				location = page_num==0? $('#location').val().split(' ') : $('#autocomplete').val().split(' ');
+			}
 			var room_type = ($('#room_type_0').prop('checked')==true ? 1 : 0)
 			+ ($('#room_type_1').prop('checked')==true ? 2 : 0)
 			+ ($('#room_type_2').prop('checked')==true ? 4 : 0)
-		
+			
+			if(location[1]!=undefined && location[1].includes('서울')){
+				location[1] = '서울특별시';
+			}
+			
 			search_data = {
 					'longitude':$('#lng').val(),'latitude':$('#lat').val(),'checkin':check_in,
 					'checkout':check_out,'guestCnt': page_num==0? $('#guests_top option:selected').val():$('#guests option:selected').val(),'pageNum':page_num==0? 1 : page_num,
@@ -642,7 +652,7 @@ var booking = (function() {
 			
 			search_data = {
 					'longitude':$('#lng').val(),'latitude':$('#lat').val(),'checkin':check_in,
-					'checkout':check_out,'guestCnt':$('#guests option:selected').val(),'pageNum':1,
+					'checkout':check_out,'guestCnt':$('#guests option:selected').val(),'pageNum':page_num,
 					'country':$('#country').val(), 'state':$('#state').val(),'city':$('#city').val(),
 					'street':$('#street').val(),'roomType':room_type,'minPrice':$('#min_price').val(),'maxPrice':$('#max_price').val(),
 					'bathroomCnt':$('#bathroom_cnt option:selected').val(),'bedCnt':$('#bed_cnt option:selected').val(),
@@ -833,21 +843,13 @@ var booking = (function() {
 				+'<select id="bathroom_cnt">'
 				+'<option selected="" value="-1">욕실 수</option>'
 				+'<option value="0">욕실 0개</option>'
-				+'<option value="0.5">욕실 0.5개</option>'
 				+'<option value="1">욕실 1개</option>'
-				+'<option value="1.5">욕실 1.5개</option>'
 				+'<option value="2">욕실 2개</option>'
-				+'<option value="2.5">욕실 2.5개</option>'
 				+'<option value="3">욕실 3개</option>'
-				+'<option value="3.5">욕실 3.5개</option>'
 				+'<option value="4">욕실 4개</option>'
-				+'<option value="4.5">욕실 4.5개</option>'
 				+'<option value="5">욕실 5개</option>'
-				+'<option value="5.5">욕실 5.5개</option>'
 				+'<option value="6">욕실 6개</option>'
-				+'<option value="6.5">욕실 6.5개</option>'
 				+'<option value="7">욕실 7개</option>'
-				+'<option value="7.5">욕실 7.5개</option>'
 				+'<option value="8">욕실 8+개</option>'
 				+'</select>'
 				+'</div>'
@@ -1227,7 +1229,7 @@ var booking = (function() {
 				}
 				if(data.bedCnt!=0){
 					$('#bed_cnt option').each(function() {
-						if($(this).val()==data.bathroomCnt){
+						if($(this).val()==data.bedCnt){
 							$(this).prop('selected',true);
 						}
 					})

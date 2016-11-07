@@ -9,13 +9,15 @@
 <c:set var="js" value="${context}/resources/js"/>
 <html lang="ko" xmlns:fb="http://ogp.me/ns/fb#">
  <meta charset="utf-8">
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
- <script src="${js}/application.js"></script>
+
 <link href="https://a1.muscache.com/airbnb/static/packages/common_o2.1-50a45a2f41dab81f98765e60188dc94c.css" media="all" rel="stylesheet" type="text/css" />
 <link href="https://a0.muscache.com/airbnb/static/packages/common-c797852784aa37fdff8ec44a848e3d10.css" media="all" rel="stylesheet" type="text/css" />
 <link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />
 <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
 <link rel="stylesheet" href="${css}/application.css" type="text/css"/>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
+ <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+ <script src="${js}/application.js"></script>
 <style>
 #locationField, #controls {
 position: relative;

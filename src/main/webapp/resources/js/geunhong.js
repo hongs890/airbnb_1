@@ -111,35 +111,7 @@ var hosting = (function(){
 			$('#hosting_bathroom_cnt_foot').prop('value',$('#host_bathroom_cnt').val());
 			$('#pub_article').html(hosting_regist_3);	
 			initAutocomplete();
-			$('#autocomplete').keyup(function(e){
-				if (e.keyCode == 13) {
-					$('#country').prop('value','');
-					$('#host_state').prop('value','');
-					$('#locality').prop('value','');
-					$('#street_number').prop('value','');
-					$('#host_optional').prop('value','');
-					$('#country').prop('value',$('#autocomplete').val().split(' ')[0]);
-					$('#host_state').prop('value',$('#autocomplete').val().split(' ')[1]);
-					$('#locality').prop('value',$('#autocomplete').val().split(' ')[2]);
-					$('#street_number').prop('value',$('#autocomplete').val().split(' ')[3]);
-					$('#host_optional').prop('value',$('#autocomplete').val().split(' ')[4]);
-					$('#hosting_autocomplete_foot').prop('value', $('#autocomplete').val()) 
-					var address = $('#autocomplete').val();
-					var geocoder;
-					geocoder = new google.maps.Geocoder();
-					geocoder.geocode( { 'address': address}, function(results, status) {
-						if (status == google.maps.GeocoderStatus.OK) {
-							var address_lat = results[0].geometry.location.lat();	//위도
-							var address_lng = results[0].geometry.location.lng();	//경도
-							$('#hosting_lat').prop('value', address_lat);
-							$('#hosting_long').prop('value', address_lng);
-						} else {
-							var address_lat = "";
-							var address_lng = "";
-						}
-					});
-				}
-			});
+			
 			
 			$('#postal_code').keyup(function(){
 				if ($('#postal_code').val() !== "") {
@@ -168,8 +140,7 @@ var hosting = (function(){
 
 				var input = document.getElementById('pac-input');
 				var searchBox = new google.maps.places.SearchBox(input);
-				alert($('#hosting_lat').val());
-				alert($('#hosting_long').val());
+
 				 var map = new google.maps.Map(document.getElementById('googleMap'), {
 					    center: {lat: Number($('#hosting_lat').val()), lng: Number($('#hosting_long').val())},
 					    zoom: 14,
@@ -2369,3 +2340,32 @@ var GUIDEBOOK =
 	      + '</div>'
 	      + '</div>'
 	      +'</div>';
+
+
+function fill_addr() {
+	$('#country').prop('value','');
+	$('#host_state').prop('value','');
+	$('#locality').prop('value','');
+	$('#street_number').prop('value','');
+	$('#host_optional').prop('value','');
+	$('#country').prop('value',$('#autocomplete').val().split(' ')[0]);
+	$('#host_state').prop('value',$('#autocomplete').val().split(' ')[1]);
+	$('#locality').prop('value',$('#autocomplete').val().split(' ')[2]);
+	$('#street_number').prop('value',$('#autocomplete').val().split(' ')[3]);
+	$('#host_optional').prop('value',$('#autocomplete').val().split(' ')[4]);
+	$('#hosting_autocomplete_foot').prop('value', $('#autocomplete').val()) 
+	var address = $('#autocomplete').val();
+	var geocoder;
+	geocoder = new google.maps.Geocoder();
+	geocoder.geocode( { 'address': address}, function(results, status) {
+		if (status == google.maps.GeocoderStatus.OK) {
+			var address_lat = results[0].geometry.location.lat();	//위도
+			var address_lng = results[0].geometry.location.lng();	//경도
+			$('#hosting_lat').prop('value', address_lat);
+			$('#hosting_long').prop('value', address_lng);
+		} else {
+			var address_lat = "";
+			var address_lng = "";
+		}
+	});
+}

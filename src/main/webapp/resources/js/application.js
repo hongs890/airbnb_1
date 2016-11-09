@@ -346,6 +346,7 @@ function initAutocomplete() {
 
 // [START region_fillform]
 function fillInAddress() {
+	
   // Get the place details from the autocomplete object.
   var place = autocomplete.getPlace();
   $('#lat').prop('value',place.geometry.location.lat());
@@ -354,7 +355,9 @@ function fillInAddress() {
   console.log('?');
   // Get each component of the address from the place details
   // and fill the corresponding field on the form.
- 
+  if(document.getElementById('country')!=null){
+	fill_addr();
+ }
 }
 
 // [END region_fillform]

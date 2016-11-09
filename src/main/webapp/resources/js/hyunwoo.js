@@ -70,6 +70,7 @@ var booking = (function() {
 				$('#option_submit').prop('disabled',false);
 			}
 		})
+		
 		// 예약가능 리스트에서 리스트를 클릭하면 디테일로 향하는 버튼 //
 		$('#pub_article').on('click','a[name=detail_go]',function(e){
 			var house_seq = $(this).children('input').prop('value');
@@ -152,7 +153,7 @@ var booking = (function() {
 							+'</div>'
 							+'<div class="pull-right space-3 summary-card__host-profile-photo">'
 							+'<div class="media-photo media-round">'
-							+'<img class="summary-card__host-profile-photo-src" src="'+app.img()+'/member/'+host.profileImg+'" alt="'+host.name+'" width="200" height="200">'
+							+'<img width="200" height="200" class="summary-card__host-profile-photo-src" src="'+app.img()+'/member/'+host.profileImg+'" alt="'+host.name+'">'
 							+'</div>'
 							+'</div>'
 							+'<div class="panel">'
@@ -296,7 +297,7 @@ var booking = (function() {
 							+'<label for="credit-card-number" data-i18n="cc_number" class="text-lead">카드 번호</label>'
 							+'<div class="right-addon first-message-right-addon">'
 							+'<a href="#" id="tooltip-cc-icon-lock" class="icon icon-lock icon-light-gray h3 link-reset"></a>'
-							+'<input type="text" id="card_number" maxlength="19" name="credit-card-number" placeholder="1234-5678-9123-4567 입력바랍니다." class="first-message-input invalid">'
+							+'<input type="text" id="card_number" maxlength="19" name="credit-card-number" placeholder="XXXX-XXXX-XXXX-XXXX" class="first-message-input invalid">'
 							+'</div>'
 							+'<div id="card_error" class="label label-warning inline-error text-lead" name="credit-card-number-error">'
 							+'</div>'
@@ -471,7 +472,7 @@ var booking = (function() {
 			$('#card_number').keyup(function(e) {
 				if((e.which >=48 && e.which <= 57) || (e.which >=96 && e.which <= 105) || e.which==189 || e.which==8 || e.which==109){
 					var cardNum = $(this).val();
-					if(cardNum.length > 18){
+					if(cardNum.length > 8){
 						if(card_util.card_num_checker($(this).val())){
 							$('#card_error').html('<font color="black">올바른 카드 번호</font>');
 							$('#bt_agrees').prop('disabled',false);
@@ -501,6 +502,13 @@ var booking = (function() {
 			
 			/// 결제화면 에서 결제버튼 ///
 			$('#paying_complete').click(function(e) {
+				if($('#bt_agrees').prop('disabled')==true){
+					
+					alert('카드번호를 정확히 입력해주십시오');
+					$('#card_number').focus();
+					return;
+				}
+				
 				e.preventDefault();
 				var pay_data = {
 					'cardNum' : $('#card_number').val(),
@@ -572,7 +580,9 @@ var booking = (function() {
 			check_out = endDay.getFullYear()+'/'+(endDay.getMonth()+1)+'/'+(endDay.getDate() <10? '0'+endDay.getDate():endDay.getDate());
 			$('#lng').val(127.04932480000007);
 			$('#lat').val(37.51523630000001);
+		
 		}
+	
 		check_in = check_in.includes(':') ? check_in : check_in + ' 15:00:00';
 		check_out = check_out.includes(':') ? check_out : check_out + ' 10:00:00';
 	
@@ -580,6 +590,7 @@ var booking = (function() {
 		if($('#autocomplete').val() !== undefined){
 			if(page_num==-1){
 				location = location.split(' ');
+				page_num = 1;
 			}else{
 				location = page_num==0? $('#location').val().split(' ') : $('#autocomplete').val().split(' ');
 			}
@@ -738,7 +749,7 @@ var booking = (function() {
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
 				+'<div id="filter-section-header-room-types">'
-				+'<span >숙소 유형(선택하지않으면 전체반환)</span><span> </span><span><i class="icon icon-question hide-sm hide-md"></i><noscript></noscript></span>'
+				+'<span>숙소 유형</span><span> </span><span><i class="icon icon-question hide-sm hide-md"></i><noscript></noscript></span>'
 				+'</div>'
 				+'</div>'
 				+'<div class="col-lg-9 col-md-11">'
@@ -786,7 +797,7 @@ var booking = (function() {
 				+'<div class="row">'
 				+'<div class="col-lg-2 col-md-12 text-center-sm text-center-md space-sm-1 sectionLabel_rcr7sj">'
 				+'<div id="filter-section-header-price">'
-				+'<span>가격 범위(선택하지않으면 전체반환)</span>'
+				+'<span>가격 범위</span>'
 				+'</div>'
 				+'</div>'
 				+'<div class="col-lg-9 col-md-11">'
@@ -1167,7 +1178,7 @@ var booking = (function() {
 				//========================== 지도 DIV(검색 리스트)==========================
 				var myLatLng = {lat: parseFloat(data.lat), lng: parseFloat(data.lng)};
 				  var map = new google.maps.Map(document.getElementById('map'), {
-				    zoom: 15,
+				    zoom: 12,
 				    center: myLatLng
 				  });
 				var image = new google.maps.MarkerImage(app.img() + '/booking/icon3.png', null, null, null, new google.maps.Size(100,25));
@@ -1882,6 +1893,7 @@ var booking = (function() {
 								+'</div>'
 								+'</div>' : ' ';
 							
+							
 							DETAIL_FORM += '</div>'
 							+'</div>'
 							+'</div>'
@@ -1933,7 +1945,7 @@ var booking = (function() {
 							+'</div>'
 							+'</div>'
 							+'<div>'
-							+'<span class="btn btn-primary btn-small"><span>호스트에게 연락하기(미구현)</span></span>'
+							+'<span class="btn btn-primary btn-small"><span>호스트에게 연락하기</span></span>'
 							+'<div></div>'
 							+'</div>'
 							+'</div>'
@@ -2005,7 +2017,8 @@ var booking = (function() {
 				var booking_list =  
 					'<div id="cancel_form" class="formbox2">'
 					+'<h2>예약취소</h2>'
-					+'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.</p>'
+					+'<p class="m_b_5">* <span class="red">예약정보</span>를 잘 확인하여 취소하시기 바랍니다.'
+					+'<br>* <span class="red">예약번호</span>를 클릭하면 상세 정보 확인 가능합니다.</p>'
 					+'<table class="table table-striped">'
 					+'<caption><h4 style="text-align:center">예약정보</h4></caption>'
 					+'<thead>'

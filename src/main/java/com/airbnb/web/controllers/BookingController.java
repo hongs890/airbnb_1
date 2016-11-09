@@ -63,8 +63,10 @@ public class BookingController {
 		int totPg = Pagination.getTotPg(totCount);
 		int startPg = Pagination.getStartPg(pgNum);
 		int lasgPg = Pagination.getLastPg(totPg, startPg);
-		int[] rows = Pagination.getStartEndRow(totCount, pgNum, Values.PG_SIZE);
+		int[] rows = Pagination.getStartEndRow(totCount, Math.abs(pgNum), Values.PG_SIZE);
 		sVal.setStart(rows[0]);
+		logger.info("예약 컨트롤러  Start {}.", sVal.getStart());
+		logger.info("예약 컨트롤러  End {}.", sVal.getEnd());
 		sVal.setEnd(rows[1]);
 		logger.info("예약 컨트롤러  totCount {}.", totCount);
 		logger.info("예약 컨트롤러  pgNum {}.", pgNum);
@@ -79,7 +81,6 @@ public class BookingController {
 		retMap.put("state", sVal.getState());
 		retMap.put("city", sVal.getCity());
 		retMap.put("street", sVal.getStreet());
-
 		retMap.put("nights", sVal.getNights());
 		retMap.put("convenience", sVal.getConvenience());
 		retMap.put("safetyFac", sVal.getSafetyFac());

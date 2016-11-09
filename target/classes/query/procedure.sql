@@ -3,6 +3,7 @@ select * from reservation;
 select * from member;
 select count(*) from member;
 show tables;
+show procedure ststaus;
 alter table member add column ssn varchar(15);
 /*
 =============== META_GROUP ===============
@@ -429,8 +430,6 @@ BEGIN
   EXECUTE stmt;
   DEALLOCATE  PREPARE stmt;
 END;
-
-
 
 CALL sp_insert_resv('2016/12/02 15:00:00','2016/12/05 10:00:00',2,12,'t@naver.com','1111-2222-3333-4444',150000);
 

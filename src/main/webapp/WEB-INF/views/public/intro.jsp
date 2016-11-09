@@ -24,9 +24,8 @@ PL:박승주</br></br>
 </h3>
 <h3 style="text-align:center;">클릭시 메인화면이동!!</br>
 (사용자ID:t 사용자비번:1)</br>
-(어드민:admin 사용자비번:1)</h3>
+(어드민:admin 관리자비번:1)</h3>
 <h2 style="margin-top:5% ; text-align:center;color: red">저희는 숙박 공유 사이트 <a href=https://www.airbnb.co.kr/>Airbnb</a>를 모델로 만들었고, 상업적인 용도로는 쓰지않습니다.</h2>
-
 </body>
 <script>
 $('#intro').css('cursor','pointer');

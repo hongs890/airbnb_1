@@ -17,7 +17,7 @@ public interface MemberService{
 	//  CREATE
 	public String signup(MemberDTO param);
 	//  UPDATE
-	public Retval update(MemberDTO param);
+	public String update(MemberDTO param);
 	//  DELETE
 	public Retval delete(MemberDTO param);
 	// SELECT

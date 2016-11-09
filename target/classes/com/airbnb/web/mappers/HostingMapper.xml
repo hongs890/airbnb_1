@@ -43,7 +43,15 @@ values (#{country}, #{state}, #{city}, #{street}, #{optional}, #{zipCode}, #{lat
 <update id="update_safety_fac" parameterType="com.airbnb.web.domains.HostingDTO">
 	update houses set safety_fac = #{safetyFac} where house_seq = #{houseSeq}
 </update>
-
+<delete id="hosting_delete_ad" parameterType="com.airbnb.web.domains.Command">
+    delete from address where house_seq = #{keyword}
+</delete>
+<delete id="hosting_delete_bl" parameterType="com.airbnb.web.domains.Command">
+    delete from block where house_seq = #{keyword}
+</delete>
+<delete id="hosting_delete_ho" parameterType="com.airbnb.web.domains.Command">
+    delete from houses where house_seq = #{keyword}
+</delete>
 <select id="building_list" resultType="string">
 	select type from building
 </select>
@@ -91,5 +99,11 @@ select if (exists(select block_date from block where house_seq = #{keyword}), 1,
 </select>
 <select id="house_count" parameterType="com.airbnb.web.domains.Command" resultType="int">
 	select count(*) from houses where email = #{keyword}
+</select>
+<select id="host_resv_cancel" parameterType="com.airbnb.web.domains.Command" resultType="com.airbnb.web.domains.BookingDTO">
+     select * from resv_view where houseSeq = #{keyword}
+</select>
+<select id="exist_cancel" parameterType="com.airbnb.web.domains.Command" resultType="int">
+	select if (exists(select resvSeq from resv_view where houseSeq = #{keyword}), 1, 0)
 </select>
 </mapper>

@@ -36,7 +36,7 @@
          <div class="comp pull-right show-logout"><div id="m_signup" class="hdr-btn link-reset">회원가입</div></div>
          <div class="comp pull-right show-logout"><div id="m_signin" class="hdr-btn link-reset">로그인</div></div>
          <div id="js-header-help-menu"><div class="comp pull-right help-trigger-wrapper no-border background-light-gray" >
-         <div  class="hdr-btn js-help-toggle link-reset needsclick">도움말<i class="header-icon icon-lifesaver-alt-gray"></i>
+         <div  class="hdr-btn js-help-toggle link-reset needsclick">도움말(미구현)<i class="header-icon icon-lifesaver-alt-gray"></i>
                </div>
             </div>
          <div class="comp pull-right hide-host comp-become-a-host ">
@@ -48,12 +48,10 @@
          </div>
   	<div class="comp pull-left back-to-search-results-wrapper"></div>
 	<div class="comp search-bar-wrapper" role="search">
-         
                 <div class="search-bar" id="locationField">
             	<i class="header-icon icon-search-alt-gray search-icon"></i>
-                  <input   type="search" placeholder="어디로 가세요?" id="location" name="location" data-date-placeholder="년/월/일" class="location" />
+                  <input   type="search" placeholder="어디로 가세요?" id="location" name="location" data-date-placeholder="년/월/일" class="location" data-toglle="tooltip" title="국내입력"/>
                    <input type="hidden" name="source" value="hdr" />
-
              <div id="header-search-settings" class="panel search-settings header-menu">
                   <div><div class="panel-body clearfix">
                     <div class="row row-condensed">

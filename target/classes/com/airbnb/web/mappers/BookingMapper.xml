@@ -33,7 +33,6 @@
 		<result property="latitude" column="latitude"/>
 		<result property="longitude" column="longitude"/>	
 	</resultMap>
-	
 	<!-- <select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal">
 		SELECT count(*) as count
 		FROM houses_view 
@@ -118,9 +117,6 @@
 		<if test="safetyFac != null">
 			AND safety_fac like #{safetyFac}
 		</if>
-		
-		
-		
 	</select> -->
 	<select id="listCount" resultType="com.airbnb.web.domains.SearchVal" parameterType="com.airbnb.web.domains.SearchVal" statementType="CALLABLE">
 		{call sp_house_cnt(
@@ -177,8 +173,7 @@
 			</otherwise>
 		</choose> -->
 	</select>
-	
- 	<select id="find" resultMap="houseMap" parameterType="com.airbnb.web.domains.SearchVal">
+ 	<select id="find" resultMap="houseMap" parameterType="com.airbnb.web.domains.SearchVal"  statementType="CALLABLE">
 		{call sp_house_list(
 			#{country},
 			#{state},

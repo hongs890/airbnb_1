@@ -91,7 +91,6 @@ var member = (function() {
 							}
 					}); 
 			$('#pub_article').on('click','#m_bt_signup',function(e){
-								alert('ㅋㅋ');
 										e.preventDefault();
 										var sign_info = {'email' : $('#signup_email').val(),
 												'pw' : $('#signup_pw').val(),

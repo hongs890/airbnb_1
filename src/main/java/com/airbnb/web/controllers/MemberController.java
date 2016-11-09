@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
+import com.airbnb.web.domains.HostingDTO;
 import com.airbnb.web.domains.MemberDTO;
 import com.airbnb.web.domains.Retval;
 import com.airbnb.web.services.MemberService;
@@ -34,27 +35,6 @@ public class MemberController {
 		@Autowired MemberService service;
 		@Autowired private SqlSession sqlSession; 
 	
-/*	
-	   @RequestMapping(value="/signin",method=RequestMethod.POST)
-	   public @ResponseBody Retval signin(@RequestParam("email") String email,
-	         @RequestParam("pw") String pw,Model model) {
-	      logger.info("TO LOGIN ID IS {}",email);
-	      logger.info("TO LOGIN PW IS {}",pw);
-	      member.setEmail(email);
-	      member.setPw(pw);
-	      MemberDTO user = service.login(member);
-	      if(email.equals("admin")&&pw.equals("1")){
-	         logger.info("Controller LOGIN {}","ADMIN");
-	         model.addAttribute("user",user);
-//	         retval.setMessage("ADMIN");	         
-	         retval.setMessage("SUCCESS");	  
-	         return retval;
-	      }else{	    	  
-	         logger.info("Controller LOGIN {}","SUCCESS");
-	         retval.setMessage("SUCCESS");
-	         return retval;
-	      }
-	   }*/
 		@RequestMapping(value = "/signin")
 		public @ResponseBody MemberDTO signin(@RequestParam("email") String email, @RequestParam("pw") String pw,Model model) {
 			logger.info("SignIn ID IS {}", email);
@@ -110,23 +90,6 @@ public class MemberController {
 	      logger.info("SIGN UP retval {}",retval.getMessage());
 	      return retval;
 	   }
-/*	   @RequestMapping(value="/login",method=RequestMethod.POST)
-	   public @ResponseBody MemberDTO login(@RequestParam("id") String id,
-	         @RequestParam("pw") String pw,Model model) {
-	      logger.info("TO LOGIN ID IS {}",id);
-	      logger.info("TO LOGIN PW IS {}",pw);
-	      member.s
-	      member.setPw(pw);
-	      MemberDTO user = service.login(member);
-	      if(user.getId().equals("NONE")){
-	         logger.info("Controller LOGIN {}","FAIL");
-	         return user;
-	      }else{
-	         logger.info("Controller LOGIN {}","SUCCESS");
-	         model.addAttribute("user", user);
-	         return user;
-	      }
-	   } */
 	   @RequestMapping(value="/check_dup/{email}",method=RequestMethod.POST,consumes="application/json")
 	   public @ResponseBody Retval checkDup(@PathVariable String email) {
 	      logger.info("checkDup {}","email");
@@ -159,16 +122,10 @@ public class MemberController {
 			logger.info("----- member_dashboard PASS -----");
 			return "member:member/dashboard.tiles";
 		}
-		@RequestMapping("/inbox")
-		public String memberinbox(){
-			logger.info("----- member_CONTOLLER inbox -----");
-			return "member:member/inbox.tiles";
-		}	
 		@RequestMapping("/logout")
 		public  String memberLogout(SessionStatus session){
 			logger.info("----- member_CONTOLLER logout PASS -----");
 			logger.info("----- member_CONTOLLER logout PASS ----- {}", retval);
-	
 			session.setComplete();
 			return "public:public/content.tiles";
 		}

@@ -80,19 +80,13 @@
                      <aside class=" panel-body link-reset hover-item no-crawl">
                         <a class="hover-item_content" id="resv_cancel">예약 현황</a>
                      </aside>
-                     <aside class=" panel-body link-reset hover-item no-crawl">
-                        <a id="m_account" class="hover-item_content">임시완4</a>
-                     </aside>
-                     <aside class=" panel-body link-reset hover-item no-crawl">
-                        <a id="m_logout" class="hover-item_content">임시5</a>
-                     </aside>
                   </div>
                </div>
             </div>
          </div>
          <div class="comp pull-right help-trigger-wrapper no-border background-light-gray">
                   <div class="hdr-btn js-help-toggle link-reset needsclick">
-                     도움말<i class="header-icon icon-lifesaver-alt-gray"></i>
+                     도움말(미구현)<i class="header-icon icon-lifesaver-alt-gray"></i>
                   </div>
          </div>
          </div>
@@ -101,7 +95,7 @@
                <div class="search-bar" id="locationField">
                <i class="header-icon icon-search-alt-gray search-icon"></i> <input
                   type="search" placeholder="어디로 가세요?" id="location" name="location"
-                  data-date-placeholder="년/월/일" class="location" /> <input
+                  data-date-placeholder="년/월/일" class="location" data-toglle="tooltip" title="국내입력"/> <input
                   type="hidden" name="source" value="hdr" />
             </div>
             <div id="header-search-settings"

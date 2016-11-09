@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
+import com.airbnb.web.domains.BookingDTO;
 import com.airbnb.web.domains.Command;
 import com.airbnb.web.domains.HostingDTO;
 import com.airbnb.web.mappers.HostingMapper;
@@ -68,6 +69,7 @@ public class HostingServiceImpl implements HostingService{
 	public Integer update_safety_fac(HostingDTO param) {
 		return sqlSession.getMapper(HostingMapper.class).update_safety_fac(param);
 	}
+	
 	@Override
 	public Integer house_count(Command command) {
 		return sqlSession.getMapper(HostingMapper.class).house_count(command);
@@ -77,8 +79,29 @@ public class HostingServiceImpl implements HostingService{
 		return sqlSession.getMapper(HostingMapper.class).exist_block(command);
 	}
 	@Override
+	public Integer exist_cancel(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).exist_cancel(command);
+	}
+	@Override
+	public Integer hosting_delete_ad(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).hosting_delete_ad(command);
+	}
+	@Override
+	public Integer hosting_delete_bl(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).hosting_delete_bl(command);
+	}
+	@Override
+	public Integer hosting_delete_ho(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).hosting_delete_ho(command);
+	}
+
+	@Override
 	public List<HostingDTO> house_list(Command command) {
 		return sqlSession.getMapper(HostingMapper.class).house_list(command);
+	}
+	@Override
+	public List<BookingDTO> host_resv_cancel(Command command) {
+		return sqlSession.getMapper(HostingMapper.class).host_resv_cancel(command);
 	}
 	@Override
 	public List<String> block_list(Command command) {
@@ -92,5 +115,7 @@ public class HostingServiceImpl implements HostingService{
 	public List<String> building_list() {
 		return sqlSession.getMapper(HostingMapper.class).building_list();
 	}
+
+
 
 }

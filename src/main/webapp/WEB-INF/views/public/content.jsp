@@ -15,7 +15,6 @@
 <link href="https://a1.muscache.com/airbnb/static/p1/main-98647fa0df25654edefa1bcc99c20a4f.css" media="screen" rel="stylesheet" type="text/css" />
 <link type="text/css" rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500">
 <link rel="stylesheet" href="${css}/application.css" type="text/css"/>
- <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script> 
  <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
  <script src="${js}/application.js"></script>
 <style>
@@ -63,16 +62,16 @@ margin-bottom: 2px;}
  <div id="locationField" style="display: inline;">
  <label class="searchbar__location col-md-4 col-lg-6">
  <span class="screen-reader-only">어디로 가세요?</span>
- <input id="autocomplete" type="text" onFocus="geolocate()" class="input-large input-contrast" name="autocomplete" placeholder="어디로 가세요?" />
+ <input id="autocomplete" type="text" onFocus="geolocate()" class="input-large input-contrast" name="autocomplete" placeholder="어디로 가세요?" data-toglle="tooltip" title="국내입력"/>
  </label>
  </div>
  <div class="input-daterange">
  <label class="searchbar__checkin col-md-3 col-lg-2">
  <span class="screen-reader-only">체크인</span>
- <input id="checkin" type="text" class="checkin input-large input-contrast" name="start" placeholder="체크인" /></label>
+ <input id="checkin" type="text" class="checkin input-large input-contrast" name="start" placeholder="체크인" data-toglle="tooltip" title="당일로부터 3일후 날짜 입력"/></label>
  <label class="searchbar__checkout col-md-3 col-lg-2">
  <span class="screen-reader-only">체크아웃</span>
- <input id="checkout" type="text" class="checkout input-large input-contrast" name="end"placeholder="체크아웃" /></label>
+ <input id="checkout" type="text" class="checkout input-large input-contrast" name="end"placeholder="체크아웃" data-toglle="tooltip" title="체크인 날짜로부터 3~4일후 날짜입력"/></label>
  </div>
  <label class="searchbar__guests col-md-2">
  <span class="screen-reader-only">게스트 수</span>
@@ -118,12 +117,11 @@ margin-bottom: 2px;}
 </div>
 <div align="center">
 <div style="padding-bottom: 100px;">
-<h2 style = "font-style: italic;">가이드북</h2><br></br>
+<h2 style = "font-style: italic;">가이드북(미구현)</h2><br></br>
 <h4>가고 싶은 도시의 명소를 확인하세요!</h4><br>
 <img src="${img}/public/seoul.jpg" id="g_main1" alt="seoul" style="width:25%;height:400px;" class="cursor" > 
  <img src="${img}/public/busan.jpg" id="g_main2" alt="busan" style="width:25%;height:400px;" class="cursor" > 
  <img src="${img}/public/incheon.jpg" id="g_main3" alt="incheon" style="width:25%;height:400px;" class="cursor" >
-
  </div>
  </div>
 	<script type="text/javascript" >

@@ -28,9 +28,8 @@ public class MemberServiceImpl implements MemberService{
 	}
 
 	@Override
-	public Retval update(MemberDTO param) {
-		// TODO Auto-generated method stub
-		return null;
+	public String update(MemberDTO param) {
+		return (sqlSession.getMapper(MemberMapper.class).update(param)==1)?"success":"fail";
 	}
 
 	@Override

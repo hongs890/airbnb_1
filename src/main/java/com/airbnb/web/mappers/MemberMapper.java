@@ -11,6 +11,7 @@ import com.airbnb.web.domains.MemberDTO;
 @Repository @Lazy
 public interface MemberMapper {
 	public boolean login(MemberMapper param);
+	public int update(MemberDTO param);
 	public int signup(MemberDTO mem);
 	public List<MemberDTO> find(Command command);
 	public int existId(String email);

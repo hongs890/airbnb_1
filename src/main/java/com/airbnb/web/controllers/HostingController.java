@@ -33,7 +33,7 @@ import com.airbnb.web.services.HostingService;
 @Controller
 @Lazy
 @RequestMapping("/hosting")
-@SessionAttributes({"user", "pgNum"})
+@SessionAttributes({"user", "pgNum", "houseSeq"})
 public class HostingController {
 	private static final Logger logger = LoggerFactory.getLogger(HostingController.class);
 	@Autowired private HostingService service;
@@ -101,6 +101,15 @@ public class HostingController {
 		retval.setMessage("success_insert");
 		return retval;
 	}
+	@RequestMapping("/delete")
+	public @ResponseBody Retval hostingDelete(@RequestParam("houseSeq") String houseSeq){
+		command.setKeyword(houseSeq);
+		service.hosting_delete_ad(command);
+		service.hosting_delete_bl(command);
+		service.hosting_delete_ho(command);
+		retval.setMessage("delete");
+		return retval;
+	}
 	@RequestMapping(value="/manage1/{pgNum}", method=RequestMethod.GET)
 	public @ResponseBody HashMap<String,Object> hostingManage1(@PathVariable String pgNum, @ModelAttribute("user") MemberDTO memberParam
 			, Model model){
@@ -124,12 +133,13 @@ public class HostingController {
 		return map;
 	}
 	@RequestMapping(value="/manage2", method=RequestMethod.POST, consumes="application/json")
-	public @ResponseBody Retval hostingManage2(@RequestBody HostingDTO param){
+	public @ResponseBody Retval hostingManage2(@RequestBody HostingDTO param, Model model){
 		String[] date = param.getBlockDate().split(",");
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 	    int temp = LocalDate.parse(date[0], formatter).until(LocalDate.parse(date[1], formatter)).getDays();  
 		LocalDate minDate = LocalDate.parse(date[0], formatter);
 		command.setKeyword(String.valueOf(param.getHouseSeq()));
+		model.addAttribute("houseSeq", param.getHouseSeq());
 		retval.setTemp(String.valueOf(minDate));
 		service.delete_block(command);
 	    for (int i = 0; i <= temp; i++) {
@@ -198,7 +208,17 @@ public class HostingController {
 		retval.setTemp(param.getCheckinTime());
 		return retval;
 	}
-
+	@RequestMapping(value="/manage6", method=RequestMethod.POST, consumes="application/json")
+	public @ResponseBody HashMap<String,Object> hostingManage6(@RequestBody HostingDTO param){
+		command.setKeyword(String.valueOf(param.getHouseSeq()));
+		HashMap<String,Object> map = new HashMap<>();
+		if (service.exist_cancel(command) == 0) {
+			map.put("list", "fail");
+		}else{
+			map.put("list", service.host_resv_cancel(command));
+		}
+		return map;
+	}
 	@RequestMapping(value="/manage7", method=RequestMethod.POST, consumes="application/json")
 	public @ResponseBody Retval hostingManage7(@RequestBody HostingDTO param, @ModelAttribute("user") MemberDTO memberParam){
 		logger.info("HostingController :: manage :: building_seq :: {}",param.getBuildingSeq());

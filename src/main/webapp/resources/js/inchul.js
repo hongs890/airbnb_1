@@ -221,7 +221,7 @@ var admin =(function(){
                  mtype: "get",
                  success: function(data) {
                             console.log(data);
-                            admin.mlist();
+                            admin.rlist();
                        },
                        error: function(x,h,m) {
                             alert('error'+m)

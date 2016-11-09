@@ -3,7 +3,7 @@
 	<div id="footer" class="container-brand-dark footer-surround footer-container">
         <div id="p_con_footer" class="page-container-responsive" role="contentinfo">
      <div class="col-md-2 col-md-offset-1 hide-sm" >
-    <h2 class="h4">회사 이야기</h2>
+    <h2 class="h4">회사 이야기(링크안됨)</h2>
       <ul class="list-layout">
           <li><a href="/about/about-us" class="link-contrast">소개</a></li>
           <li><a href="/careers" class="link-contrast">채용정보</a></li>
@@ -16,7 +16,7 @@
       </ul>
     </div>
         <div class="col-md-2 hide-sm" >
-      <h2 class="h4">둘러보기</h2>
+      <h2 class="h4">둘러보기(링크안됨)</h2>
       <ul class="list-layout">
           <li><a href="/trust" class="link-contrast">신뢰와 안전</a></li>
           <li><a href="/invite?r=6" class="link-contrast">추천</a></li>
@@ -28,7 +28,7 @@
       </ul>
     </div>
       <div class="col-md-2 hide-sm">
-      <h2 class="h4">호스팅하기</h2>
+      <h2 class="h4">호스팅하기(링크안됨)</h2>
       <ul class="list-layout">
           <li><a href="/host" class="link-contrast">호스팅을 해야 하는 이유</a></li>
           <li><a href="/hospitality" class="link-contrast">따뜻한 손님맞이</a></li>
@@ -119,6 +119,8 @@
         <input type="hidden" id="hosting_longitude_foot">
         <input type="hidden" id="manage_house_seq_foot">
         <input type="hidden" id="hosting_autocomplete_foot">
+         <input type="hidden" id="hosting_lat">
+        <input type="hidden" id="hosting_long">
       </div>
     </div>
 </div>

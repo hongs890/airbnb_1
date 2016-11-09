@@ -5,6 +5,7 @@ select * from member;
 select * from block;
 select * from building;
 select * from houses;
+select * from houses_view;
 select * from Guide_Major;
 select * from Guide_minor;
  select * from information_schema.primary constraints;
@@ -57,7 +58,6 @@ CREATE TABLE houses (
 	other_rule   VARCHAR(100) NULL,     -- 입력하는 룰
 	checkin_term INT          NULL,     -- 체크인 가능 날짜
 	checkin_time VARCHAR(15)  NULL,     -- 체크인 가능 시간
-	period       DATE         NULL,     -- 체크인 가능 기간
 	min_nights   INT          NULL,     -- 최소숙박가능 일수
 	max_nights   INT          NULL,     -- max_nights
 	price        INT          NULL,     -- price
